@@ -1,340 +1,649 @@
 venue,citacoes,estrato,tipo,sigla_ou_issn,nome_qualis,como
-Brazilian Symposium on Software Engineering,112,A3,evento,SBES,Brazilian Symposium on Software Engineering,nome
-arXiv.org,62,,,,,preprint
-Brazilian Symposium on Software Quality,48,A3,evento,SBQS,Simpósio Brasileiro de Qualidade de Software,apelido
-,36,,,,,sem venue
-Journal of Software Engineering Research and Development,22,A4,periódico,2195-1721,JOURNAL OF SOFTWARE ENGINEERING RESEARCH AND DEVELOPMENT,ISSN
-Brazilian Symposium on Information Systems,22,A4,evento,SBSI,Simpósio Brasileiro de Sistemas de Informação,apelido
-Journal of Systems and Software,20,A2,periódico,0164-1212,THE JOURNAL OF SYSTEMS AND SOFTWARE,ISSN
-Information and Software Technology,16,A2,periódico,0950-5849,INFORMATION AND SOFTWARE TECHNOLOGY,ISSN
-ACM Transactions on Software Engineering and Methodology,13,A1,periódico,1049-331X,ACM TRANSACTIONS ON SOFTWARE ENGINEERING AND METHODOLOGY,ISSN
-Proceedings of the 2026 IEEE/ACM 48th International Conference on Software Engineering,13,A1,evento,ICSE,International Conference on Software Engineering,nome
-IEEE Access,11,A3,periódico,2169-3536,IEEE ACCESS,ISSN
-Empirical Software Engineering,10,A2,periódico,1382-3256,EMPIRICAL SOFTWARE ENGINEERING,ISSN
-SIGSOFT FSE Companion,9,,,,,workshop/trilha
-Brazilian Symposium on Systematic and Automated Software Testing,9,B1,evento,SAST,Brazilian Symposium on Systematic and Automated Software Testing,nome
-IEEE Working Conference on Mining Software Repositories,9,A1,evento,MSR,Working Conference on Mining Software Repositories,nome
-Conferencia Iberoamericana de Software Engineering,9,B1,evento,CIbSE,Conferencia Iberoamericana de Software Engineering,nome
-"IEEE International Conference on Software Analysis, Evolution, and Reengineering",8,A1,evento,SANER,"IEEE International Conference on Software Analysis, Evolution and Reengineering",nome
-Brazilian Symposium on Collaborative Systems,8,A4,evento,SBSC,Simpósio Brasileiro de Sistemas Colaborativos,apelido
-International Symposium on Empirical Software Engineering and Measurement,7,A2,evento,ESEM,ACM/IEEE International Symposium on Empirical Software Engineering and Measurement,nome
-Anais do VI Simpósio Brasileiro de Educação em Computação (EDUCOMP 2026),7,B1,evento,EDUCOMP,Simpósio Brasileiro de Educação em Computação,nome
-Anais do XXXIV Workshop sobre Educação em Computação (WEI 2026),6,A4,evento,WEI,Workshop sobre Educação em Computação,nome
-Simpósio Brasileiro de Fatores Humanos em Sistemas Computacionais,6,A3,evento,IHC,Simpósio Brasileiro sobre Fatores Humanos em Sistemas Computacionais,nome aproximado
-IEEE Transactions on Software Engineering,6,A1,periódico,0098-5589,IEEE TRANSACTIONS ON SOFTWARE ENGINEERING,ISSN
-International Conference on Evaluation & Assessment in Software Engineering,6,A2,evento,EASE,International Conference on Evaluation and Assessment in Software Engineering,nome
-Applied Sciences,6,C,periódico,2076-3417,APPLIED SCIENCES,ISSN
-"IEEE/ACM International Conference on Connected Health: Applications, Systems and Engineering Technologies",6,A4,evento,CHASE,International Workshop on Cooperative and Human Aspects of Software Engineering,sigla
-IEEE International Conference on Software Maintenance and Evolution,5,A2,evento,ICSME,IEEE International Conference on Software Maintenance and Evolution,nome
-Programming and computer software,5,,,,,não listado
-International Conference on Enterprise Information Systems,5,A3,evento,ICEIS,International Conference on Enterprise Information Systems,nome
-Frontiers in Education Conference,5,A2,evento,FIE,IEEE Frontiers in Education Conference,nome
-2025 IEEE/ACM 47th International Conference on Software Engineering: Software Engineering in Society (ICSE-SEIS),5,B1,evento,ICSE-SEIS,International Conference on Software Engineering: Software Engineering in Society,nome
+Brazilian Symposium on Software Engineering,279,A3,evento,SBES,Brazilian Symposium on Software Engineering,nome
+arXiv.org,127,,,,,preprint
+Brazilian Symposium on Software Quality,106,A3,evento,SBQS,Simpósio Brasileiro de Qualidade de Software,apelido
+,80,,,,,sem venue
+Journal of Systems and Software,66,A2,periódico,0164-1212,THE JOURNAL OF SYSTEMS AND SOFTWARE,ISSN
+Journal of Software Engineering Research and Development,60,A4,periódico,2195-1721,JOURNAL OF SOFTWARE ENGINEERING RESEARCH AND DEVELOPMENT,ISSN
+Empirical Software Engineering,53,A2,periódico,1382-3256,EMPIRICAL SOFTWARE ENGINEERING,ISSN
+Brazilian Symposium on Information Systems,52,A4,evento,SBSI,Simpósio Brasileiro de Sistemas de Informação,apelido
+Information and Software Technology,44,A2,periódico,0950-5849,INFORMATION AND SOFTWARE TECHNOLOGY,ISSN
+ACM Transactions on Software Engineering and Methodology,34,A1,periódico,1049-331X,ACM TRANSACTIONS ON SOFTWARE ENGINEERING AND METHODOLOGY,ISSN
+IEEE Access,34,A3,periódico,2169-3536,IEEE ACCESS,ISSN
+IEEE Working Conference on Mining Software Repositories,26,A1,evento,MSR,Working Conference on Mining Software Repositories,nome
+International Conference on Enterprise Information Systems,22,A3,evento,ICEIS,International Conference on Enterprise Information Systems,nome
+International Symposium on Empirical Software Engineering and Measurement,21,A2,evento,ESEM,ACM/IEEE International Symposium on Empirical Software Engineering and Measurement,nome
+Brazilian Symposium on Systematic and Automated Software Testing,21,B1,evento,SAST,Brazilian Symposium on Systematic and Automated Software Testing,nome
+Conferencia Iberoamericana de Software Engineering,21,B1,evento,CIbSE,Conferencia Iberoamericana de Software Engineering,nome
+International Conference on Evaluation & Assessment in Software Engineering,20,A2,evento,EASE,International Conference on Evaluation and Assessment in Software Engineering,nome
+"IEEE International Conference on Software Analysis, Evolution, and Reengineering",20,A1,evento,SANER,"IEEE International Conference on Software Analysis, Evolution and Reengineering",nome
+IEEE International Conference on Software Maintenance and Evolution,20,A2,evento,ICSME,IEEE International Conference on Software Maintenance and Evolution,nome
+Proceedings of the 2026 IEEE/ACM 48th International Conference on Software Engineering,19,A1,evento,ICSE,International Conference on Software Engineering,nome
+J. Softw. Evol. Process.,19,A4,periódico,2047-7481,JOURNAL OF SOFTWARE: EVOLUTION AND PROCESS,nome
+IEEE Transactions on Software Engineering,17,A1,periódico,0098-5589,IEEE TRANSACTIONS ON SOFTWARE ENGINEERING,ISSN
+International Conference on Automated Software Engineering,16,A1,evento,ASE,IEEE/ACM International Conference on Automated Software Engineering,nome
+"IEEE/ACM International Conference on Connected Health: Applications, Systems and Engineering Technologies",16,A4,evento,CHASE,International Workshop on Cooperative and Human Aspects of Software Engineering,sigla
+International Conference on Software Engineering,16,A1,evento,ICSE,International Conference on Software Engineering,nome
+International Conference on Human Factors in Computing Systems,14,A1,evento,CHI,ACM Conference on Human Factors in Computing Systems,apelido
+ESEC/SIGSOFT FSE,14,,,,,não listado
+"Brazilian Symposium on Software Components, Architectures and Reuse",14,B1,evento,SBCARS,"Brazilian Symposium on Components, Architectures and Reuse Software",apelido
+Anais do XXXIII Workshop sobre Educação em Computação (WEI 2025),13,A4,evento,WEI,Workshop sobre Educação em Computação,nome
+SIGSOFT FSE Companion,13,,,,,workshop/trilha
+"Software, Practice & Experience",13,A2,periódico,0038-0644,"SOFTWARE, PRACTICE & EXPERIENCE (PRINT)",ISSN
+Brazilian Symposium on Collaborative Systems,13,A4,evento,SBSC,Simpósio Brasileiro de Sistemas Colaborativos,apelido
+"Workshops on Software Visualization, Evolution and Maintenance",12,,,,,workshop/trilha
+Simpósio Brasileiro de Fatores Humanos em Sistemas Computacionais,11,A3,evento,IHC,Simpósio Brasileiro sobre Fatores Humanos em Sistemas Computacionais,nome aproximado
+Applied Sciences,11,C,periódico,2076-3417,APPLIED SCIENCES,ISSN
+Workshop em Engenharia de Requisitos,11,,,,,workshop/trilha
+Proc. ACM Hum. Comput. Interact.,11,A1,periódico,2573-0142,PROCEEDINGS OF THE ACM ON HUMAN-COMPUTER INTERACTION,nome
+Journal of Interactive Systems,11,A4,periódico,2236-3297,SBC JOURNAL ON 3D INTERACTIVE SYSTEMS,ISSN
+SEET@ICSE,10,B1,evento,ICSE-SEET,ACM International Conference on Software Engineering: Software Engineering Education and Training,sigla
+Frontiers in Education Conference,10,A2,evento,FIE,IEEE Frontiers in Education Conference,nome
+2025 IEEE/ACM 47th International Conference on Software Engineering: Software Engineering in Society (ICSE-SEIS),10,B1,evento,ICSE-SEIS,International Conference on Software Engineering: Software Engineering in Society,nome
+International Conference on Computer Supported Education,10,A3,evento,CSEDU,International Conference on Computer Supported Education,nome
+Conference on Software Engineering Education and Training,9,,,,,não listado
+Software quality journal,9,A3,periódico,0963-9314,SOFTWARE QUALITY JOURNAL,ISSN
+Anais do XXXIV Workshop sobre Educação em Computação (WEI 2026),9,A4,evento,WEI,Workshop sobre Educação em Computação,nome
+Science of Computer Programming,9,A3,periódico,0167-6423,SCIENCE OF COMPUTER PROGRAMMING (PRINT),ISSN
+TechDebt@ICSE,9,,,,,workshop/trilha
+Proc. ACM Softw. Eng.,9,B3,periódico,2994-970X,PROCEEDINGS OF THE ACM ON SOFTWARE ENGINEERING (ONLINE),nome
+Anais do VI Simpósio Brasileiro de Educação em Computação (EDUCOMP 2026),8,B1,evento,EDUCOMP,Simpósio Brasileiro de Educação em Computação,nome
+Anais do IV Simpósio Brasileiro de Educação em Computação (EDUCOMP 2024),8,B1,evento,EDUCOMP,Simpósio Brasileiro de Educação em Computação,nome
+Anais do XXXII Workshop sobre Educação em Computação (WEI 2024),8,A4,evento,WEI,Workshop sobre Educação em Computação,nome
+IEEE International Requirements Engineering Conference,8,A2,evento,RE,IEEE International Requirements Engineering Conference,nome
+"Anais do XI Workshop sobre Aspectos Sociais, Humanos e Econômicos de Software (WASHES 2026)",7,B2,evento,WASHES,"Workshop sobre Aspectos Sociais, Humanos e Econômicos de Software",nome
+Computer Science Education,7,,,,,não listado
+Anais Estendidos do XIII Congresso Brasileiro de Software: Teoria e Prática (CBSoft Estendido 2022),7,,,,,não listado
+Programming and computer software,7,,,,,não listado
+Requirements Engineering,7,A2,periódico,0947-3602,REQUIREMENTS ENGINEERING (LONDON. PRINT),ISSN
+International Conference on Information Control Systems & Technologies,7,,,,,não listado
+ACM Symposium on Applied Computing,6,A1,evento,SAC,ACM Symposium on Applied Computing,nome
+EUROMICRO Conference on Software Engineering and Advanced Applications,6,A3,evento,SEAA,Euromicro Conference on Software Engineering and Advanced Applications,nome
+IEEE Symposium on Visual Languages / Human-Centric Computing Languages and Environments,6,A4,evento,VLHCC,IEEE Symposium on Visual Languages and Human-Centric Computing,apelido
+International Workshop on Software Engineering for Systems-of-Systems,6,,,,,workshop/trilha
+"International Conference on Software Testing, Verification and Validation Workshops",6,,,,,workshop/trilha
+Anais do XXXIV Simpósio Brasileiro de Informática na Educação (SBIE 2023),6,A3,evento,SBIE,Simpósio Brasileiro de Informática na Educação,nome
+IEEE Revista Iberoamericana de Tecnologias del Aprendizaje,6,A2,periódico,1932-8540,IEEE-RITA,ISSN
+Education sciences,6,C,periódico,2227-7102,EDUCATION SCIENCES,nome
+Journal of Software: Evolution and Process,6,A4,periódico,2047-7481,JOURNAL OF SOFTWARE: EVOLUTION AND PROCESS,nome
+2024 IEEE/ACM 46th International Conference on Software Engineering: Software Engineering Education and Training (ICSE-SEET),6,B1,evento,ICSE-SEET,ACM International Conference on Software Engineering: Software Engineering Education and Training,nome
+IET Software,6,A3,periódico,1751-8806,IET SOFTWARE (PRINT),ISSN
+"International Conference on Software Quality, Reliability and Security",6,A3,evento,QRS,"IEEE International Conference on Software Quality, Reliability, and Security",nome
+Proc. ACM Program. Lang.,6,,,,,não listado
+Anais Estendidos do VI Simpósio Brasileiro de Educação em Computação (EDUCOMP 2026),6,B1,evento,EDUCOMP,Simpósio Brasileiro de Educação em Computação,nome
+Cadernos do IME - Série Informática,5,C,periódico,1413-9014,CADERNOS DO IME. SÉRIE INFORMÁTICA,ISSN
+Journal of the Brazilian Computer Society,5,A3,periódico,0104-6500,JOURNAL OF THE BRAZILIAN COMPUTER SOCIETY (IMPRESSO),ISSN
+Frontiers in Education,5,C,periódico,2504-284X,FRONTIERS IN EDUCATION,ISSN
+Journal of universal computer science (Online),5,B1,periódico,0948-6968,JOURNAL OF UNIVERSAL COMPUTER SCIENCE,ISSN
+"Anais do IX Workshop sobre Aspectos Sociais, Humanos e Econômicos de Software (WASHES 2024)",5,B2,evento,WASHES,"Workshop sobre Aspectos Sociais, Humanos e Econômicos de Software",nome
+International Conference on Soft Computing and Software Engineering,5,,,,,não listado
 CHASE@ICSE,5,,,,,workshop/trilha
-"Anais do XI Workshop sobre Aspectos Sociais, Humanos e Econômicos de Software (WASHES 2026)",5,B2,evento,WASHES,"Workshop sobre Aspectos Sociais, Humanos e Econômicos de Software",nome
-International Conference on Human Factors in Computing Systems,5,A1,evento,CHI,ACM Conference on Human Factors in Computing Systems,apelido
-International Conference on Automated Software Engineering,5,A1,evento,ASE,IEEE/ACM International Conference on Automated Software Engineering,nome
-International Workshop on Software Engineering for Systems-of-Systems,5,,,,,workshop/trilha
-ITiCSE-WGR,4,,,,,não listado
-Conference on Software Engineering Education and Training,4,,,,,não listado
-IEEE International Requirements Engineering Conference,4,A2,evento,RE,IEEE International Requirements Engineering Conference,nome
-TechDebt@ICSE,4,,,,,workshop/trilha
+Anais do XXXI Workshop sobre Educação em Computação (WEI 2023),5,A4,evento,WEI,Workshop sobre Educação em Computação,nome
+Iberian Conference on Information Systems and Technologies,5,A3,evento,CISTI,Iberian Conference on Information Systems and Technologies,nome
+2022 IEEE/ACM 44th International Conference on Software Engineering: Companion Proceedings (ICSE-Companion),5,,,,,workshop/trilha
+Brazilian Symposium on Games and Digital Entertainment,5,,,,,não listado
+Caderno Pedagógico,5,C,periódico,1983-0882,CADERNO PEDAGÓGICO (LAJEADO. ONLINE),nome
+International Journal of Advanced Computer Science and Applications,5,C,periódico,2156-5570,INTERNATIONAL JOURNAL OF ADVANCED COMPUTER SCIENCE AND APPLICATIONS (ONLINE),ISSN
+ITiCSE-WGR,5,,,,,não listado
+Annual International Computer Software and Applications Conference,5,A2,evento,COMPSAC,IEEE Computer Software and Applications Conference,apelido
+Anais Estendidos do XV Congresso Brasileiro de Software: Teoria e Prática (CBSoft Estendido 2024),5,,,,,não listado
+Anais Estendidos do XVII Simpósio Brasileiro de Sistemas Colaborativos (SBSC Estendido 2022),5,A4,evento,SBSC,Simpósio Brasileiro de Sistemas Colaborativos,nome
+Braz. J. Inf. Syst.,5,A4,periódico,1984-2902,ISYS: REVISTA BRASILEIRA DE SISTEMAS DE INFORMAÇÃO,apelido
+Integrated Spatial Databases,4,,,,,não listado
+International Symposium on Information Science and Engineering,4,B4,evento,ISE,Workshop Brasileiro de Engenharia de Software Inteligente,nome
+SN Computer Science,4,A2,periódico,2661-8907,SN COMPUTER SCIENCE,ISSN
+2025 IEEE/ACM 47th International Conference on Software Engineering: Companion Proceedings (ICSE-Companion),4,,,,,workshop/trilha
+International journal of human computer interactions,4,C,periódico,2180-1347,INTERNATIONAL JOURNAL OF HUMAN COMPUTER INTERACTION,ISSN
+Technical Symposium on Computer Science Education,4,A1,evento,SIGCSE,ACM Technical Symposium on Computer Science Education,nome
+Brazilian Symposium on Multimedia and the Web,4,A3,evento,WEBMEDIA,Brazilian Symposium on Multimedia and the Web,nome
+IEEE Global Engineering Education Conference,4,A2,evento,EDUCON,IEEE Global Engineering Education Conference,nome
+IEEE International Conference on Program Comprehension,4,A2,evento,ICPC,International Conference on Program Comprehension,nome
+International Computing Education Research Workshop,4,,,,,workshop/trilha
+Social Science Research Network,4,A1,periódico,1556-5068,COMPARATIVE LAW EJOURNAL,ISSN
+Neurocomputing,4,A1,periódico,0925-2312,NEUROCOMPUTING (AMSTERDAM),ISSN
+Anais do XVIII Women in Information Technology (WIT 2024),4,B1,evento,WIT,Women in Information Technology,nome
+2024 12th International Conference in Software Engineering Research and Innovation (CONISOFT),4,,,,,não listado
+"2025 IEEE/ACM Sixth Workshop on Gender Equality, Diversity, and Inclusion in Software Engineering (GEICSE)",4,,,,,workshop/trilha
 "Proceedings of the 1st International Workshop on AI for Software Quality Evaluation - Judgment, Metrics, Benchmarks, and Beyond",4,,,,,workshop/trilha
-IEEE Revista Iberoamericana de Tecnologias del Aprendizaje,4,A2,periódico,1932-8540,IEEE-RITA,ISSN
-SEET@ICSE,4,B1,evento,ICSE-SEET,ACM International Conference on Software Engineering: Software Engineering Education and Training,sigla
-International Conference on Computer Supported Education,4,A3,evento,CSEDU,International Conference on Computer Supported Education,nome
-Anais do IV Simpósio Brasileiro de Educação em Computação (EDUCOMP 2024),4,B1,evento,EDUCOMP,Simpósio Brasileiro de Educação em Computação,nome
-"Brazilian Symposium on Software Components, Architectures and Reuse",4,B1,evento,SBCARS,"Brazilian Symposium on Components, Architectures and Reuse Software",apelido
-Proc. ACM Hum. Comput. Interact.,4,A1,periódico,2573-0142,PROCEEDINGS OF THE ACM ON HUMAN-COMPUTER INTERACTION,nome
-International Conference on Information Control Systems & Technologies,4,,,,,não listado
-Social Science Research Network,3,A1,periódico,1556-5068,COMPARATIVE LAW EJOURNAL,ISSN
-Journal of the Brazilian Computer Society,3,A3,periódico,0104-6500,JOURNAL OF THE BRAZILIAN COMPUTER SOCIETY (IMPRESSO),ISSN
-IEEE Symposium on Visual Languages / Human-Centric Computing Languages and Environments,3,A4,evento,VLHCC,IEEE Symposium on Visual Languages and Human-Centric Computing,apelido
-Annual International Computer Software and Applications Conference,3,A2,evento,COMPSAC,IEEE Computer Software and Applications Conference,apelido
-EUROMICRO Conference on Software Engineering and Advanced Applications,3,A3,evento,SEAA,Euromicro Conference on Software Engineering and Advanced Applications,nome
-Anais do XXXII Workshop sobre Educação em Computação (WEI 2024),3,A4,evento,WEI,Workshop sobre Educação em Computação,nome
-Requirements Engineering,3,A2,periódico,0947-3602,REQUIREMENTS ENGINEERING (LONDON. PRINT),ISSN
-2024 IEEE/ACM 46th International Conference on Software Engineering: Software Engineering Education and Training (ICSE-SEET),3,B1,evento,ICSE-SEET,ACM International Conference on Software Engineering: Software Engineering Education and Training,nome
-"Anais do IX Workshop sobre Aspectos Sociais, Humanos e Econômicos de Software (WASHES 2024)",3,B2,evento,WASHES,"Workshop sobre Aspectos Sociais, Humanos e Econômicos de Software",nome
-Anais Estendidos do XVI Congresso Brasileiro de Software: Teoria e Prática (CBSoft 2025),3,,,,,não listado
-Anais do XXXIII Workshop sobre Educação em Computação (WEI 2025),3,A4,evento,WEI,Workshop sobre Educação em Computação,nome
-"Workshops on Software Visualization, Evolution and Maintenance",3,,,,,workshop/trilha
+Software Product Lines Conference,4,,,,,não listado
+2025 IEEE International Conference on Advances in Data-Driven Analytics And Intelligent Systems (ADACIS),4,,,,,não listado
+PeerJ Computer Science,4,A2,periódico,2376-5992,PEERJ COMPUTER SCIENCE,ISSN
+AIware,3,B3,evento,AIWARE,ACM International Conference on AI-Powered Software,sigla
+"2024 IEEE/ACM Workshop on Gender Equality, Diversity, and Inclusion in Software Engineering (GEICSE)",3,,,,,workshop/trilha
+"International Conference on Teaching, Assessment, and Learning for Engineering",3,,,,,não listado
+Procedia Computer Science,3,,,,,não listado
+iSys,3,A4,periódico,1984-2902,ISYS: REVISTA BRASILEIRA DE SISTEMAS DE INFORMAÇÃO,ISSN
+ICSE-SEIS,3,B1,evento,ICSE-SEIS,International Conference on Software Engineering: Software Engineering in Society,sigla
+Anais Estendidos do XXII Simpósio Brasileiro de Qualidade de Software (SBQS Estendido 2023),3,A3,evento,SBQS,Simpósio Brasileiro de Qualidade de Software,nome
+Revista Brasileira de Informática na Educ.,3,,,,,não listado
+2024 IEEE/ACM 46th International Conference on Software Engineering: Companion Proceedings (ICSE-Companion),3,,,,,workshop/trilha
+International Conference/Workshop on Automation of Software Test,3,,,,,workshop/trilha
+Information,3,C,periódico,2078-2489,INFORMATION,ISSN
 International Conference on Learning Analytics and Knowledge,3,A1,evento,LAK,International Learning Analytics and Knowledge Conference,nome aproximado
-International Computing Education Research Workshop,3,,,,,workshop/trilha
-"2025 IEEE/ACM Sixth Workshop on Gender Equality, Diversity, and Inclusion in Software Engineering (GEICSE)",3,,,,,workshop/trilha
-International Conference on Soft Computing and Software Engineering,3,,,,,não listado
+2022 IEEE/ACM 44th International Conference on Software Engineering: Software Engineering Education and Training (ICSE-SEET),3,B1,evento,ICSE-SEET,ACM International Conference on Software Engineering: Software Engineering Education and Training,nome
+Anais Estendidos do XVI Congresso Brasileiro de Software: Teoria e Prática (CBSoft 2025),3,,,,,não listado
 Anais do XX Women in Information Technology (WIT 2026),3,B1,evento,WIT,Women in Information Technology,nome
+Computer Applications in Engineering Education,3,A1,periódico,1061-3773,COMPUTER APPLICATIONS IN ENGINEERING EDUCATION,ISSN
+2024 IEEE/ACM 46th International Conference on Software Engineering: Software Engineering in Practice (ICSE-SEIP),3,A1,evento,ICSE-SEIP,ACM International Conference on Software Engineering: Software Engineering in Practice,nome
+RECIMA21 - Revista Científica Multidisciplinar - ISSN 2675-6218,3,A4,periódico,2675-6218,RECIMA21,ISSN
+CENTERIS/ProjMAN/HCist,3,,,,,não listado
+IEEE International Symposium on Software Reliability Engineering,3,A2,evento,ISSRE,IEEE International Symposium on Software Reliability Engineering,nome
+International Workshop on Variability Modelling of Software-Intensive Systems,3,A3,evento,VAMOS,International Workshop on Variability Modelling of Software-intensive Systems,nome
+Anais do I Workshop de Práticas de Ciência Aberta para Engenharia de Software (OpenScienSE 2021),3,B4,evento,OPENSCIENSE,Workshop de Práticas de Ciência Aberta Para Engenharia de Software,nome
+International Conference on Software and Data Technologies,3,B1,evento,ICSOFT,International Conference on Software Technologies,apelido
+ACM/IEEE International Conference on Model Driven Engineering Languages and Systems,3,A2,evento,MODELS,International Conference on Model Driven Engineering Languages and Systems,nome
+Latin American Computing Conference / Conferencia Latinoamericana En Informatica,3,B2,evento,CLEI,Conferencia Latinoamericana de Informática,sigla
+Scientific Reports,3,A1,periódico,2045-2322,SCIENTIFIC REPORTS,ISSN
 Eye Tracking Research & Application,3,,,,,não listado
-2024 12th International Conference in Software Engineering Research and Innovation (CONISOFT),3,,,,,não listado
 International Journal of Information and Education Technology,3,,,,,não listado
-2025 IEEE/ACM International Workshop on Designing Software (Designing),2,,,,,workshop/trilha
-Workshop em Engenharia de Requisitos,2,,,,,workshop/trilha
-International Conference/Workshop on Automation of Software Test,2,,,,,workshop/trilha
-Cadernos do IME - Série Informática,2,C,periódico,1413-9014,CADERNOS DO IME. SÉRIE INFORMÁTICA,ISSN
-"Software, Practice & Experience",2,A2,periódico,0038-0644,"SOFTWARE, PRACTICE & EXPERIENCE (PRINT)",ISSN
-International Symposium on Information Science and Engineering,2,B4,evento,ISE,Workshop Brasileiro de Engenharia de Software Inteligente,nome
-Education sciences,2,C,periódico,2227-7102,EDUCATION SCIENCES,nome
-The International Journal of Organizational Analysis,2,A1,periódico,1934-8835,INTERNATIONAL JOURNAL OF ORGANIZATIONAL ANALYSIS (2005),nome
-Anais do XVIII Women in Information Technology (WIT 2024),2,B1,evento,WIT,Women in Information Technology,nome
-"2024 IEEE/ACM Workshop on Gender Equality, Diversity, and Inclusion in Software Engineering (GEICSE)",2,,,,,workshop/trilha
-International Conference on Software Engineering,2,A1,evento,ICSE,International Conference on Software Engineering,nome
-Journal of Interactive Systems,2,A4,periódico,2236-3297,SBC JOURNAL ON 3D INTERACTIVE SYSTEMS,ISSN
-Braz. J. Inf. Syst.,2,A4,periódico,1984-2902,ISYS: REVISTA BRASILEIRA DE SISTEMAS DE INFORMAÇÃO,apelido
-IEEE Global Engineering Education Conference,2,A2,evento,EDUCON,IEEE Global Engineering Education Conference,nome
-Caderno Pedagógico,2,C,periódico,1983-0882,CADERNO PEDAGÓGICO (LAJEADO. ONLINE),nome
-Computer Science Education,2,,,,,não listado
-AIware,2,B3,evento,AIWARE,ACM International Conference on AI-Powered Software,sigla
-Smart Learning Environments,2,A1,periódico,2196-7091,SMART LEARNING ENVIRONMENTS,ISSN
-iSys,2,A4,periódico,1984-2902,ISYS: REVISTA BRASILEIRA DE SISTEMAS DE INFORMAÇÃO,ISSN
-Frontiers in Education,2,C,periódico,2504-284X,FRONTIERS IN EDUCATION,ISSN
-Journal of Computer Languages,2,A4,periódico,2590-1184,JOURNAL OF COMPUTER LANGUAGES,ISSN
-"International Conference on Software Quality, Reliability and Security",2,A3,evento,QRS,"IEEE International Conference on Software Quality, Reliability, and Security",nome
+IEEE Working Conference on Source Code Analysis and Manipulation,3,A3,evento,SCAM,IEEE International Working Conference on Source Code Analysis and Manipulation,nome
+International Conference on Mobile Software Engineering and Systems,3,B2,evento,MOBILESOFT,International Conference on Mobile Software Engineering and Systems,nome
+Sustainability,3,A3,periódico,2071-1050,SUSTAINABILITY (BASEL),ISSN
+International Conference on Software Engineering Research and Applications,3,,,,,não listado
+ACM Computing Surveys,3,A1,periódico,0360-0300,ACM COMPUTING SURVEYS,ISSN
+AIP Conference Proceedings,3,,,,,não listado
+Anais do XXVII Workshop de Informática na Escola (WIE 2021),3,A4,evento,WIE,Workshop de Informática na Escola,nome
+Asia-Pacific Software Engineering Conference,3,,,,,não listado
+Education and Information Technologies : Official Journal of the IFIP technical committee on Education,3,A1,periódico,1360-2357,EDUCATION AND INFORMATION TECHNOLOGIES,ISSN
+ICSSP/ICGSE,3,,,,,não listado
+Multimedia tools and applications,3,A2,periódico,1380-7501,MULTIMEDIA TOOLS AND APPLICATIONS,ISSN
+"Proceedings of the 2024 13th International Conference on Networks, Communication and Computing",2,,,,,não listado
+Comput. Stand. Interfaces,2,,,,,não listado
+PROBLEMS IN PROGRAMMING,2,,,,,não listado
+International Conference on Formal Structures for Computation and Deduction,2,A4,evento,FSCD,International Conference on Formal Structures for Computation and Deduction,nome
+Anais do XXIX Workshop sobre Educação em Computação (WEI 2021),2,A4,evento,WEI,Workshop sobre Educação em Computação,nome
+Anais da VIII Escola Regional de Engenharia de Software (ERES 2024),2,,,,,não listado
 Assessment &amp; Evaluation in Higher Education,2,,,,,não listado
-Science of Computer Programming,2,A3,periódico,0167-6423,SCIENCE OF COMPUTER PROGRAMMING (PRINT),ISSN
-IEEE International Conference on Program Comprehension,2,A2,evento,ICPC,International Conference on Program Comprehension,nome
-Anais Estendidos do XXII Simpósio Brasileiro de Qualidade de Software (SBQS Estendido 2023),2,A3,evento,SBQS,Simpósio Brasileiro de Qualidade de Software,nome
-Expert systems with applications,2,A1,periódico,0957-4174,EXPERT SYSTEMS WITH APPLICATIONS,ISSN
-ICSE-SEIS,2,B1,evento,ICSE-SEIS,International Conference on Software Engineering: Software Engineering in Society,sigla
-Anais Estendidos do VI Simpósio Brasileiro de Educação em Computação (EDUCOMP 2026),2,B1,evento,EDUCOMP,Simpósio Brasileiro de Educação em Computação,nome
-Int. J. Hum. Comput. Stud.,2,A1,periódico,1071-5819,INTERNATIONAL JOURNAL OF HUMAN-COMPUTER STUDIES (PRINT),apelido
-Applied Informatics,2,C,periódico,2673-2688,AI,nome
-Brazilian Symposium on Databases,2,A4,evento,SBBD,Simpósio Brasileiro de Banco de Dados,apelido
-2026 ASEE Annual Conference &amp; Exposition Proceedings,2,,,,,não listado
-IEEE Software,2,A3,periódico,0740-7459,IEEE SOFTWARE,ISSN
+International Journal of Environmental Research and Public Health,2,C,periódico,1660-4601,INTERNATIONAL JOURNAL OF ENVIRONMENTAL RESEARCH AND PUBLIC HEALTH,ISSN
+International Conference of the Chilean Computer Science Society,2,B1,evento,SCCC,International Conference of the Chilean Computer Science Society,nome
+ComTech,2,,,,,não listado
+Annual Conference on Innovation and Technology in Computer Science Education,2,,,,,não listado
+Smart Learning Environments,2,A1,periódico,2196-7091,SMART LEARNING ENVIRONMENTS,ISSN
+Informatics Educ.,2,,,,,não listado
+ANT/EDI40,2,,,,,não listado
+ACM-SIGPLAN Symposium on Programming Language Design and Implementation,2,,,,,não listado
+Anais Estendidos do IV Simpósio Brasileiro de Educação em Computação (EDUCOMP Estendido 2024),2,B1,evento,EDUCOMP,Simpósio Brasileiro de Educação em Computação,nome
+2025 13th International Conference in Software Engineering Research and Innovation (CONISOFT),2,,,,,não listado
+Softw.,2,,,,,não listado
+2023 IEEE/ACM 45th International Conference on Software Engineering: Software Engineering Education and Training (ICSE-SEET),2,B1,evento,ICSE-SEET,ACM International Conference on Software Engineering: Software Engineering Education and Training,nome
+Technology and Society,2,A1,periódico,0160-791X,TECHNOLOGY IN SOCIETY,nome
+International Conference on Information Technology Based Higher Education and Training,2,B2,evento,ITHET,International Conference on Information Technology Based Higher Education and Training,nome
+"Interdisciplinary Journal of Information, Knowledge, and Management",2,,,,,não listado
+Anais do XVII Women in Information Technology (WIT 2023),2,B1,evento,WIT,Women in Information Technology,nome
+Anais do LII Seminário Integrado de Software e Hardware (SEMISH 2025),2,A4,evento,SEMISH,Seminário Integrado de Software e Hardware,nome
+Applied Soft Computing,2,A1,periódico,1568-4946,APPLIED SOFT COMPUTING (PRINT),ISSN
+"Anais do VII Workshop em Blockchain: Teoria, Tecnologias e Aplicações (WBlockchain 2024)",2,B4,evento,WBLOCKCHAIN,"Workshop em Blockchain: Teoria, Tecnologias e Aplicações",nome
+"Anais do VI Workshop em Blockchain: Teoria, Tecnologias e Aplicações (WBlockchain 2023)",2,B4,evento,WBLOCKCHAIN,"Workshop em Blockchain: Teoria, Tecnologias e Aplicações",nome
+ACM Transactions on Computing Education,2,A1,periódico,1946-6226,ACM TRANSACTIONS ON COMPUTING EDUCATION,ISSN
+Journal of Applied Research and Technology,2,B2,periódico,1665-6423,JOURNAL OF APPLIED RESEARCH AND TECHNOLOGY,ISSN
+2023 IEEE/ACM 45th International Conference on Software Engineering: Software Engineering in Practice (ICSE-SEIP),2,A1,evento,ICSE-SEIP,ACM International Conference on Software Engineering: Software Engineering in Practice,nome
+Computer and Telecommunication Engineering,2,,,,,não listado
+Innovative Higher Education,2,,,,,não listado
+Open Education Studies,2,,,,,não listado
+Italian National Conference on Sensors,2,A4,periódico,1424-8220,SENSORS (BASEL),ISSN
+"IEEE International Conference on Software Quality, Reliability and Security Companion",2,,,,,workshop/trilha
+2023 2nd International Conference on Multidisciplinary Engineering and Applied Science (ICMEAS),2,,,,,não listado
+Anais Estendidos do XVIII Simpósio Brasileiro de Sistemas de Informação (SBSI Estendido 2022),2,A4,evento,SBSI,Simpósio Brasileiro de Sistemas de Informação,nome
+International Joint Conference on Automated Reasoning,2,A4,evento,IJCAR,International Joint Conference on Automated Reasoning,nome
+International Journal of Human-Computer Interaction,2,A1,periódico,1044-7318,INTERNATIONAL JOURNAL OF HUMAN-COMPUTER INTERACTION,ISSN
+Brazilian Symposium on Games and Digital Entertainment,2,A4,evento,SBGAMES,Simpósio Brasileiro de Jogos e Entretenimento Digital,nome
+BigData Congress [Services Society],2,A1,evento,BIGDATA,IEEE International Conference on Big Data,nome
+Anais do XVI Women in Information Technology (WIT 2022),2,B1,evento,WIT,Women in Information Technology,nome
+International Symposium on Service Oriented Software Engineering,2,A4,evento,SOSEC,IEEE Annual System of Systems Engineering Conference,nome
+Anais do XXVIII Workshop de Informática na Escola (WIE 2022),2,A4,evento,WIE,Workshop de Informática na Escola,nome
+Anais Estendidos do XII Congresso Brasileiro de Informática na Educação (CBIE 2023),2,,,,,não listado
+Journal of Information Systems and Technology Management,2,B1,periódico,1807-1775,JISTEM-JOURNAL OF INFORMATION SYSTEMS AND TECHNOLOGY MANAGEMENT,ISSN
+"International Conference on Engineering, Technology and Innovation",2,,,,,não listado
+Computing,2,A1,periódico,0010-485X,COMPUTING,ISSN
+International Conference on Information Technology,2,A2,evento,CIT,IEEE International Conference on Information Technology,nome
+Revista de Gestão e Projetos,2,A4,periódico,2236-0972,REVISTA DE GESTÃO E PROJETOS,ISSN
+International Symposium on Service Oriented Software Engineering,2,,,,,não listado
+2025 International Conference on Electrical and Computer Engineering Researches (ICECER),2,,,,,não listado
+ICSOB Companion,2,,,,,workshop/trilha
+International Conference on Evaluation of Novel Approaches to Software Engineering,2,A4,evento,ENASE,International Conference on Evaluation of Novel Approaches to Software Engineering,nome
+2025 IEEE/ACM International Workshop on Designing Software (Designing),2,,,,,workshop/trilha
+Syst.,2,,,,,não listado
+Anais da XII Escola Regional de Informática de Goiás (ERI-GO 2024),2,,,,,não listado
+International Conference on Data and Software Engineering,2,,,,,não listado
+VFAST Transactions on Software Engineering,2,,,,,não listado
+Continuing Professional Education Theory and Practice,2,,,,,não listado
 Universal Library of Innovative Research and Studies,2,,,,,não listado
-Sustainability,2,A3,periódico,2071-1050,SUSTAINABILITY (BASEL),ISSN
-Software quality journal,2,A3,periódico,0963-9314,SOFTWARE QUALITY JOURNAL,ISSN
-Anais da II Conferência de Tecnologia do ICET (CONNECTech 2025),2,,,,,não listado
-Anais do XXXIX Concurso de Teses e Dissertações da SBC (CTD-SBC 2026),2,,,,,não listado
-Computer Applications in Engineering Education,2,A1,periódico,1061-3773,COMPUTER APPLICATIONS IN ENGINEERING EDUCATION,ISSN
-International Journal of Advanced Computer Science and Applications,2,C,periódico,2156-5570,INTERNATIONAL JOURNAL OF ADVANCED COMPUTER SCIENCE AND APPLICATIONS (ONLINE),ISSN
+Journal of King Saud University: Computer and Information Sciences,2,A1,periódico,1319-1578,JOURNAL OF KING SAUD UNIVERSITY - COMPUTER AND INFORMATION SCIENCES,ISSN
+Brazilian Symposium on Databases,2,A4,evento,SBBD,Simpósio Brasileiro de Banco de Dados,apelido
 Anais do III Simpósio Brasileiro de Computação na Educação Básica (SBC-EB 2026),2,,,,,não listado
-Brain Science,1,C,periódico,2076-3425,BRAIN SCIENCES,nome
-International Conference on Big Data and Artificial Intelligence,1,,,,,não listado
-Egyptian Informatics Journal,1,,,,,não listado
-Processes,1,B1,periódico,2227-9717,PROCESSES,ISSN
-"Conference on Fairness, Accountability and Transparency",1,A1,evento,FACCT,"ACM Conference on Fairness, Accountability, and Transparency",nome
-International Conference on Information Technology Based Higher Education and Training,1,B2,evento,ITHET,International Conference on Information Technology Based Higher Education and Training,nome
-West Science Journal Economic and Entrepreneurship,1,,,,,não listado
-Scientific Bulletin of UNFU,1,,,,,não listado
-Technology and Society,1,A1,periódico,0160-791X,TECHNOLOGY IN SOCIETY,nome
-International Conference Computing Engineering and Design,1,,,,,não listado
-International Conference on Intelligent Computing,1,,,,,não listado
-IEEE Open Journal of the Industrial Electronics Society,1,,,,,não listado
-Journal of universal computer science (Online),1,B1,periódico,0948-6968,JOURNAL OF UNIVERSAL COMPUTER SCIENCE,ISSN
-Transylvanian Review of Administrative Sciences,1,,,,,não listado
-"2024 IEEE 7th International Conference on Automation, Electronics and Electrical Engineering (AUTEEE)",1,,,,,não listado
-2025 IEEE 5th International Conference on Software Engineering and Artificial Intelligence (SEAI),1,,,,,não listado
-Anais Estendidos do IV Simpósio Brasileiro de Educação em Computação (EDUCOMP Estendido 2024),1,B1,evento,EDUCOMP,Simpósio Brasileiro de Educação em Computação,nome
-NLBSE@ICSE,1,,,,,workshop/trilha
-PeerJ Computer Science,1,A2,periódico,2376-5992,PEERJ COMPUTER SCIENCE,ISSN
-Fourth International Conference on Geoscience and Remote Sensing Mapping,1,,,,,não listado
-"International Conference on Secure and Trust Computing, Data Management and Applications",1,,,,,não listado
-Charity,1,,,,,não listado
-2024 International Conference on IT Innovation and Knowledge Discovery (ITIKD),1,,,,,não listado
-Rendvédelem,1,,,,,não listado
-Trends in Neuroscience and Education,1,,,,,não listado
-Journal of Education Technology,1,,,,,não listado
-Accounting Education,1,,,,,não listado
-International Symposium on Electronic Commerce,1,,,,,não listado
-Journal of Baltic Science Education,1,,,,,não listado
-HRI Companion,1,,,,,workshop/trilha
-IEEE Transactions on Education,1,A2,periódico,0018-9359,IEEE TRANSACTIONS ON EDUCATION,ISSN
-Computers and Education: Artificial Intelligence,1,A1,periódico,2666-920X,COMPUTERS AND EDUCATION: ARTIFICIAL INTELLIGENCE,ISSN
-European Conference on e-Learning,1,,,,,não listado
-International Conference on Parallel and Distributed Systems,1,A3,evento,ICPADS,International Conference on Parallel and Distributed Systems,nome
-BMC Medical Education,1,A2,periódico,1472-6920,BMC MEDICAL EDUCATION (ONLINE),ISSN
-International Conference on Education Technology and Computer,1,,,,,não listado
-International Journal of Artificial Intelligence in Education,1,A1,periódico,1560-4306,INTERNATIONAL JOURNAL OF ARTIFICIAL INTELLIGENCE IN EDUCATION,nome
+Journal of Computer Languages,2,A4,periódico,2590-1184,JOURNAL OF COMPUTER LANGUAGES,ISSN
+IEEE Software,2,A3,periódico,0740-7459,IEEE SOFTWARE,ISSN
+Applied Informatics,2,C,periódico,2673-2688,AI,nome
+The International Journal of Organizational Analysis,2,A1,periódico,1934-8835,INTERNATIONAL JOURNAL OF ORGANIZATIONAL ANALYSIS (2005),nome
+2025 IEEE/ACM 47th International Conference on Software Engineering: New Ideas and Emerging Results (ICSE-NIER),2,A3,evento,ICSE-NIER,ACM International Conference on Software Engineering: New Ideas and Emerging Results,nome
+International Conference on Learning Representations,2,A1,evento,ICLR,International Conference on Learning Representations,nome
+2026 ASEE Annual Conference &amp; Exposition Proceedings,2,,,,,não listado
+Expert systems with applications,2,A1,periódico,0957-4174,EXPERT SYSTEMS WITH APPLICATIONS,ISSN
+Anais da II Conferência de Tecnologia do ICET (CONNECTech 2025),2,,,,,não listado
+Int. J. Hum. Comput. Stud.,2,A1,periódico,1071-5819,INTERNATIONAL JOURNAL OF HUMAN-COMPUTER STUDIES (PRINT),apelido
+Electronics,2,B1,periódico,2079-9292,ELECTRONICS,nome
+Anais do XXXIX Concurso de Teses e Dissertações da SBC (CTD-SBC 2026),2,,,,,não listado
+Anais Estendidos do XXIII Simpósio Brasileiro de Qualidade de Software (SBQS Estendido 2024),1,A3,evento,SBQS,Simpósio Brasileiro de Qualidade de Software,nome
+"Proceedings of the 2nd International Conference on Environmental, Energy, and Earth Science, ICEEES 2023, 30 October 2023, Pekanbaru, Indonesia",1,,,,,não listado
+Systemic Analytics,1,,,,,não listado
+Bilgisayar Bilimleri ve Mühendisliği Dergisi,1,,,,,não listado
+International Journal of Innovative Technologies in Economy,1,,,,,não listado
+"Journal of Advances in Accounting, Economics, and Management",1,,,,,não listado
+International Journal of Innovative Technologies in Social Science,1,,,,,não listado
+SinkrOn,1,,,,,não listado
+Journal of Computers in Education,1,A1,periódico,2197-9995,JOURNAL OF COMPUTERS IN EDUCATION,ISSN
+SBC Reviews on Computer Science,1,C,periódico,2966-3938,SBC REVIEWS ON COMPUTER SCIENCE (ONLINE),nome
+International Journal of Software Engineering & Applications,1,B2,periódico,0975-9018,INTERNATIONAL JOURNAL OF SOFTWARE ENGINEERING & APPLICATIONS (IJSEA),ISSN
+International Conference on Lean and Agile Software Development,1,,,,,não listado
+Anais Estendidos do XII Congresso Brasileiro de Software: Teoria e Prática (CBSoft Estendido 2021),1,,,,,não listado
+International Journal of Software Engineering &amp; Applications,1,B2,periódico,0975-9018,INTERNATIONAL JOURNAL OF SOFTWARE ENGINEERING & APPLICATIONS (IJSEA),nome
+RISTI - Revista Ibérica de Sistemas e Tecnologias de Informação,1,,,,,não listado
+CAIS,1,,,,,não listado
+Computer Science and Information Technology,1,,,,,não listado
+Proceedings of the 2026 Symposium on Software Engineering in the Global South,1,,,,,não listado
+Journal of Computer Science and Engineering (JCSE),1,,,,,não listado
+"2022 IEEE 28th International Conference on Engineering, Technology and Innovation (ICE/ITMC) & 31st International Association For Management of Technology (IAMOT) Joint Conference",1,,,,,não listado
+"Conference on Privacy, Security and Trust",1,A4,evento,PST,"International Conference on Privacy, Security and Trust",sigla
+مجلة جامعة صنعاء للعلوم التطبيقية والتكنولوجيا,1,,,,,não listado
+Educational technology research and development,1,,,,,não listado
+Multimodal Technologies and Interaction,1,C,periódico,2414-4088,MULTIMODAL TECHNOLOGIES INTERACT,ISSN
+Latin American Conference on Computational Intelligence,1,B2,evento,LA-CCI,Latin American Conference on Computational Intelligence,nome
+2023 IEEE/ACM 45th International Conference on Software Engineering: New Ideas and Emerging Results (ICSE-NIER),1,A3,evento,ICSE-NIER,ACM International Conference on Software Engineering: New Ideas and Emerging Results,nome
+2023 11th International Conference in Software Engineering Research and Innovation (CONISOFT),1,,,,,não listado
+International Conference on Model-Driven Engineering and Software Development,1,B1,evento,MODELSWARD,International Conference on Model-Driven Engineering and Software Development,nome
+Anais do XXXI Workshop de Informática na Escola (WIE 2025),1,A4,evento,WIE,Workshop de Informática na Escola,nome
+Tehnički glasnik,1,,,,,não listado
+International Conference on Computer Science and Software Engineering,1,A3,evento,CASCON,Annual International Conference on Computer Science and Software Engineering,nome aproximado
+International Journal of Advances in Intelligent Informatics,1,,,,,não listado
+"2025 International Conference on Artificial Intelligence, Computer, Data Sciences and Applications (ACDSA)",1,,,,,não listado
+"International Conference on Information Technology, Computer, and Electrical Engineering",1,,,,,não listado
+Anais Estendidos do XI Congresso Brasileiro de Software: Teoria e Prática (CBSoft 2020),1,,,,,não listado
+The Arabian journal for science and engineering,1,A1,periódico,2193-567X,ARABIAN JOURNAL FOR SCIENCE AND ENGINEERING (IMPRESSO),nome
+2026 International Conference on Emerging Technologies in Computing and Communication (ETCC),1,,,,,não listado
+2024 13th International Conference On Software Process Improvement (CIMPS),1,,,,,não listado
+IEEE International Conference on Information Reuse and Integration,1,,,,,não listado
+IEEE Journal of Oceanic Engineering,1,,,,,não listado
+Acta Medica Iranica,1,,,,,não listado
+Journal of Supercomputing,1,A2,periódico,0920-8542,JOURNAL OF SUPERCOMPUTING,ISSN
+Proceedings of the 2nd International Conference on Intelligent Education and Computer Technology,1,,,,,não listado
+2022 31st Annual Conference of the European Association for Education in Electrical and Information Engineering (EAEEIE),1,,,,,não listado
+International Journal of Electrical and Computer Engineering (IJECE),1,,,,,não listado
+IEEE International Workshops on Enabling Technologies: Infrastracture for Collaborative Enterprises,1,,,,,workshop/trilha
+"2025 International Conference on Circuits, Controls and Communications (CCUBE)",1,,,,,não listado
+International Conference on Machine Learning,1,A1,evento,ICML,International Conference on Machine Learning,nome
+USENIX Security Symposium,1,,,,,não listado
+Revista docencia universitaria,1,,,,,não listado
+GeCoIn@ECAI,1,,,,,workshop/trilha
+2019 IEEE/ACM 41st International Conference on Software Engineering: Companion Proceedings (ICSE-Companion),1,,,,,workshop/trilha
+International Symposium on Software Testing and Analysis,1,A1,evento,ISSTA,International Symposium on Software Testing and Analysis,nome
+ACM SIGSOFT Softw. Eng. Notes,1,,,,,não listado
+De Fermat : Jurnal Pendidikan Matematika,1,,,,,não listado
+Mathematical Structures in Computer Science,1,A4,periódico,0960-1295,MSCS. MATHEMATICAL STRUCTURES IN COMPUTER SCIENCE (PRINT),ISSN
+USENIX Annual Technical Conference,1,A1,evento,ATC,USENIX Annual Technical Conference,nome
+International Journal of Special Education,1,,,,,não listado
+Theoretical Computer Science,1,B1,periódico,0304-3975,THEORETICAL COMPUTER SCIENCE,ISSN
+ACM SIGAPP Applied Computing Review,1,B4,periódico,1559-6915,APPLIED COMPUTING REVIEW,ISSN
+Annual Conference for Computer Science Logic,1,,,,,não listado
+2022 IEEE/ACM 44th International Conference on Software Engineering: Software Engineering in Practice (ICSE-SEIP),1,A1,evento,ICSE-SEIP,ACM International Conference on Software Engineering: Software Engineering in Practice,nome
+Telos: Revista de Estudios Interdisciplinarios en Ciencias Sociales,1,,,,,não listado
+ACM Transactions on Computational Logic,1,A2,periódico,1529-3785,ACM TRANSACTIONS ON COMPUTATIONAL LOGIC,ISSN
+2022 Ivannikov Memorial Workshop (IVMEM),1,,,,,workshop/trilha
+International Joint Conference on Artificial Intelligence,1,A1,evento,IJCAI,International Joint Conference on Artificial Intelligence,nome
+Journal of Problem Based Learning in Higher Education,1,,,,,não listado
+Neural Information Processing Systems,1,A1,evento,NEURIPS,Neural Information Processing Systems,nome
+Conference on Data and Application Security and Privacy,1,,,,,não listado
+International journal of electronic governance and research,1,A3,periódico,1548-3886,INTERNATIONAL JOURNAL OF ELECTRONIC GOVERNMENT RESEARCH,nome
+IEEE International Conference on Tools with Artificial Intelligence,1,A2,evento,ICTAI,IEEE International Conference on Tools with Artificial Intelligence,nome
+IEEE Pacific Visualization Symposium,1,,,,,não listado
+Journal of Environmental Management,1,A1,periódico,0301-4797,JOURNAL OF ENVIRONMENTAL MANAGEMENT,ISSN
+Land,1,C,periódico,2073-445X,LAND,ISSN
+Mediterranean Conference on Information Systems,1,,,,,não listado
+2026 International Conference on Smart Futuristic Technology,1,,,,,não listado
+2021 IEEE/ACM 43rd International Conference on Software Engineering: Companion Proceedings (ICSE-Companion),1,,,,,workshop/trilha
+European Conference on Modelling and Simulation,1,,,,,não listado
+2022 6th International Conference on Informatics and Computational Sciences (ICICoS),1,,,,,não listado
+2023 3rd International Conference on Innovative Sustainable Computational Technologies (CISCT),1,,,,,não listado
+Brazilian Symposium on Computer Networks and Distributed Systems,1,A4,evento,SBRC,Simpósio Brasileiro de Redes de Computadores e Sistemas Distribuídos,apelido
+Journal of Environmental Chemical Engineering,1,,,,,não listado
+Djtechno: Jurnal Teknologi Informasi,1,,,,,não listado
+TUGboat,1,,,,,não listado
+2023 2nd International Conference for Innovation in Technology (INOCON),1,,,,,não listado
+2026 International Conference on Sustainable Engineering and Digital Innovation (ICSEDI),1,,,,,não listado
+2023 International Conference on Information Technology (ICIT),1,A2,evento,CIT,IEEE International Conference on Information Technology,nome
+Anais do XVI Brazilian e-Science Workshop (BRESCI 2022),1,B4,evento,BRESCI,Brazilian e-Science Workshop,nome
+"2022 International Conference on Innovation and Intelligence for Informatics, Computing, and Technologies (3ICT)",1,,,,,não listado
+Frontiers in Artificial Intelligence Research,1,,,,,não listado
+WSESE@ICSE,1,,,,,workshop/trilha
+IACR Cryptology ePrint Archive,1,,,,,não listado
+"IEEE/ACM International Symposium on Cluster, Cloud and Internet Computing",1,A2,evento,CCGRID,"IEEE/ACM International Symposium on Cluster, Cloud and Grid Computing",sigla
+2022 IEEE International Conference on Autonomic Computing and Self-Organizing Systems Companion (ACSOS-C),1,,,,,workshop/trilha
+2023 IEEE International Conference on Software Services Engineering (SSE),1,A4,evento,SSE,IEEE International Conference on Software Services Engineering,nome
+2024 IEEE 21st International Conference on Software Architecture Companion (ICSA-C),1,,,,,workshop/trilha
+International Journal of Next-Generation Computing,1,,,,,não listado
+2021 6th International Conference on Management in Emerging Markets (ICMEM),1,,,,,não listado
 International Conference on Artificial Intelligence Testing,1,,,,,não listado
-Annual Conference on Innovation and Technology in Computer Science Education,1,,,,,não listado
-Review of accounting studies,1,,,,,não listado
-International Conference on Computational Linguistics,1,A1,evento,COLING,International Conference on Computational Linguistics,nome
-Neurocomputing,1,A1,periódico,0925-2312,NEUROCOMPUTING (AMSTERDAM),ISSN
-Research in Adaptive and Convergent Systems,1,,,,,não listado
-Annual Meeting of the Association for Computational Linguistics,1,A1,evento,ACL,Annual Meeting of the Association for Computational Linguistics,nome
+HRI Companion,1,,,,,workshop/trilha
+International Conference on Product Focused Software Process Improvement,1,A3,evento,PROFES,International Conference on Product-Focused Software Process Improvement,nome
+"Semantic Web: – Interoperability, Usability, Applicability",1,A2,periódico,1570-0844,"SEMANTIC WEB: INTEROPERABILITY, USABILITY, APPLICABILITY",nome
+IEEE Aerospace Conference,1,,,,,não listado
+International Conference on Advances in Web-Based Learning,1,,,,,não listado
+QuASoQ/SEED@APSEC,1,,,,,workshop/trilha
+2022 International Conference on Computational Science and Computational Intelligence (CSCI),1,,,,,não listado
+INOVTEK Polbeng - Seri Informatika,1,,,,,não listado
+Conjecturas,1,C,periódico,1657-5830,CONJECTURAS,ISSN
+Anais do II Simpósio Brasileiro de Educação em Computação (EDUCOMP 2022),1,B1,evento,EDUCOMP,Simpósio Brasileiro de Educação em Computação,nome
+Conference on Information Technology Education,1,,,,,não listado
+IMX,1,A3,evento,ACMIMX,ACM International Conference on Interactive Media Experiences,nome
+International Conference on Agile Software Development,1,A3,evento,XP,International Conference on Agile Software Development,nome
+Anais da VI Escola Regional de Engenharia de Software (ERES 2022),1,,,,,não listado
+Expert Syst. J. Knowl. Eng.,1,A2,periódico,1468-0394,EXPERT SYSTEMS (ONLINE),nome
+"Anais do VIII Workshop sobre Aspectos Sociais, Humanos e Econômicos de Software (WASHES 2023)",1,B2,evento,WASHES,"Workshop sobre Aspectos Sociais, Humanos e Econômicos de Software",nome
+Revista Iberoamericana de Tecnología en Educación y Educación en Tecnología,1,A1,periódico,1850-9959,REVISTA IBEROAMERICANA DE TECNOLOGIA EN EDUCACIÓN Y EDUCACIÓN EN TECNOLOGÍA (EN LÍNEA),ISSN
+Anais do Computer on the Beach,1,,,,,não listado
+"Journal of Physics, Conference Series",1,B4,periódico,1742-6588,JOURNAL OF PHYSICS. CONFERENCE SERIES (PRINT),ISSN
+Journal of Integrated Design & Process Science,1,,,,,não listado
+Anais do III Workshop sobre as Implicações da Computação na Sociedade (WICS 2022),1,B3,evento,WICS,Workshop sobre as Implicações da Computação na Sociedade,nome
+International Journal of Innovations in Science Engineering And Management,1,,,,,não listado
+SEST,1,,,,,não listado
+Conference on Computer Science and Communication Technology,1,,,,,não listado
+International Journal of System Assurance Engineering and Management,1,,,,,não listado
+European Conference on the Engineering of Computer-Based Systems,1,,,,,não listado
+New Trends in Computer Sciences,1,,,,,não listado
+ONTOBRAS,1,B2,evento,ONTOBRAS,Seminar on Ontology Research in Brazil,sigla
+2024 International Conference on Information Technology Research and Innovation (ICITRI),1,,,,,não listado
+Revista EDICIC,1,A4,periódico,2236-5753,REVISTA EDICIC,ISSN
+Software Ecosystems: Tooling and Analytics,1,,,,,não listado
+Journal of Korean Institute of Industrial Engineers,1,,,,,não listado
+International journal of software engineering and knowledge engineering,1,B1,periódico,0218-1940,INTERNATIONAL JOURNAL OF SOFTWARE ENGINEERING AND KNOWLEDGE ENGINEERING,ISSN
+Intell. Converged Networks,1,,,,,não listado
+ACM Trans. Comput. Hum. Interact.,1,A2,periódico,1073-0516,ACM TRANSACTIONS ON COMPUTER-HUMAN INTERACTION,nome
+Journal of automated reasoning,1,A4,periódico,0168-7433,JOURNAL OF AUTOMATED REASONING,ISSN
+BoatSE@ICSE,1,,,,,workshop/trilha
+2026 6th International Conference on Intelligent Technologies (CONIT),1,,,,,não listado
+2022 IEEE/ACM International Conference on Technical Debt (TechDebt),1,A3,evento,TECHDEBT,International Conference on Technical Debt,nome
+Indonesian Journal of Computer Science,1,,,,,não listado
+International Journal on Smart Sensing and Intelligent Systems,1,,,,,não listado
+2025 IEEE/ACM International Conference on Technical Debt (TechDebt),1,A3,evento,TECHDEBT,International Conference on Technical Debt,nome
+International Multi-Topic Conference,1,,,,,não listado
+International Conference on Information and Communication Technologies for Ageing Well and e-Health,1,,,,,não listado
+Communications in Computer and Information Science,1,B1,periódico,1865-0929,COMMUNICATIONS IN COMPUTER AND INFORMATION SCIENCE,ISSN
+Machines,1,B2,periódico,2075-1702,MACHINES,ISSN
+RISTI: Revista Ibérica de Sistemas e Tecnologias de Informação,1,,,,,não listado
+Journal of Intelligent & Fuzzy Systems,1,A4,periódico,1064-1246,JOURNAL OF INTELLIGENT & FUZZY SYSTEMS,ISSN
+Revista de Sistemas e Computação,1,B4,periódico,2237-2903,REVISTA DE SISTEMAS E COMPUTAÇÃO - RSC,ISSN
+International Workshop on Reversible Computation,1,,,,,workshop/trilha
+Intelligent Sustainable Systems,1,,,,,não listado
+International Symposium on Open Collaboration,1,B1,evento,OPENSYM,International Symposium on Open Collaboration,nome
+IEEE Transactions on Computational Social Systems,1,A1,periódico,2329-924X,IEEE TRANSACTIONS ON COMPUTATIONAL SOCIAL SYSTEMS,ISSN
+International Journal on Software Tools for Technology Transfer (STTT),1,A4,periódico,1433-2779,INTERNATIONAL JOURNAL ON SOFTWARE TOOLS FOR TECHNOLOGY TRANSFER (PRINT),ISSN
+GECCO Companion,1,,,,,workshop/trilha
+Anais do XX Workshop Anual do MPS (WAMPS 2024),1,,,,,workshop/trilha
+Anais da V Escola Regional de Engenharia de Software (ERES 2021),1,,,,,não listado
+FEBS Open Bio,1,,,,,não listado
+JOIV: International Journal on Informatics Visualization,1,,,,,não listado
+Functional Safety and Proof of Compliance,1,,,,,não listado
+"International Conference on Secure and Trust Computing, Data Management and Applications",1,,,,,não listado
+Anais do III Simpósio Brasileiro de Educação em Computação (EDUCOMP 2023),1,B1,evento,EDUCOMP,Simpósio Brasileiro de Educação em Computação,nome
+Anais da VII Escola Regional de Engenharia de Software (ERES 2023),1,,,,,não listado
+2026 IEEE Engineering Education World Conference (EDUNINE),1,,,,,não listado
+International Conference on Foundations of Digital Games,1,A2,evento,FDG,International Conference on Foundations of Digital Games,nome
+ISS Companion,1,,,,,workshop/trilha
+Chemometrics and Intelligent Laboratory Systems,1,A1,periódico,0169-7439,CHEMOMETRICS AND INTELLIGENT LABORATORY SYSTEMS (PRINT),ISSN
+2024 IEEE 5th International Symposium on the Internet of Sounds (IS2),1,,,,,não listado
+2024 IEEE 4th International Conference on Software Engineering and Artificial Intelligence (SEAI),1,,,,,não listado
+Discover Artificial Intelligence,1,A4,periódico,2731-0809,DISCOVER ARTIFICIAL INTELLIGENCE,ISSN
+International Journal of Computing and Digital Systems,1,B2,periódico,2210-142X,INTERNATIONAL JOURNAL OF COMPUTING AND DIGITAL SYSTEMS,ISSN
+World Symposium on Software Engineering,1,,,,,não listado
+Anais Estendidos do XIV Congresso Brasileiro de Software: Teoria e Prática (CBSoft Estendido 2023),1,,,,,não listado
+Frontiers of Computer Science,1,A1,periódico,2095-2228,FRONTIERS OF COMPUTER SCIENCE (PRINT),ISSN
 "International Journal of Advanced Research in Science, Communication and Technology",1,,,,,não listado
-CHI Extended Abstracts,1,,,,,não listado
-IEEE Signal Processing Magazine,1,A1,periódico,1053-5888,IEEE SIGNAL PROCESSING MAGAZINE (PRINT),ISSN
-IEEE Transactions on Learning Technologies,1,A1,periódico,1939-1382,IEEE TRANSACTIONS ON LEARNING TECHNOLOGIES,ISSN
-IEEE/ACM International Conference on Human-Robot Interaction,1,,,,,não listado
-Workshop on Innovative Use of NLP for Building Educational Applications,1,,,,,workshop/trilha
-2024 IEEE/ACM 46th International Conference on Software Engineering: Software Engineering in Society (ICSE-SEIS),1,B1,evento,ICSE-SEIS,International Conference on Software Engineering: Software Engineering in Society,nome
-2024 IEEE/ACM International Workshop on Responsible AI Engineering (RAIE),1,,,,,workshop/trilha
-INNOVACADEMIA,1,,,,,não listado
-"2024 IEEE 2nd International Conference on Electrical Engineering, Computer and Information Technology (ICEECIT)",1,,,,,não listado
-Anais Estendidos do XV Congresso Brasileiro de Software: Teoria e Prática (CBSoft Estendido 2024),1,,,,,não listado
-Proc. ACM Softw. Eng.,1,B3,periódico,2994-970X,PROCEEDINGS OF THE ACM ON SOFTWARE ENGINEERING (ONLINE),nome
-2024 IEEE/ACM 46th International Conference on Software Engineering: Companion Proceedings (ICSE-Companion),1,,,,,workshop/trilha
-Proceedings of the 3rd International Workshop on Designing Software,1,,,,,workshop/trilha
-Conference on Computing Education Practice,1,,,,,não listado
-UK & Ireland Computing Education Research Conference,1,,,,,não listado
-Anais do XVII Women in Information Technology (WIT 2023),1,B1,evento,WIT,Women in Information Technology,nome
-2023 IEEE/ACM 45th International Conference on Software Engineering: Software Engineering Education and Training (ICSE-SEET),1,B1,evento,ICSE-SEET,ACM International Conference on Software Engineering: Software Engineering Education and Training,nome
-Environmental and Sustainability Indicators,1,,,,,não listado
-International Conference on Human-Agent Interaction,1,,,,,não listado
-World Journal of Advanced Engineering Technology and Sciences,1,,,,,não listado
-International Conference on Electrical Engineering and Informatics,1,,,,,não listado
-International Conference on Evaluation of Novel Approaches to Software Engineering,1,A4,evento,ENASE,International Conference on Evaluation of Novel Approaches to Software Engineering,nome
-SoftwareX,1,A3,periódico,2352-7110,SOFTWAREX,ISSN
-Australasian Computer Science Week,1,,,,,não listado
-Computers & electrical engineering,1,A2,periódico,0045-7906,COMPUTERS & ELECTRICAL ENGINEERING,ISSN
-International Symposium on Service Oriented Software Engineering,1,,,,,não listado
-IEEE International Conference on Cloud Computing,1,A2,evento,CLOUD,IEEE International Conference on Cloud Computing,nome
-BElgian-NEtherlands software eVOLution symposium,1,,,,,não listado
-"2026 Intermountain Engineering, Technology and Computing (IETC)",1,,,,,não listado
-Integrated Spatial Databases,1,,,,,não listado
-Applied Computational Intelligence and Soft Computing,1,,,,,não listado
-International Journal of Human-Computer Studies,1,A1,periódico,1071-5819,INTERNATIONAL JOURNAL OF HUMAN-COMPUTER STUDIES (PRINT),ISSN
-Anais do LII Seminário Integrado de Software e Hardware (SEMISH 2025),1,A4,evento,SEMISH,Seminário Integrado de Software e Hardware,nome
-Conference on Digital Government Research,1,,,,,não listado
-Jurnal Repositor,1,,,,,não listado
-Proceedings of the 2026 IEEE/ACM 2nd International Workshop on Neuro-Symbolic Software Engineering,1,,,,,workshop/trilha
-Procedia Computer Science,1,,,,,não listado
-Revue d'Intelligence Artificielle,1,,,,,não listado
-Revista de Gestão Social e Ambiental,1,C,periódico,1981-982X,REVISTA DE GESTÃO SOCIAL E AMBIENTAL (RGSA),ISSN
-"International Conference on Engineering, Technology and Innovation",1,,,,,não listado
-Journal of Information Systems and Technology Management,1,B1,periódico,1807-1775,JISTEM-JOURNAL OF INFORMATION SYSTEMS AND TECHNOLOGY MANAGEMENT,ISSN
-Anais Estendidos do XII Congresso Brasileiro de Informática na Educação (CBIE 2023),1,,,,,não listado
-Central-European Journal of New Technologies in Research Education and Practice,1,,,,,não listado
+International Conference Control and Robots,1,,,,,não listado
+Concurrency and Computation,1,A2,periódico,1532-0626,CONCURRENCY AND COMPUTATION: PRACTICE & EXPERIENCE,ISSN
+International Symposium on Computers in Education,1,B2,evento,SIIE,Simpósio Internacional de Informática Educatica,sigla
+SoutheastCon,1,,,,,não listado
+Ide,1,,,,,workshop/trilha
+Food Control,1,A1,periódico,0956-7135,FOOD CONTROL,ISSN
 2026 VII International Conference on Neural Networks and Neurotechnologies (NeuroNT),1,,,,,não listado
+Frontiers in Psychology,1,A2,periódico,1664-1078,FRONTIERS IN PSYCHOLOGY,ISSN
+SIGCSE Virtual,1,,,,,não listado
+BULLETIN Series of Physics &amp; Mathematical Sciences,1,,,,,não listado
+TecnoLógicas,1,,,,,não listado
 2026 IEEE 34th International Requirements Engineering Conference Workshops (REW),1,,,,,workshop/trilha
-International Symposium on Service Oriented Software Engineering,1,A4,evento,SOSEC,IEEE Annual System of Systems Engineering Conference,nome
-2025 IEEE International Conference on Advances in Data-Driven Analytics And Intelligent Systems (ADACIS),1,,,,,não listado
-BigData Congress [Services Society],1,A1,evento,BIGDATA,IEEE International Conference on Big Data,nome
-International Journal of Human-Computer Interaction,1,A1,periódico,1044-7318,INTERNATIONAL JOURNAL OF HUMAN-COMPUTER INTERACTION,ISSN
-Anais do XXXIV Simpósio Brasileiro de Informática na Educação (SBIE 2023),1,A3,evento,SBIE,Simpósio Brasileiro de Informática na Educação,nome
-Proceedings of the Design Society,1,,,,,não listado
-Anais Estendidos do XXIV Simpósio Brasileiro de Segurança da Informação e de Sistemas Computacionais (SBSeg Estendido 2024),1,A4,evento,SBSeg,Simpósio Brasileiro de Segurança da Informação e de Sistemas Computacionais,nome
-Royal Society Open Science,1,A1,periódico,2054-5703,ROYAL SOCIETY OPEN SCIENCE,ISSN
-International Conference on eDemocracy & eGovernment,1,,,,,não listado
-"Interdisciplinary Journal of Information, Knowledge, and Management",1,,,,,não listado
-Lancet Global Health,1,,,,,não listado
-Electronic Journal of Information Systems in Developing Countries,1,A3,periódico,1681-4835,THE ELECTRONIC JOURNAL OF INFORMATION SYSTEMS IN DEVELOPING COUNTRIES,ISSN
-Revista Brasileira de Informática na Educação,1,A3,periódico,1414-5685,REVISTA BRASILEIRA DE INFORMÁTICA NA EDUCAÇÃO,ISSN
-Revista Brasileira de Informática na Educ.,1,,,,,não listado
-Anais Estendidos do XIV Congresso Brasileiro de Informática na Educação (CBIE 2025),1,,,,,não listado
-International journal of human computer interactions,1,C,periódico,2180-1347,INTERNATIONAL JOURNAL OF HUMAN COMPUTER INTERACTION,ISSN
-J. Softw. Evol. Process.,1,A4,periódico,2047-7481,JOURNAL OF SOFTWARE: EVOLUTION AND PROCESS,nome
-at - Automatisierungstechnik,1,,,,,não listado
-International Conference on Software Engineering and Computer Systems,1,,,,,não listado
-Brazilian Symposium on Programming Languages,1,A4,evento,SBLP,Brazilian Symposium on Programming Languages,nome
-"Autonomous Infrastructure, Management and Security",1,,,,,não listado
-International Conference on Emerging Technologies,1,,,,,não listado
-European journal of dental education,1,,,,,não listado
-Disability and Rehabilitation: Assistive Technology,1,A1,periódico,1748-3115,DISABILITY AND REHABILITATION: ASSISTIVE TECHNOLOGY,nome
-IEEE Transactions on Reliability,1,A1,periódico,0018-9529,IEEE TRANSACTIONS ON RELIABILITY,ISSN
-Conference of the Centre for Advanced Studies on Collaborative Research,1,A3,evento,CASCON,Annual International Conference on Computer Science and Software Engineering,apelido
-Universal Access in the Information Society,1,A3,periódico,1615-5289,UNIVERSAL ACCESS IN THE INFORMATION SOCIETY (PRINT),ISSN
-2024 IEEE International Conference on Consumer Electronics-Asia (ICCE-Asia),1,,,,,não listado
-Anais do XXXV Simpósio Brasileiro de Informática na Educação (SBIE 2024),1,A3,evento,SBIE,Simpósio Brasileiro de Informática na Educação,nome
-Innovative STEM Education,1,,,,,não listado
-SN Computer Science,1,A2,periódico,2661-8907,SN COMPUTER SCIENCE,ISSN
-Anais da XII Escola Regional de Informática de Goiás (ERI-GO 2024),1,,,,,não listado
-Ivy Enber Scientific Journal,1,,,,,não listado
-Anais do XXI Congresso Latino-Americano de Software Livre e Tecnologias Abertas (Latinoware 2024),1,B4,evento,LATINOWARE,Congresso Latino-americano de Software Livre e Tecnologias Abertas,nome
-Contemporary Educational Technology,1,,,,,não listado
-Continuing Professional Education Theory and Practice,1,,,,,não listado
-Information,1,C,periódico,2078-2489,INFORMATION,ISSN
-"2025 6th International Conference on Communication, Computing & Industry 6.0 (C2I6)",1,,,,,não listado
-VFAST Transactions on Software Engineering,1,,,,,não listado
-Revista de ciencias sociales,1,,,,,não listado
-Journal of King Saud University: Computer and Information Sciences,1,A1,periódico,1319-1578,JOURNAL OF KING SAUD UNIVERSITY - COMPUTER AND INFORMATION SCIENCES,ISSN
-Technology audit and production reserves,1,B2,periódico,2706-5448,TECHNOLOGY AUDIT AND PRODUCTION RESERVES (ONLINE),nome
-IEEE International Symposium on Software Reliability Engineering,1,A2,evento,ISSRE,IEEE International Symposium on Software Reliability Engineering,nome
-IWSM-Mensura,1,,,,,não listado
-2026 IEEE International Conference for Convergence in Computing Technology (I3CTCON),1,,,,,não listado
-ВИМІРЮВАЛЬНА ТА ОБЧИСЛЮВАЛЬНА ТЕХНІКА В ТЕХНОЛОГІЧНИХ ПРОЦЕСАХ,1,,,,,não listado
-Syst.,1,,,,,não listado
-"Anais da XIII Escola Regional de Computação do Ceará, Maranhão e Piauí (ERCEMAPI 2025)",1,,,,,não listado
+Science Engineering and Technology,1,,,,,não listado
+ACM SIGCHI Annual Symposium on Computer-Human Interaction in Play,1,A2,evento,CHIPlay,ACM SIGCHI Annual Symposium on Computer-Human Interaction in Play,nome
+GAS@ICSE,1,,,,,workshop/trilha
+Gamify@ISSTA,1,,,,,workshop/trilha
+Anais do XXXVI Concurso de Teses e Dissertações (CTD 2023),1,,,,,não listado
+Anais do III Workshop Investigações em Interação Humano-Dados (WIDE 2024),1,B4,evento,WIDE,Workshop on Interactions with Human Experiences,sigla
+Innovations in Systems and Software Engineering,1,B1,periódico,1614-5046,INNOVATIONS IN SYSTEMS AND SOFTWARE ENGINEERING (PRINT),ISSN
+International Conference on Communication and Electronics Systems,1,,,,,não listado
+Annals of Emerging Technologies in Computing,1,,,,,não listado
+"Proceedings of the LACCEI international multi-conference for engineering, education and technology",1,,,,,não listado
+Anais Estendidos do XVII Simpósio Brasileiro de Sistemas Colaborativos (SBSC Estendido 2021),1,A4,evento,SBSC,Simpósio Brasileiro de Sistemas Colaborativos,nome
+Review of Management and Economic Engineering,1,,,,,não listado
+SAGE Open,1,A1,periódico,2158-2440,SAGE OPEN,ISSN
+Journal of Advances in Management Research,1,A2,periódico,0972-7981,JOURNAL OF ADVANCES IN MANAGEMENT RESEARCH,ISSN
+European Management Journal,1,,,,,não listado
+International Conference on Artificial Intelligence in Education,1,A2,evento,AIED,International Conference on Artificial Intelligence in Education,nome
+HMD Praxis der Wirtschaftsinformatik,1,,,,,não listado
+IEEE Biennial Congress of Argentina,1,,,,,não listado
+Vysshee Obrazovanie v Rossii  = Higher Education in Russia,1,,,,,não listado
+The eurasia proceedings of educational & social sciences,1,,,,,não listado
+Anais do XXIX Workshop de Informática na Escola (WIE 2023),1,A4,evento,WIE,Workshop de Informática na Escola,nome
+2025 ASEE Annual Conference &amp; Exposition  Proceedings,1,,,,,não listado
+IEEE International Symposium on Network Computing and Applications,1,A4,evento,NCA,IEEE International Symposium on Network Computing and Applications,nome
+"Higher Education, Skills and Work-based Learning",1,,,,,não listado
 The Web Conference,1,A1,evento,WWW,The ACM Web Conference,nome
 International Conference on Multimodal Interaction,1,,,,,não listado
-AMC journal,1,,,,,não listado
-Journal of Information Security and Applications,1,A1,periódico,2214-2126,JOURNAL OF INFORMATION SECURITY AND APPLICATIONS,ISSN
+International Journal of Sports Science &amp; Coaching,1,,,,,não listado
+2024 IEEE/ACM 46th International Conference on Software Engineering: Software Engineering in Society (ICSE-SEIS),1,B1,evento,ICSE-SEIS,International Conference on Software Engineering: Software Engineering in Society,nome
+2024 IEEE/ACM International Workshop on Responsible AI Engineering (RAIE),1,,,,,workshop/trilha
+IEEE/ACM International Conference on Human-Robot Interaction,1,,,,,não listado
+Frontiers Artif. Intell.,1,C,periódico,2624-8212,FRONTIERS IN ARTIFICIAL INTELLIGENCE,nome
+NLBSE@ICSE,1,,,,,workshop/trilha
+International Conference on Computing Communication and Networking Technologies,1,,,,,não listado
+Transylvanian Review of Administrative Sciences,1,,,,,não listado
+2024 3rd Edition of IEEE Delhi Section Flagship Conference (DELCON),1,,,,,não listado
+International Conference on Intelligent Computing,1,,,,,não listado
+IEEE Open Journal of the Industrial Electronics Society,1,,,,,não listado
+Brain Science,1,C,periódico,2076-3425,BRAIN SCIENCES,nome
+Fourth International Conference on Geoscience and Remote Sensing Mapping,1,,,,,não listado
+E3S Web of Conferences,1,,,,,não listado
+AGENT@ICSE,1,,,,,workshop/trilha
+2025 IEEE 5th International Conference on Software Engineering and Artificial Intelligence (SEAI),1,,,,,não listado
+"2024 IEEE 7th International Conference on Automation, Electronics and Electrical Engineering (AUTEEE)",1,,,,,não listado
+Proceedings of the 2024 Sixteenth International Conference on Contemporary Computing,1,,,,,não listado
+VISIGRAPP,1,B2,evento,VISIGRAPP,"Conference on Computer Vision, Imaging and Computer Graphics Theory and Applications",sigla
+International Conference on Big Data and Artificial Intelligence,1,,,,,não listado
+International Conference Computing Engineering and Design,1,,,,,não listado
+Scientific Bulletin of UNFU,1,,,,,não listado
+Central-European Journal of New Technologies in Research Education and Practice,1,,,,,não listado
+ВИМІРЮВАЛЬНА ТА ОБЧИСЛЮВАЛЬНА ТЕХНІКА В ТЕХНОЛОГІЧНИХ ПРОЦЕСАХ,1,,,,,não listado
+"Conference on Fairness, Accountability and Transparency",1,A1,evento,FACCT,"ACM Conference on Fairness, Accountability, and Transparency",nome
+2026 IEEE International Conference for Convergence in Computing Technology (I3CTCON),1,,,,,não listado
 Conference on Information Communications Technology and Society,1,,,,,não listado
+Universal Access in the Information Society,1,A3,periódico,1615-5289,UNIVERSAL ACCESS IN THE INFORMATION SOCIETY (PRINT),ISSN
+"2024 IEEE 2nd International Conference on Electrical Engineering, Computer and Information Technology (ICEECIT)",1,,,,,não listado
+Proceedings of the 2026 IEEE/ACM 2nd International Workshop on Neuro-Symbolic Software Engineering,1,,,,,workshop/trilha
+2024 IEEE International Conference on Consumer Electronics-Asia (ICCE-Asia),1,,,,,não listado
+Revue d'Intelligence Artificielle,1,,,,,não listado
+Royal Society Open Science,1,A1,periódico,2054-5703,ROYAL SOCIETY OPEN SCIENCE,ISSN
+Brazilian Symposium on Programming Languages,1,A4,evento,SBLP,Brazilian Symposium on Programming Languages,nome
+International Conference on Software Engineering and Computer Systems,1,,,,,não listado
+at - Automatisierungstechnik,1,,,,,não listado
+Anais do XXXV Simpósio Brasileiro de Informática na Educação (SBIE 2024),1,A3,evento,SBIE,Simpósio Brasileiro de Informática na Educação,nome
+Anais do XXI Congresso Latino-Americano de Software Livre e Tecnologias Abertas (Latinoware 2024),1,B4,evento,LATINOWARE,Congresso Latino-americano de Software Livre e Tecnologias Abertas,nome
+Anais Estendidos do XIV Congresso Brasileiro de Informática na Educação (CBIE 2025),1,,,,,não listado
+Revista Brasileira de Informática na Educação,1,A3,periódico,1414-5685,REVISTA BRASILEIRA DE INFORMÁTICA NA EDUCAÇÃO,ISSN
+Electronic Journal of Information Systems in Developing Countries,1,A3,periódico,1681-4835,THE ELECTRONIC JOURNAL OF INFORMATION SYSTEMS IN DEVELOPING COUNTRIES,ISSN
+Lancet Global Health,1,,,,,não listado
+Revista de ciencias sociales,1,,,,,não listado
+International Conference on eDemocracy & eGovernment,1,,,,,não listado
+Anais Estendidos do XXIV Simpósio Brasileiro de Segurança da Informação e de Sistemas Computacionais (SBSeg Estendido 2024),1,A4,evento,SBSeg,Simpósio Brasileiro de Segurança da Informação e de Sistemas Computacionais,nome
+Revista de Gestão Social e Ambiental,1,C,periódico,1981-982X,REVISTA DE GESTÃO SOCIAL E AMBIENTAL (RGSA),ISSN
+Proceedings of the Design Society,1,,,,,não listado
+Technology audit and production reserves,1,B2,periódico,2706-5448,TECHNOLOGY AUDIT AND PRODUCTION RESERVES (ONLINE),nome
+IWSM-Mensura,1,,,,,não listado
+West Science Journal Economic and Entrepreneurship,1,,,,,não listado
+Processes,1,B1,periódico,2227-9717,PROCESSES,ISSN
+Proceedings of the 3rd International Workshop on Designing Software,1,,,,,workshop/trilha
+International Symposium on Electronic Commerce,1,,,,,não listado
+Journal of Education Technology,1,,,,,não listado
+Trends in Neuroscience and Education,1,,,,,não listado
+CLEI Electronic Journal,1,B3,periódico,0717-5000,CLEI ELECTRONIC JOURNAL,ISSN
+"Autonomous Infrastructure, Management and Security",1,,,,,não listado
+INNOVACADEMIA,1,,,,,não listado
+European journal of dental education,1,,,,,não listado
+"Proceedings of the 2025 16th International Conference on E-business, Management and Economics",1,,,,,não listado
+MedienPädagogik: Zeitschrift für Theorie und Praxis der Medienbildung,1,,,,,não listado
+European Journal of Education,1,,,,,não listado
+International Conference on Emerging Technologies,1,,,,,não listado
+Proceedings of the Association for Information Science and Technology,1,,,,,não listado
+Mimbar PGSD Undiksha,1,,,,,não listado
+CISETC,1,,,,,não listado
+IT Professional,1,A4,periódico,1520-9202,IT PROFESSIONAL,nome
+Norsk IKT-konferanse for forskning og utdanning,1,,,,,não listado
+Cureus,1,B1,periódico,2168-8184,CUREUS,ISSN
+International Symposium on Computational and Business Intelligence,1,,,,,não listado
+Proceedings of the 2026 AERA Annual Meeting,1,,,,,não listado
+International Journal of Network Management,1,A3,periódico,1099-1190,INTERNATIONAL JOURNAL OF NETWORK MANAGEMENT (ONLINE),nome
+Pakistan Journal of Medical Sciences,1,,,,,não listado
+"International Convention on Information and Communication Technology, Electronics and Microelectronics",1,,,,,não listado
+Frontiers of Digital Education,1,,,,,não listado
+Educación y Educadores,1,,,,,não listado
+Accounting Education,1,,,,,não listado
+Journal of Baltic Science Education,1,,,,,não listado
+Egyptian Informatics Journal,1,,,,,não listado
+Uluslararası sürdürülebilir mühendislik ve teknoloji dergisi,1,,,,,não listado
+Businesses,1,,,,,não listado
+IWSiB@ICSE,1,,,,,workshop/trilha
+2024 International Conference on IT Innovation and Knowledge Discovery (ITIKD),1,,,,,não listado
+Rendvédelem,1,,,,,não listado
+Workshop on Innovative Use of NLP for Building Educational Applications,1,,,,,workshop/trilha
+IEEE Transactions on Learning Technologies,1,A1,periódico,1939-1382,IEEE TRANSACTIONS ON LEARNING TECHNOLOGIES,ISSN
+IEEE Signal Processing Magazine,1,A1,periódico,1053-5888,IEEE SIGNAL PROCESSING MAGAZINE (PRINT),ISSN
+CHI Extended Abstracts,1,,,,,não listado
+"Research in Equitable and Sustained Participation in Engineering, Computing, and Technology",1,,,,,não listado
+Annual Meeting of the Association for Computational Linguistics,1,A1,evento,ACL,Annual Meeting of the Association for Computational Linguistics,nome
+Research in Adaptive and Convergent Systems,1,,,,,não listado
+International Journal of Evaluation and Research in Education (IJERE),1,,,,,não listado
+International Conference on Computational Linguistics,1,A1,evento,COLING,International Conference on Computational Linguistics,nome
+Review of accounting studies,1,,,,,não listado
+DiGRA Digital Library,1,,,,,não listado
+Perspectiva XXI,1,A1,periódico,2175-795X,PERSPECTIVA,nome
+International Journal of Artificial Intelligence in Education,1,A1,periódico,1560-4306,INTERNATIONAL JOURNAL OF ARTIFICIAL INTELLIGENCE IN EDUCATION,nome
+International Conference on Education Technology and Computer,1,,,,,não listado
+BMC Medical Education,1,A2,periódico,1472-6920,BMC MEDICAL EDUCATION (ONLINE),ISSN
+International Conference on Parallel and Distributed Systems,1,A3,evento,ICPADS,International Conference on Parallel and Distributed Systems,nome
+European Conference on e-Learning,1,,,,,não listado
+Computers and Education: Artificial Intelligence,1,A1,periódico,2666-920X,COMPUTERS AND EDUCATION: ARTIFICIAL INTELLIGENCE,ISSN
+IEEE Transactions on Education,1,A2,periódico,0018-9359,IEEE TRANSACTIONS ON EDUCATION,ISSN
 "2025 IEEE VIII Congreso Internacional en Inteligencia Ambiental, Ingenieria de Software y Salud Electronica y Movil (AmITIC)",1,,,,,não listado
-Novatio : Journal of Management Technology and Innovation,1,,,,,não listado
-"2026 3rd International Conference on Algorithms, Software Engineering and Network Security (ASENS)",1,,,,,não listado
-Anais do XII Latin American Symposium on Digital Government (LASDiGov 2025),1,,,,,não listado
-International Conference on Learning Representations,1,A1,evento,ICLR,International Conference on Learning Representations,nome
-International Journal of Sustainability and Innovation in Engineering,1,,,,,não listado
+Conference on Computing Education Practice,1,,,,,não listado
+Electronic Proceedings in Theoretical Computer Science,1,,,,,não listado
+Contemporary Educational Technology,1,,,,,não listado
+"Automation, Control, and Information Technology",1,A2,evento,CIT,IEEE International Conference on Information Technology,nome aproximado
+Innovative STEM Education,1,,,,,não listado
+Conference of the Centre for Advanced Studies on Collaborative Research,1,A3,evento,CASCON,Annual International Conference on Computer Science and Software Engineering,apelido
+IEEE Transactions on Reliability,1,A1,periódico,0018-9529,IEEE TRANSACTIONS ON RELIABILITY,ISSN
+AMC journal,1,,,,,não listado
+Computing and Communication Workshop and Conference,1,,,,,workshop/trilha
+"Software testing, verification & reliability",1,A4,periódico,0960-0833,"SOFTWARE TESTING, VERIFICATION & RELIABILITY",ISSN
+International Conferences on Dependable Systems and Their Applications,1,,,,,não listado
+2023 6th International Conference on Information Systems and Computer Networks (ISCON),1,,,,,não listado
+"2023 Congress in Computer Science, Computer Engineering, & Applied Computing (CSCE)",1,,,,,não listado
+Journal of Information Security and Applications,1,A1,periódico,2214-2126,JOURNAL OF INFORMATION SECURITY AND APPLICATIONS,ISSN
+2023 38th IEEE/ACM International Conference on Automated Software Engineering Workshops (ASEW),1,,,,,workshop/trilha
+World wide web (Bussum),1,A2,periódico,1386-145X,WORLD WIDE WEB,ISSN
+ACS/IEEE International Conference on Computer Systems and Applications,1,A4,evento,AICCSA,ACS/IEEE International Conference on Computer Systems and Applications,nome
+International Conference on Emerging Intelligent Data and Web Technologies,1,,,,,não listado
+De Computis,1,,,,,não listado
+ACM Symposium on User Interface Software and Technology,1,,,,,não listado
 CCF Transactions on High Performance Computing,1,,,,,não listado
+2022 IEEE/ACM 44th International Conference on Software Engineering: Software Engineering in Society (ICSE-SEIS),1,B1,evento,ICSE-SEIS,International Conference on Software Engineering: Software Engineering in Society,nome
+"2026 3rd International Conference on Algorithms, Software Engineering and Network Security (ASENS)",1,,,,,não listado
+European Conference of Software Engineering Education,1,,,,,não listado
+Personal and Ubiquitous Computing,1,A1,periódico,1617-4909,PERSONAL AND UBIQUITOUS COMPUTING (PRINT),ISSN
+UbiComp Companion,1,,,,,workshop/trilha
+Ivy Enber Scientific Journal,1,,,,,não listado
+International Conference on Wireless Communications and Mobile Computing,1,A1,evento,IWCMC,International Wireless Communications and Mobile Computing Conference,sigla
+Ingeniería y Competitividad,1,,,,,não listado
+Disability and Rehabilitation: Assistive Technology,1,A1,periódico,1748-3115,DISABILITY AND REHABILITATION: ASSISTIVE TECHNOLOGY,nome
+South African Journal of Industrial Engineering,1,,,,,não listado
+Cleaner Engineering and Technology,1,,,,,não listado
+Environment-Behaviour Proceedings Journal,1,,,,,não listado
+Alexandria Engineering Journal,1,,,,,não listado
+Journal of Information Systems Engineering & Management,1,B3,periódico,2468-4376,JOURNAL OF INFORMATION SYSTEMS ENGINEERING & MANAGEMENT,ISSN
+International Journal of Software Engineering and Computer Systems,1,,,,,não listado
+International Conference on Recent Advances and Innovations in Engineering,1,,,,,não listado
+"International Conference on Software, Telecommunications and Computer Networks",1,A4,evento,SOFTCOM,"International Conference on Software, Telecommunications and Computer Networks",nome
+"Engineering, Technology &amp; Applied Science Research",1,,,,,não listado
+PLoS ONE,1,A1,periódico,1932-6203,PLOS ONE,ISSN
+"2025 International Conference on Emerging Technologies in Electronics, Computing, and Communication (ICETECC)",1,,,,,não listado
+Journal of Software and Systems Modeling,1,A2,periódico,1619-1366,SOFTWARE AND SYSTEMS MODELING,ISSN
+MoDaST,1,,,,,não listado
+Conference on Computer Science and Information Systems,1,A3,evento,FEDCSIS,Federated Conference on Computer Science and Information Systems,sigla
+International Conference on Intelligent Data Acquisition and Advanced Computing Systems: Technology and Applications,1,,,,,não listado
+Discover Sustainability,1,,,,,não listado
+International Conference on Information and Knowledge Management,1,A1,evento,CIKM,ACM International Conference on Information and Knowledge Management,nome
+"2025 6th International Conference on Communication, Computing & Industry 6.0 (C2I6)",1,,,,,não listado
+Educational Dimension,1,,,,,não listado
+Journal of Information and Organizational Sciences,1,,,,,não listado
+2023 ACM/IEEE International Conference on Model Driven Engineering Languages and Systems Companion (MODELS-C),1,,,,,workshop/trilha
+International Conference on Knowledge and Systems Engineering,1,,,,,não listado
+"Anais da XIII Escola Regional de Computação do Ceará, Maranhão e Piauí (ERCEMAPI 2025)",1,,,,,não listado
+Studies in Higher Education,1,,,,,não listado
+2026 International Conference on Current Research in Artificial Intelligence and Data Science (ICCRAIDS),1,,,,,não listado
+UK & Ireland Computing Education Research Conference,1,,,,,não listado
+Revista Sociedade Científica,1,B2,periódico,2595-8402,REVISTA SOCIEDADE CIENTÍFICA,ISSN
+IEEE International Conference on Industry Applications,1,B2,evento,INDUSCON,International Conference on Industry Applications,nome
+2024 5th International Conference on Data Analytics for Business and Industry (ICDABI),1,,,,,não listado
+2026 IEEE Cloud Summit,1,B2,evento,IEEECloudS,IEEE Cloud Summit,nome
+Jurnal Repositor,1,,,,,não listado
+Conference on Digital Government Research,1,,,,,não listado
+2025 5th International Conference on Educational Communications and Technology (ICTAECT),1,,,,,não listado
+International Journal of Human-Computer Studies,1,A1,periódico,1071-5819,INTERNATIONAL JOURNAL OF HUMAN-COMPUTER STUDIES (PRINT),ISSN
+Applied Computational Intelligence and Soft Computing,1,,,,,não listado
+Anais do XII Encontro Nacional de Computação dos Institutos Federais (EnCompIF 2025),1,,,,,não listado
+"2026 Intermountain Engineering, Technology and Computing (IETC)",1,,,,,não listado
+BElgian-NEtherlands software eVOLution symposium,1,,,,,não listado
+IEEE International Conference on Cloud Computing,1,A2,evento,CLOUD,IEEE International Conference on Cloud Computing,nome
+Computer,1,A3,periódico,0018-9162,COMPUTER MAGAZINE,ISSN
+Computers & electrical engineering,1,A2,periódico,0045-7906,COMPUTERS & ELECTRICAL ENGINEERING,ISSN
+Australasian Computer Science Week,1,,,,,não listado
+SoftwareX,1,A3,periódico,2352-7110,SOFTWAREX,ISSN
+2025 IEEE/ACM 4th International Conference on AI Engineering – Software Engineering for AI (CAIN),1,A4,evento,CAIN,International Conference on AI Engineering – Software Engineering for AI,nome
+International Conference on Electrical Engineering and Informatics,1,,,,,não listado
+World Journal of Advanced Engineering Technology and Sciences,1,,,,,não listado
+International Conference on Human-Agent Interaction,1,,,,,não listado
+Environmental and Sustainability Indicators,1,,,,,não listado
+International Conference on Software Quality. Process Automation in Software Development,1,A4,evento,SWQD,Conference Software Quality Days,apelido
+Journal of Internet Services and Applications,1,A3,periódico,1867-4828,JOURNAL OF INTERNET SERVICES AND APPLICATIONS,ISSN
+Anais do I Colóquio em Blockchain e Web Descentralizada (CBlockchain 2023),1,,,,,não listado
+IEICE Trans. Inf. Syst.,1,,,,,não listado
+Charity,1,,,,,não listado
+Anais da X Escola Regional de Informática de Goiás (ERI-GO 2022),1,,,,,não listado
+Journal of Reliable Intelligent Environments,1,A2,periódico,2199-4676,JOURNAL OF RELIABLE INTELLIGENT ENVIRONMENTS,nome
+Novatio : Journal of Management Technology and Innovation,1,,,,,não listado
+Nanotechnology Perceptions,1,,,,,não listado
+Anais do XII Latin American Symposium on Digital Government (LASDiGov 2025),1,,,,,não listado
+"Eurasia Journal of Mathematics, Science and Technology Education",1,,,,,não listado
+International Journal of Research In Business and Social Science,1,,,,,não listado
+International Journal of Sustainability and Innovation in Engineering,1,,,,,não listado
 International journal of innovative research and creative technology,1,,,,,não listado
 2025 IEEE 22nd International Conference on Software Architecture Companion (ICSA-C),1,,,,,workshop/trilha
 International Journal of Computer Applications,1,C,periódico,0975-8887,INTERNATIONAL JOURNAL OF COMPUTER APPLICATIONS,ISSN
 International Conference on Knowledge-Based Intelligent Information & Engineering Systems,1,,,,,não listado
-International Conference on Emerging Intelligent Data and Web Technologies,1,,,,,não listado
+Journal of engineering design,1,,,,,não listado
+Jurnal Ilmiah Teknik Elektro Komputer dan Informatika,1,,,,,não listado
+2025 5th International Conference on Intelligent Cybernetics Technology & Applications (ICICyTA),1,,,,,não listado
+i-manager's Journal on Software Engineering,1,,,,,não listado
+International Conference on Advances in Social Networks Analysis and Mining,1,A2,evento,ASONAM,IEEE/ACM International Conference on Advances in Social Networks Analysis and Mining,nome
+Indian Journal of Information Sources and Services,1,,,,,não listado
+Anais Estendidos do II Simpósio Brasileiro de Educação em Computação (EDUCOMP Estendido 2022),1,B1,evento,EDUCOMP,Simpósio Brasileiro de Educação em Computação,nome
+Anais do XXX Workshop sobre Educação em Computação (WEI 2022),1,A4,evento,WEI,Workshop sobre Educação em Computação,nome
 Discover Education,1,,,,,não listado
-International Conference on Software and Data Technologies,1,B1,evento,ICSOFT,International Conference on Software Technologies,apelido
-2025 IEEE/ACM 47th International Conference on Software Engineering: New Ideas and Emerging Results (ICSE-NIER),1,A3,evento,ICSE-NIER,ACM International Conference on Software Engineering: New Ideas and Emerging Results,nome
-Revista Sociedade Científica,1,B2,periódico,2595-8402,REVISTA SOCIEDADE CIENTÍFICA,ISSN
-IEEE International Conference on Industry Applications,1,B2,evento,INDUSCON,International Conference on Industry Applications,nome
-Brazilian Symposium on Multimedia and the Web,1,A3,evento,WEBMEDIA,Brazilian Symposium on Multimedia and the Web,nome
-2026 IEEE Cloud Summit,1,B2,evento,IEEECloudS,IEEE Cloud Summit,nome
-Technical Symposium on Computer Science Education,1,A1,evento,SIGCSE,ACM Technical Symposium on Computer Science Education,nome
-2025 5th International Conference on Educational Communications and Technology (ICTAECT),1,,,,,não listado
-Anais do XII Encontro Nacional de Computação dos Institutos Federais (EnCompIF 2025),1,,,,,não listado
-Computer,1,A3,periódico,0018-9162,COMPUTER MAGAZINE,ISSN
-2025 IEEE/ACM 4th International Conference on AI Engineering – Software Engineering for AI (CAIN),1,A4,evento,CAIN,International Conference on AI Engineering – Software Engineering for AI,nome
-International Conference on Software Quality. Process Automation in Software Development,1,A4,evento,SWQD,Conference Software Quality Days,apelido
-Journal of Internet Services and Applications,1,A3,periódico,1867-4828,JOURNAL OF INTERNET SERVICES AND APPLICATIONS,ISSN
-International Conference on Data and Software Engineering,1,,,,,não listado
-International Journal of Sports Science &amp; Coaching,1,,,,,não listado
-"Proceedings of the 2025 16th International Conference on E-business, Management and Economics",1,,,,,não listado
-SBC Reviews on Computer Science,1,C,periódico,2966-3938,SBC REVIEWS ON COMPUTER SCIENCE (ONLINE),nome
-Proceedings of the 2026 Symposium on Software Engineering in the Global South,1,,,,,não listado
-Perspectiva XXI,1,A1,periódico,2175-795X,PERSPECTIVA,nome
-Uluslararası sürdürülebilir mühendislik ve teknoloji dergisi,1,,,,,não listado
-CLEI Electronic Journal,1,B3,periódico,0717-5000,CLEI ELECTRONIC JOURNAL,ISSN
-CISETC,1,,,,,não listado
-IT Professional,1,A4,periódico,1520-9202,IT PROFESSIONAL,nome
-International Symposium on Computational and Business Intelligence,1,,,,,não listado
-International Journal of Network Management,1,A3,periódico,1099-1190,INTERNATIONAL JOURNAL OF NETWORK MANAGEMENT (ONLINE),nome
-International Journal of Software Engineering and Computer Systems,1,,,,,não listado
-CAIS,1,,,,,não listado
-2025 IEEE/ACM 47th International Conference on Software Engineering: Companion Proceedings (ICSE-Companion),1,,,,,workshop/trilha
-ICSOB Companion,1,,,,,workshop/trilha
-Educación y Educadores,1,,,,,não listado
-Discover Sustainability,1,,,,,não listado
-Frontiers of Digital Education,1,,,,,não listado
-"International Convention on Information and Communication Technology, Electronics and Microelectronics",1,,,,,não listado
-Pakistan Journal of Medical Sciences,1,,,,,não listado
-2026 International Conference on Emerging Technologies in Computing and Communication (ETCC),1,,,,,não listado
-Proceedings of the 2026 AERA Annual Meeting,1,,,,,não listado
-"International Conference on Teaching, Assessment, and Learning for Engineering",1,,,,,não listado
-Cureus,1,B1,periódico,2168-8184,CUREUS,ISSN
-Norsk IKT-konferanse for forskning og utdanning,1,,,,,não listado
-Mimbar PGSD Undiksha,1,,,,,não listado
-Proceedings of the Association for Information Science and Technology,1,,,,,não listado
-European Journal of Education,1,,,,,não listado
-MedienPädagogik: Zeitschrift für Theorie und Praxis der Medienbildung,1,,,,,não listado
-2026 International Conference on Smart Futuristic Technology,1,,,,,não listado
-DiGRA Digital Library,1,,,,,não listado
-Journal of Software: Evolution and Process,1,A4,periódico,2047-7481,JOURNAL OF SOFTWARE: EVOLUTION AND PROCESS,nome
-International Journal of Evaluation and Research in Education (IJERE),1,,,,,não listado
-IET Software,1,A3,periódico,1751-8806,IET SOFTWARE (PRINT),ISSN
-Frontiers Artif. Intell.,1,C,periódico,2624-8212,FRONTIERS IN ARTIFICIAL INTELLIGENCE,nome
-International Conference on Computing Communication and Networking Technologies,1,,,,,não listado
-ACM Symposium on Applied Computing,1,A1,evento,SAC,ACM Symposium on Applied Computing,nome
-Electronics,1,B1,periódico,2079-9292,ELECTRONICS,nome
-MoDaST,1,,,,,não listado
-2024 3rd Edition of IEEE Delhi Section Flagship Conference (DELCON),1,,,,,não listado
-"Higher Education, Skills and Work-based Learning",1,,,,,não listado
-2025 ASEE Annual Conference &amp; Exposition  Proceedings,1,,,,,não listado
-Journal of Problem Based Learning in Higher Education,1,,,,,não listado
-Telos: Revista de Estudios Interdisciplinarios en Ciencias Sociales,1,,,,,não listado
-De Fermat : Jurnal Pendidikan Matematika,1,,,,,não listado
-Revista docencia universitaria,1,,,,,não listado
-E3S Web of Conferences,1,,,,,não listado
-AGENT@ICSE,1,,,,,workshop/trilha
-"2025 International Conference on Circuits, Controls and Communications (CCUBE)",1,,,,,não listado
-IEEE International Conference on Tools with Artificial Intelligence,1,A2,evento,ICTAI,IEEE International Conference on Tools with Artificial Intelligence,nome
-Proceedings of the 2024 Sixteenth International Conference on Contemporary Computing,1,,,,,não listado
-VISIGRAPP,1,B2,evento,VISIGRAPP,"Conference on Computer Vision, Imaging and Computer Graphics Theory and Applications",sigla
-Journal of Environmental Management,1,A1,periódico,0301-4797,JOURNAL OF ENVIRONMENTAL MANAGEMENT,ISSN
-Businesses,1,,,,,não listado
-IWSiB@ICSE,1,,,,,workshop/trilha
-"Research in Equitable and Sustained Participation in Engineering, Computing, and Technology",1,,,,,não listado
-Journal of Environmental Chemical Engineering,1,,,,,não listado
-Brazilian Symposium on Computer Networks and Distributed Systems,1,A4,evento,SBRC,Simpósio Brasileiro de Redes de Computadores e Sistemas Distribuídos,apelido
-Applied Soft Computing,1,A1,periódico,1568-4946,APPLIED SOFT COMPUTING (PRINT),ISSN
+Handbook on Teaching Empirical Software Engineering,1,,,,,não listado
+"2025 Joint International Conference on Digital Arts, Media and Technology with ECTI Northern Section Conference on Electrical, Electronics, Computer and Telecommunications Engineering (ECTI DAMT & NCON)",1,,,,,não listado
+Proceedings of the 8th International Workshop on Software Engineering Research and Practices for the IoT,1,,,,,workshop/trilha
+International Workshop on Bots in Software Engineering,1,,,,,workshop/trilha
