@@ -189,6 +189,9 @@ body {
 header { padding: 18px 24px 8px; }
 header h1 { margin: 0; font-size: 20px; }
 header p { margin: 4px 0 0; color: var(--muted); }
+.rodape { border-top: 1px solid var(--line); background: var(--panel); color: var(--muted); font-size: 13px; text-align: center; padding: 14px 24px; margin-top: 8px; }
+.rodape a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.rodape a:hover { text-decoration: underline; }
 header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
 #abrirTour { font: inherit; font-size: 13px; color: var(--accent); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
 #abrirTour:hover { border-color: var(--accent); }
@@ -295,11 +298,24 @@ td.doi a { color: var(--accent); }
 .gcard .col { min-width: 26px; }
 .gcard .col .b { width: 18px; }
 .gcard .col .b { border-radius: 4px 4px 0 0; }
-.hbarras { display: grid; grid-template-columns: max-content 1fr max-content; gap: 8px 10px; align-items: center; }
-.hbarras .r { font-size: 12px; color: var(--muted); }
-.hbarras .t { height: 14px; background: var(--bg); border-radius: 0 4px 4px 0; }
-.hbarras .t div { height: 100%; background: var(--bar); border-radius: 0 4px 4px 0; min-width: 2px; }
-.hbarras .v { font-size: 12px; font-weight: 600; }
+.hbarras { display: flex; flex-direction: column; gap: 2px; }
+.hlinha { display: grid; grid-template-columns: 96px 1fr 40px; gap: 10px; align-items: center; width: 100%; padding: 4px 4px; border-radius: 4px; }
+.hlinha:hover { background: var(--accent-soft); }
+.hbarras .r { font-size: 12px; color: var(--muted); text-align: left; }
+.hbarras .t { display: flex; align-items: center; }
+.hbarras .t span { display: block; height: 14px; background: var(--bar); border-radius: 0 4px 4px 0; min-width: 2px; }
+.hbarras .v { font-size: 12px; font-weight: 600; text-align: right; }
+button.filtro { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+.gcard .col.filtro { border-radius: 4px; padding: 0 2px; }
+.gcard .col.filtro:hover { background: var(--accent-soft); }
+.filtro.apagada .b, .filtro.apagada .t span { opacity: .25; }
+.filtro.sel .a, .filtro.sel .r { color: var(--accent); font-weight: 700; }
+.filtro:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.chips .chip + .chip { margin-left: 4px; }
+.detalhe .col.filtro { border-radius: 4px; padding: 0 2px; }
+.detalhe .col.filtro:hover { background: var(--accent-soft); }
+.dica-h3 { color: var(--muted); font-weight: 400; font-size: 12px; }
+.limpar-anocit { background: none; border: 0; padding: 0; font: inherit; font-size: 12px; font-weight: 400; color: var(--accent); cursor: pointer; }
 .anos-cab { color: var(--muted); font-size: 12px; margin-bottom: 2px; }
 .anos-cab button { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; }
 .anos-cab button:hover { text-decoration: underline; }
@@ -350,6 +366,9 @@ td.doi a { color: var(--accent); }
   </section>
   <section class="graficos" id="graficos" hidden></section>
 </main>
+<footer class="rodape">
+  Developed by <a href="https://rafaelparizi.github.io/" target="_blank" rel="noopener">Rafael Parizi</a>
+</footer>
 <script>
 const DADOS = __DADOS__;
 const $ = (id) => document.getElementById(id);
@@ -402,7 +421,9 @@ document.addEventListener("mouseover", (e) => {
 });
 document.addEventListener("scroll", () => tip.classList.remove("on"), true);
 
-const venuesOff = new Set();  // venues desmarcadas no card (vazio = todas marcadas)
+const venuesOff = new Set();
+let anoCitFiltro = null;  // ano de citação clicado no gráfico do artigo (null = todos)
+const anoCitDe = (c) => String(c.ano ?? "s/ano");  // venues desmarcadas no card (vazio = todas marcadas)
 const porTitulo = (a) => a.match === "titulo" || a.match === "titulo_aproximado";
 const autoresDe = (a) => String(a.autores ?? "").split(", ").filter(Boolean);
 
@@ -436,7 +457,15 @@ function renderAnos() {
     <button class="vchip${anosOff.has(a) ? "" : " on"}" data-ano="${a}" aria-pressed="${!anosOff.has(a)}">${a} <b>${contAnos[a]}</b></button>`).join("");
 }
 
-function filtrados() {
+// Filtros vindos dos gráficos (clique nas barras)
+let matchFiltro = null;    // "doi" | "titulo" | "titulo_aproximado" | "nao_encontrado"
+let autoresFiltro = null;  // 1..8 (8 = 8 ou mais)
+const faixaAutores = (a) => Math.min(autoresDe(a).length, 8);
+const ROT_MATCH = { doi: "DOI", titulo: "título", titulo_aproximado: "título aprox.", nao_encontrado: "não encontrado" };
+
+// `ignorar` deixa de aplicar um filtro: cada gráfico ignora o próprio, para
+// continuar mostrando todas as barras (com a selecionada em destaque)
+function filtrados(ignorar = null) {
   const q = $("busca").value.trim().toLowerCase();
   const soCitados = $("soCitados").checked;
   const soSimilares = $("soSimilares").checked;
@@ -444,7 +473,9 @@ function filtrados() {
   const soTitulo = $("soTitulo").checked;
   const ordem = $("ordem").value;
   const lista = DADOS.filter((a) =>
-    !anosOff.has(String(a.ano)) &&
+    (ignorar === "ano" || !anosOff.has(String(a.ano))) &&
+    (ignorar === "match" || !matchFiltro || (a.match || "nao_encontrado") === matchFiltro) &&
+    (ignorar === "autores" || !autoresFiltro || faixaAutores(a) === autoresFiltro) &&
     (!soCitados || a.citantes.length > 0) &&
     (!soSimilares || a.similar) &&
     (!soDuplicatas || a.distintos < a.citantes.length) &&
@@ -458,22 +489,25 @@ function filtrados() {
 }
 
 // ---- Gráficos (acompanham os filtros ativos) ----
-function barrasV(itens, altura = 120) {
+// Cada barra é um filtro: data-f (dimensão) e data-v (valor); `apagada` = fora do filtro atual
+function barrasV(itens, f, altura = 120) {
   const max = Math.max(1, ...itens.map((i) => i.v));
   return `<div class="grafico">${itens.map((i) => `
-    <div class="col" data-tip="${esc(i.tip)}">
+    <button class="col filtro${i.apagada ? " apagada" : ""}${i.sel ? " sel" : ""}" data-f="${f}" data-v="${esc(i.chave)}" data-tip="${esc(i.tip)}">
       <span class="v">${i.v}</span>
       <div class="b" style="height:${Math.round((i.v / max) * altura)}px"></div>
       <span class="a">${esc(i.r)}</span>
-    </div>`).join("")}</div>`;
+    </button>`).join("")}</div>`;
 }
 
-function barrasH(itens) {
+function barrasH(itens, f) {
   const max = Math.max(1, ...itens.map((i) => i.v));
   return `<div class="hbarras">${itens.map((i) => `
-    <span class="r">${esc(i.r)}</span>
-    <div class="t" data-tip="${esc(i.tip)}"><div style="width:${(i.v / max) * 100}%"></div></div>
-    <span class="v">${i.v}</span>`).join("")}</div>`;
+    <button class="hlinha filtro${i.apagada ? " apagada" : ""}${i.sel ? " sel" : ""}" data-f="${f}" data-v="${esc(i.chave)}" data-tip="${esc(i.tip)}">
+      <span class="r">${esc(i.r)}</span>
+      <span class="t"><span style="width:${(i.v / max) * 100}%"></span></span>
+      <span class="v">${i.v}</span>
+    </button>`).join("")}</div>`;
 }
 
 const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
@@ -485,46 +519,77 @@ function renderGraficos(lista) {
   $("graficos").hidden = !ver;
   document.querySelector("main").classList.toggle("com-graficos", ver);
   if (!ver) return;
-  if (!lista.length) { $("graficos").innerHTML = `<div class="gcard vazio">Nenhum artigo com os filtros atuais.</div>`; return; }
 
-  const anos = [...new Set(lista.map((a) => a.ano))].sort((x, y) => x - y);
-  const porAno = (f) => anos.map((ano) => lista.filter((a) => a.ano === ano).reduce((s, a) => s + f(a), 0));
+  const dica = " · clique para filtrar";
+  const soUmAno = TODOS_ANOS.length - anosOff.size === 1;
 
+  // Anos: calculados sem o filtro de ano
+  const lAno = filtrados("ano");
+  const anos = [...new Set(lAno.map((a) => a.ano))].sort((x, y) => x - y);
+  const porAno = (f) => anos.map((ano) => lAno.filter((a) => a.ano === ano).reduce((s, a) => s + f(a), 0));
   const nArt = porAno(() => 1);
   const nCit = porAno((a) => a.citantes.length);
-  const g1 = barrasV(anos.map((ano, k) => ({ r: ano, v: nArt[k], tip: `${ano}: ${nArt[k]} artigos` })));
-  const g2 = barrasV(anos.map((ano, k) => ({ r: ano, v: nCit[k],
-    tip: `${ano}: ${nCit[k]} citações em ${nArt[k]} artigos (média ${(nCit[k] / nArt[k]).toFixed(2)})` })));
+  const itemAno = (ano, v, tip) => ({ chave: ano, r: ano, v, tip: tip + dica,
+    apagada: anosOff.has(String(ano)), sel: soUmAno && !anosOff.has(String(ano)) });
+  const g1 = barrasV(anos.map((ano, k) => itemAno(ano, nArt[k], `${ano}: ${plural(nArt[k], "artigo", "artigos")}`)), "ano");
+  const g2 = barrasV(anos.map((ano, k) => itemAno(ano, nCit[k],
+    `${ano}: ${plural(nCit[k], "citação", "citações")} em ${plural(nArt[k], "artigo", "artigos")} (média ${(nCit[k] / nArt[k]).toFixed(2)})`)), "ano");
+  const citVisiveis = lista.reduce((s, a) => s + a.citantes.length, 0);
 
-  const rotMatch = { doi: "DOI", titulo: "título", titulo_aproximado: "título aprox.", nao_encontrado: "não encontrado" };
+  // Como foram encontrados: sem o próprio filtro
+  const lMatch = filtrados("match");
   const contMatch = {};
-  lista.forEach((a) => { const k = a.match || "nao_encontrado"; contMatch[k] = (contMatch[k] || 0) + 1; });
-  const g3 = barrasH(Object.keys(rotMatch).filter((k) => contMatch[k]).map((k) => ({
-    r: rotMatch[k], v: contMatch[k],
-    tip: `${rotMatch[k]}: ${contMatch[k]} artigos (${Math.round((contMatch[k] / lista.length) * 100)}%)` })));
+  lMatch.forEach((a) => { const k = a.match || "nao_encontrado"; contMatch[k] = (contMatch[k] || 0) + 1; });
+  const g3 = barrasH(Object.keys(ROT_MATCH).filter((k) => contMatch[k]).map((k) => ({
+    chave: k, r: ROT_MATCH[k], v: contMatch[k],
+    apagada: matchFiltro && matchFiltro !== k, sel: matchFiltro === k,
+    tip: `${ROT_MATCH[k]}: ${plural(contMatch[k], "artigo", "artigos")} (${Math.round((contMatch[k] / lMatch.length) * 100)}%)${dica}` })), "match");
 
-  const nAut = lista.map((a) => autoresDe(a).length);
+  // Autores por artigo: sem o próprio filtro
+  const lAut = filtrados("autores");
   const faixas = [1, 2, 3, 4, 5, 6, 7, 8];
-  const hist = faixas.map((f) => nAut.filter((n) => (f === 8 ? n >= 8 : n === f)).length);
-  const media = nAut.reduce((s, n) => s + n, 0) / nAut.length;
+  const hist = faixas.map((f) => lAut.filter((a) => faixaAutores(a) === f).length);
+  const nAut = lista.map((a) => autoresDe(a).length);
+  const media = nAut.length ? nAut.reduce((s, n) => s + n, 0) / nAut.length : 0;
   const distintos = new Set(lista.flatMap(autoresDe)).size;
-  const g4 = barrasV(faixas.map((f, k) => ({ r: f === 8 ? "8+" : f, v: hist[k],
-    tip: `${hist[k]} artigos com ${f === 8 ? "8 ou mais" : f} autor${f === 1 ? "" : "es"}` })));
+  const g4 = barrasV(faixas.map((f, k) => ({ chave: f, r: f === 8 ? "8+" : f, v: hist[k],
+    apagada: autoresFiltro && autoresFiltro !== f, sel: autoresFiltro === f,
+    tip: `${plural(hist[k], "artigo", "artigos")} com ${f === 8 ? "8 ou mais" : f} autor${f === 1 ? "" : "es"}${dica}` })), "autores");
 
   $("graficos").innerHTML =
-    cartao("Artigos por ano", `${plural(lista.length, "artigo SBES", "artigos SBES")}`, g1) +
-    cartao("Citações por ano de publicação", `${plural(nCit.reduce((s, n) => s + n, 0), "citação recebida", "citações recebidas")} pelos artigos de cada ano`, g2) +
+    cartao("Artigos por ano", `${plural(lista.length, "artigo SBES visível", "artigos SBES visíveis")}`, g1) +
+    cartao("Citações por ano de publicação", `${plural(citVisiveis, "citação recebida", "citações recebidas")} pelos artigos visíveis`, g2) +
     cartao("Como os artigos foram encontrados", "no Semantic Scholar", g3) +
     cartao("Número de autores por artigo", `média ${media.toFixed(1)} · ${plural(distintos, "autor distinto", "autores distintos")}`, g4);
 }
+
+// Clique numa barra: filtra por aquele valor; clicar de novo remove o filtro
+$("graficos").addEventListener("click", (e) => {
+  const b = e.target.closest(".filtro");
+  if (!b) return;
+  const { f, v } = b.dataset;
+  if (f === "ano") {
+    const soEste = TODOS_ANOS.length - anosOff.size === 1 && !anosOff.has(v);
+    anosOff.clear();
+    if (!soEste) TODOS_ANOS.forEach((a) => { if (a !== v) anosOff.add(a); });
+    renderAnos();
+  }
+  if (f === "match") matchFiltro = matchFiltro === v ? null : v;
+  if (f === "autores") autoresFiltro = autoresFiltro === Number(v) ? null : Number(v);
+  renderLista();
+});
 
 function renderLista() {
   const lista = filtrados();
   renderKpis(lista);
   renderGraficos(lista);
-  $("chips").innerHTML = autorFiltro
-    ? `<button class="chip" id="limparAutor" title="Remover filtro">Autor: ${esc(autorFiltro)} <span aria-hidden="true">✕</span></button>`
-    : "";
+  const chip = (tipo, texto) =>
+    `<button class="chip" data-limpar="${tipo}" title="Remover filtro">${texto} <span aria-hidden="true">✕</span></button>`;
+  $("chips").innerHTML = [
+    autorFiltro && chip("autor", `Autor: ${esc(autorFiltro)}`),
+    matchFiltro && chip("match", `Encontrado por: ${ROT_MATCH[matchFiltro]}`),
+    autoresFiltro && chip("autores", `Autores: ${autoresFiltro === 8 ? "8 ou mais" : autoresFiltro}`),
+  ].filter(Boolean).join(" ");
   if (!lista.length) { $("lista").innerHTML = `<div class="vazio">Nenhum artigo encontrado.</div>`; return; }
   $("lista").innerHTML = lista.map((a) => `
     <div class="item${a.idx === selecionado ? " ativo" : ""}" data-idx="${a.idx}">
@@ -563,7 +628,9 @@ function renderPainel(a) {
   a.citantes.forEach((c) => { cont[venueDe(c)] = (cont[venueDe(c)] || 0) + 1; });
   [...venuesOff].forEach((v) => { if (!(v in cont)) venuesOff.delete(v); });
   const opcoes = Object.keys(cont).sort((x, y) => cont[y] - cont[x] || x.localeCompare(y));
-  const linhas = a.citantes.filter((c) => !venuesOff.has(venueDe(c)));
+  const porVenue = a.citantes.filter((c) => !venuesOff.has(venueDe(c)));
+  if (anoCitFiltro && !porVenue.some((c) => anoCitDe(c) === anoCitFiltro)) anoCitFiltro = null;
+  const linhas = porVenue.filter((c) => !anoCitFiltro || anoCitDe(c) === anoCitFiltro);
 
   const n = linhas.length;
   const distintos = new Set(linhas.map((c) => (c.grupo ? `g${c.grupo}` : c.id))).size;
@@ -581,24 +648,26 @@ function renderPainel(a) {
       </div>
     </div>` : "";
 
+  // gráfico calculado sem o filtro de ano, para manter todas as barras visíveis
   const porAno = {};
-  linhas.forEach((c) => { const k = c.ano ?? "s/ano"; porAno[k] = (porAno[k] || 0) + 1; });
+  porVenue.forEach((c) => { const k = anoCitDe(c); porAno[k] = (porAno[k] || 0) + 1; });
   const anos = Object.keys(porAno).sort();
   const max = Math.max(1, ...Object.values(porAno));
-  const grafico = n ? `
-    <h3>Citações por ano</h3>
+  const grafico = porVenue.length ? `
+    <h3>Citações por ano ${anoCitFiltro ? `· <button class="limpar-anocit">mostrar todos os anos</button>` : `<span class="dica-h3">(clique em um ano para filtrar)</span>`}</h3>
     <div class="grafico">${anos.map((k) => `
-      <div class="col" title="${esc(k)}: ${porAno[k]}">
+      <button class="col filtro anocit${anoCitFiltro && anoCitFiltro !== k ? " apagada" : ""}${anoCitFiltro === k ? " sel" : ""}" data-anocit="${esc(k)}"
+        data-tip="${esc(k)}: ${plural(porAno[k], "citação", "citações")} · clique para ${anoCitFiltro === k ? "remover o filtro" : "ver só este ano"}">
         <span class="v">${porAno[k]}</span>
         <div class="b" style="height:${Math.round((porAno[k] / max) * 80)}px"></div>
         <span class="a">${esc(k)}</span>
-      </div>`).join("")}
+      </button>`).join("")}
     </div>` : "";
 
   const tabela = !a.citantes.length
     ? `<p class="vazio" style="padding:12px 0">Nenhuma citação registrada no Semantic Scholar.</p>`
     : `
-    <h3>Quem citou (${venuesOff.size ? `${n} de ${a.citantes.length}` : n})</h3>
+    <h3>Quem citou (${venuesOff.size || anoCitFiltro ? `${n} de ${a.citantes.length}` : n}${anoCitFiltro ? ` · citações de ${esc(anoCitFiltro)}` : ""})</h3>
     <div class="tabela"><table>
       <thead><tr><th>Ano</th><th>Artigo citante</th><th>Autores</th><th>Venue</th><th>DOI</th></tr></thead>
       <tbody>${linhas.map((c) => {
@@ -639,11 +708,23 @@ $("lista").addEventListener("click", (e) => {
   if (!item) return;
   selecionado = Number(item.dataset.idx);
   venuesOff.clear();
+  anoCitFiltro = null;
   renderDetalhe(DADOS.find((a) => a.idx === selecionado));
   renderLista();
 });
 $("detalhe").addEventListener("click", (e) => {
   const atual = () => DADOS.find((a) => a.idx === selecionado);
+  const barra = e.target.closest(".anocit");
+  if (barra) {
+    anoCitFiltro = anoCitFiltro === barra.dataset.anocit ? null : barra.dataset.anocit;
+    renderPainel(atual());
+    return;
+  }
+  if (e.target.closest(".limpar-anocit")) {
+    anoCitFiltro = null;
+    renderPainel(atual());
+    return;
+  }
   const chip = e.target.closest(".vchip");
   if (chip) {
     // clique desmarca (ou volta a marcar) a venue
@@ -676,8 +757,11 @@ $("detalhe").addEventListener("click", (e) => {
   renderLista();
 });
 $("chips").addEventListener("click", (e) => {
-  if (!e.target.closest("#limparAutor")) return;
-  autorFiltro = null;
+  const c = e.target.closest("[data-limpar]");
+  if (!c) return;
+  if (c.dataset.limpar === "autor") autorFiltro = null;
+  if (c.dataset.limpar === "match") matchFiltro = null;
+  if (c.dataset.limpar === "autores") autoresFiltro = null;
   renderLista();
 });
 $("soCitados").addEventListener("change", renderLista);
@@ -716,6 +800,7 @@ renderLista();
 // ---- Tour guiado (Shepherd.js) ----
 // Abre sozinho na primeira visita; "Não quero mais ver" grava a preferência no navegador.
 const CHAVE_TOUR = "tourOculto";
+let graficosPeloTour = false;
 const tourOculto = () => { try { return localStorage.getItem(CHAVE_TOUR) === "1"; } catch (e) { return false; } };
 
 function criarTour() {
@@ -741,14 +826,12 @@ function criarTour() {
   const concluir = { text: "Concluir", action() { this.complete(); } };
 
   const passos = [
-    { id: "inicio", title: "Bem-vindo ao dashboard",
-      text: "Este painel mostra quem citou os artigos do SBES, segundo o Semantic Scholar. O tour leva menos de um minuto." },
+    { id: "inicio", title: "Quem cita os artigos do SBES?",
+      text: "Este painel reúne, a partir do Semantic Scholar, os trabalhos que citaram os artigos publicados no Simpósio Brasileiro de Engenharia de Software. Em menos de um minuto, veja como explorar os dados." },
     { id: "cards", title: "Resumo", attachTo: { element: "#kpis", on: "bottom" },
       text: "Totais dos artigos visíveis: quantos artigos, quantos foram citados, total de citações e artigos citantes distintos. Mudam conforme os filtros." },
     { id: "anos", title: "Anos de publicação", attachTo: { element: ".anos-barra", on: "bottom" },
       text: "Todos os anos vêm marcados. Clique em um ano para desmarcá-lo; use <b>desmarcar todos</b> e depois marque só o ano que quer ver." },
-    { id: "graficos", title: "Gráficos", attachTo: { element: ".anos-topo .toggle", on: "left" },
-      text: "Marque <b>Ver gráficos</b> para abrir uma terceira coluna com artigos e citações por ano, como os artigos foram encontrados e número de autores." },
     { id: "filtros", title: "Busca e filtros", attachTo: { element: ".filtros", on: "right" },
       text: "Busque por título ou autor, ordene por número de citações e filtre pelos badges. Passe o mouse sobre um badge para ver o que ele significa." },
     { id: "lista", title: "Artigos", attachTo: { element: "#lista", on: "right" },
@@ -758,10 +841,23 @@ function criarTour() {
         if (selecionado === null) document.querySelector("#lista .item")?.click();
         setTimeout(ok, 50);
       }),
-      text: "Clique no nome de um autor para ver os artigos dele. No card <b>venues</b>, clique para desmarcar uma venue; os cards, o gráfico e a tabela são recalculados." },
-    { id: "fim", title: "Pronto!",
-      text: "Para rever este tour, use o botão <b>Ver tour</b> no topo da página." },
+      text: "Clique no nome de um autor para ver os artigos dele. No card <b>venues</b>, clique para desmarcar uma venue, e no gráfico <b>Citações por ano</b>, clique em um ano para ver só as citações daquele ano. Os cards e a tabela são recalculados." },
+    { id: "graficos", title: "Ver gráficos", attachTo: { element: ".anos-topo .toggle", on: "left" },
+      text: "Marque <b>Ver gráficos</b> para abrir uma terceira coluna com artigos e citações por ano, como os artigos foram encontrados e número de autores." },
+    { id: "painel-graficos", title: "Gráficos que filtram", attachTo: { element: "#graficos", on: "left" },
+      beforeShowPromise: () => new Promise((ok) => {
+        if (!$("verGraficos").checked) { graficosPeloTour = true; $("verGraficos").click(); }
+        setTimeout(ok, 80);
+      }),
+      text: "Aqui ficam artigos e citações por ano, como os artigos foram encontrados e o número de autores. <b>Cada barra é um filtro:</b> clique para ver só aqueles artigos; clique de novo para remover. Os filtros ativos aparecem acima da lista, com um ✕ para limpar.<br><br>Para rever este tour, use <b>Ver tour</b> no topo da página." },
   ];
+  // se o tour abriu os gráficos só para mostrá-los, fecha de novo ao terminar
+  const restaurar = () => {
+    if (graficosPeloTour && $("verGraficos").checked) $("verGraficos").click();
+    graficosPeloTour = false;
+  };
+  tour.on("complete", restaurar);
+  tour.on("cancel", restaurar);
   passos.forEach((p, i) => {
     const botoes = [naoVer];
     if (i > 0) botoes.push(voltar);
