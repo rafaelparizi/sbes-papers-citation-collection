@@ -54,8 +54,9 @@ def sobrenomes(autores) -> set[str]:
     return {n.split()[-1].lower() for n in str(autores or "").split(", ") if n.strip()}
 
 
-def eh_preprint(venue) -> bool:
-    return "arxiv" in str(venue or "").lower()
+def eh_preprint(venue, doi) -> bool:
+    # 10.48550 é o prefixo dos DOIs atribuídos pelo arXiv
+    return "arxiv" in str(venue or "").lower() or str(doi or "").startswith("10.48550/")
 
 
 def agrupar_duplicatas(citantes: list[dict]) -> None:
@@ -113,7 +114,7 @@ def montar_dados() -> list[dict]:
                     "autores": limpar(c["citing_authors"]),
                     "venue": limpar(c["citing_venue"]),
                     "doi": limpar(c["citing_doi"]),
-                    "preprint": eh_preprint(c["citing_venue"]),
+                    "preprint": eh_preprint(c["citing_venue"], c["citing_doi"]),
                 })
             agrupar_duplicatas(citantes)
             citantes = ordenar_citantes(citantes)
@@ -243,6 +244,8 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
 td a { color: var(--text); text-decoration: none; }
 td a:hover { color: var(--accent); text-decoration: underline; }
 td.sm { color: var(--muted); font-size: 12px; }
+td.doi { word-break: break-all; min-width: 110px; }
+td.doi a { color: var(--accent); }
 @media (max-width: 820px) {
   header, .kpis { padding-left: 16px; padding-right: 16px; }
   main { grid-template-columns: 1fr; padding: 0 16px 16px; }
@@ -390,7 +393,7 @@ function renderDetalhe(a) {
   const tabela = n ? `
     <h3>Quem citou (${n})</h3>
     <div class="tabela"><table>
-      <thead><tr><th>Ano</th><th>Artigo citante</th><th>Autores</th><th>Venue</th></tr></thead>
+      <thead><tr><th>Ano</th><th>Artigo citante</th><th>Autores</th><th>Venue</th><th>DOI</th></tr></thead>
       <tbody>${a.citantes.map((c) => {
         const outros = c.grupo ? a.citantes.filter((o) => o.grupo === c.grupo && o !== c).map((o) => o.titulo) : [];
         return `
@@ -401,6 +404,7 @@ function renderDetalhe(a) {
             c.preprint ? ` <span class="tag pre">preprint</span>` : ""}</td>
           <td class="sm">${esc(c.autores)}</td>
           <td class="sm">${esc(c.venue || "—")}</td>
+          <td class="sm doi">${c.doi ? `<a href="https://doi.org/${esc(c.doi)}" target="_blank" rel="noopener">${esc(c.doi)}</a>` : "—"}</td>
         </tr>`;
       }).join("")}
       </tbody>
