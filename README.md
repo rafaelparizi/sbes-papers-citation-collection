@@ -64,6 +64,7 @@ Os registros continuam na contagem de citações (que segue o `citationCount` do
 ### Recursos do dashboard
 
 - Faixa de anos de publicação abaixo dos cards do topo: todos marcados por padrão; clicar desmarca (ou marca de novo) um ano, com atalhos para marcar ou desmarcar todos.
+- Tour guiado ([Shepherd.js](https://shepherdjs.dev/) 11.2.0, licença MIT) que abre na primeira visita; o botão **Não quero mais ver** grava a preferência no navegador e **Ver tour**, no topo, abre o tour de novo.
 - **Ver gráficos** abre uma terceira coluna com artigos por ano, citações por ano de publicação, como os artigos foram encontrados (DOI/título) e número de autores por artigo; os gráficos acompanham os filtros ativos.
 - Busca por título/autor, ordenação por número de citações e clique no nome de um autor para ver os artigos dele.
 - Badges com explicação ao passar o mouse: **similar** (título diferente no Semantic Scholar), **título** (encontrado pela busca por título, porque o DOI não foi reconhecido), **duplicata** e **preprint**. Cada badge da lista tem um filtro correspondente.

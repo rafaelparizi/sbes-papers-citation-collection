@@ -155,6 +155,7 @@ HTML = r"""<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Citações SBES</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/css/shepherd.css">
 <style>
 :root {
   --bg: #f6f7f9; --panel: #ffffff; --text: #1d2330; --muted: #5d6677;
@@ -188,6 +189,24 @@ body {
 header { padding: 18px 24px 8px; }
 header h1 { margin: 0; font-size: 20px; }
 header p { margin: 4px 0 0; color: var(--muted); }
+header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+#abrirTour { font: inherit; font-size: 13px; color: var(--accent); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+#abrirTour:hover { border-color: var(--accent); }
+/* Tour (Shepherd.js) com as cores do dashboard */
+.shepherd-element { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 8px; max-width: 360px; box-shadow: 0 8px 28px rgba(0,0,0,.18); }
+.shepherd-element .shepherd-arrow:before { background: var(--panel) !important; }
+.shepherd-has-title .shepherd-content .shepherd-header { background: var(--panel); padding: 14px 16px 0; }
+.shepherd-title { color: var(--text); font-size: 15px; font-weight: 600; }
+.shepherd-cancel-icon { color: var(--muted); }
+.shepherd-text { color: var(--text); font-size: 14px; line-height: 1.5; padding: 8px 16px 4px; }
+.shepherd-footer { padding: 8px 16px 14px; gap: 6px; flex-wrap: wrap; }
+.shepherd-button { font: inherit; font-size: 13px; border-radius: 6px; padding: 6px 12px; margin: 0; background: var(--accent); color: var(--panel); }
+.shepherd-button:not(:disabled):hover { background: var(--accent); filter: brightness(1.1); color: var(--panel); }
+.shepherd-button.secundario { background: var(--bg); color: var(--text); border: 1px solid var(--line); }
+.shepherd-button.secundario:not(:disabled):hover { background: var(--bg); color: var(--text); border-color: var(--accent); }
+.shepherd-button.nao-ver { background: none; color: var(--muted); padding: 6px 4px; margin-right: auto; text-decoration: underline; }
+.shepherd-button.nao-ver:not(:disabled):hover { background: none; color: var(--text); }
+.shepherd-modal-overlay-container.shepherd-modal-is-visible { opacity: .35; }
 .kpis { display: flex; gap: 12px; flex-wrap: wrap; padding: 8px 24px 16px; }
 .kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; min-width: 130px; }
 .kpi b { display: block; font-size: 20px; }
@@ -295,8 +314,11 @@ td.doi a { color: var(--accent); }
 </head>
 <body>
 <header>
-  <h1>Citações dos artigos do SBES</h1>
-  <p>Fonte: Semantic Scholar · gerado em __GERADO__</p>
+  <div>
+    <h1>Citações dos artigos do SBES</h1>
+    <p>Fonte: Semantic Scholar · gerado em __GERADO__</p>
+  </div>
+  <button id="abrirTour" type="button">Ver tour</button>
 </header>
 <div class="kpis" id="kpis"></div>
 <div class="anos-barra">
@@ -688,6 +710,73 @@ $("verGraficos").addEventListener("change", () => {
 
 renderAnos();
 renderLista();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/js/shepherd.min.js"></script>
+<script>
+// ---- Tour guiado (Shepherd.js) ----
+// Abre sozinho na primeira visita; "Não quero mais ver" grava a preferência no navegador.
+const CHAVE_TOUR = "tourOculto";
+const tourOculto = () => { try { return localStorage.getItem(CHAVE_TOUR) === "1"; } catch (e) { return false; } };
+
+function criarTour() {
+  const tour = new Shepherd.Tour({
+    useModalOverlay: true,
+    defaultStepOptions: {
+      cancelIcon: { enabled: true, label: "Fechar" },
+      scrollTo: { behavior: "smooth", block: "center" },
+      modalOverlayOpeningPadding: 6,
+      modalOverlayOpeningRadius: 8,
+    },
+  });
+  const naoVer = {
+    text: "Não quero mais ver",
+    classes: "nao-ver",
+    action() {
+      try { localStorage.setItem(CHAVE_TOUR, "1"); } catch (e) {}
+      this.complete();
+    },
+  };
+  const voltar = { text: "Voltar", classes: "secundario", action() { this.back(); } };
+  const proximo = { text: "Próximo", action() { this.next(); } };
+  const concluir = { text: "Concluir", action() { this.complete(); } };
+
+  const passos = [
+    { id: "inicio", title: "Bem-vindo ao dashboard",
+      text: "Este painel mostra quem citou os artigos do SBES, segundo o Semantic Scholar. O tour leva menos de um minuto." },
+    { id: "cards", title: "Resumo", attachTo: { element: "#kpis", on: "bottom" },
+      text: "Totais dos artigos visíveis: quantos artigos, quantos foram citados, total de citações e artigos citantes distintos. Mudam conforme os filtros." },
+    { id: "anos", title: "Anos de publicação", attachTo: { element: ".anos-barra", on: "bottom" },
+      text: "Todos os anos vêm marcados. Clique em um ano para desmarcá-lo; use <b>desmarcar todos</b> e depois marque só o ano que quer ver." },
+    { id: "graficos", title: "Gráficos", attachTo: { element: ".anos-topo .toggle", on: "left" },
+      text: "Marque <b>Ver gráficos</b> para abrir uma terceira coluna com artigos e citações por ano, como os artigos foram encontrados e número de autores." },
+    { id: "filtros", title: "Busca e filtros", attachTo: { element: ".filtros", on: "right" },
+      text: "Busque por título ou autor, ordene por número de citações e filtre pelos badges. Passe o mouse sobre um badge para ver o que ele significa." },
+    { id: "lista", title: "Artigos", attachTo: { element: "#lista", on: "right" },
+      text: "Clique em um artigo para ver os detalhes. O número à direita é a quantidade de citações." },
+    { id: "detalhe", title: "Detalhes e quem citou", attachTo: { element: "#detalhe", on: "left" },
+      beforeShowPromise: () => new Promise((ok) => {
+        if (selecionado === null) document.querySelector("#lista .item")?.click();
+        setTimeout(ok, 50);
+      }),
+      text: "Clique no nome de um autor para ver os artigos dele. No card <b>venues</b>, clique para desmarcar uma venue; os cards, o gráfico e a tabela são recalculados." },
+    { id: "fim", title: "Pronto!",
+      text: "Para rever este tour, use o botão <b>Ver tour</b> no topo da página." },
+  ];
+  passos.forEach((p, i) => {
+    const botoes = [naoVer];
+    if (i > 0) botoes.push(voltar);
+    botoes.push(i === passos.length - 1 ? concluir : proximo);
+    tour.addStep({ ...p, buttons: botoes });
+  });
+  return tour;
+}
+
+if (window.Shepherd) {
+  $("abrirTour").addEventListener("click", () => criarTour().start());
+  if (!tourOculto()) criarTour().start();
+} else {
+  $("abrirTour").hidden = true;  // sem internet: o dashboard funciona, só o tour fica indisponível
+}
 </script>
 </body>
 </html>
