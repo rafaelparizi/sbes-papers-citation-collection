@@ -192,7 +192,8 @@ header p { margin: 4px 0 0; color: var(--muted); }
 .kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; min-width: 130px; }
 .kpi b { display: block; font-size: 20px; }
 .kpi span { color: var(--muted); font-size: 12px; }
-main { display: grid; grid-template-columns: minmax(300px, 420px) 1fr; gap: 16px; padding: 0 24px 24px; }
+main { display: grid; grid-template-columns: minmax(300px, 420px) 1fr; gap: 16px; padding: 0 24px 24px; align-items: start; }
+main.com-graficos { grid-template-columns: minmax(280px, 380px) minmax(0, 1fr) minmax(280px, 360px); }
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
 .filtros { display: flex; gap: 8px; padding: 12px; border-bottom: 1px solid var(--line); }
 select, input {
@@ -265,12 +266,28 @@ td.doi a { color: var(--accent); }
 .vchip.on::before { content: "✓ "; }
 .vchip.on b, .kpi .vchip.on b { color: var(--panel); }
 .anos-barra { padding: 0 24px 16px; }
+.anos-topo { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.graficos { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.graficos[hidden] { display: none; }
+.gcard { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; min-width: 0; }
+.gcard h3 { margin: 0; font-size: 14px; }
+.gcard .sub { color: var(--muted); font-size: 12px; margin: 2px 0 10px; }
+.gcard .grafico { height: 150px; border-bottom-color: var(--line); gap: 4px; }
+.gcard .col { min-width: 26px; }
+.gcard .col .b { width: 18px; }
+.gcard .col .b { border-radius: 4px 4px 0 0; }
+.hbarras { display: grid; grid-template-columns: max-content 1fr max-content; gap: 8px 10px; align-items: center; }
+.hbarras .r { font-size: 12px; color: var(--muted); }
+.hbarras .t { height: 14px; background: var(--bg); border-radius: 0 4px 4px 0; }
+.hbarras .t div { height: 100%; background: var(--bar); border-radius: 0 4px 4px 0; min-width: 2px; }
+.hbarras .v { font-size: 12px; font-weight: 600; }
 .anos-cab { color: var(--muted); font-size: 12px; margin-bottom: 2px; }
 .anos-cab button { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; }
 .anos-cab button:hover { text-decoration: underline; }
 .limpar-venues { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; }
 @media (max-width: 820px) {
   header, .kpis, .anos-barra { padding-left: 16px; padding-right: 16px; }
+  main.com-graficos { grid-template-columns: 1fr; }
   main { grid-template-columns: 1fr; padding: 0 16px 16px; }
   .lista { max-height: 50vh; }
 }
@@ -283,7 +300,10 @@ td.doi a { color: var(--accent); }
 </header>
 <div class="kpis" id="kpis"></div>
 <div class="anos-barra">
-  <div class="anos-cab">Anos de publicação <span id="anosAcoes"></span></div>
+  <div class="anos-topo">
+    <div class="anos-cab">Anos de publicação <span id="anosAcoes"></span></div>
+    <label class="toggle"><input id="verGraficos" type="checkbox"> Ver gráficos</label>
+  </div>
   <div class="vchips" id="anos"></div>
 </div>
 <main>
@@ -306,6 +326,7 @@ td.doi a { color: var(--accent); }
   <section class="panel" id="detalhe">
     <div class="vazio">Selecione um artigo à esquerda para ver quem o citou.</div>
   </section>
+  <section class="graficos" id="graficos" hidden></section>
 </main>
 <script>
 const DADOS = __DADOS__;
@@ -414,9 +435,71 @@ function filtrados() {
   return lista;
 }
 
+// ---- Gráficos (acompanham os filtros ativos) ----
+function barrasV(itens, altura = 120) {
+  const max = Math.max(1, ...itens.map((i) => i.v));
+  return `<div class="grafico">${itens.map((i) => `
+    <div class="col" data-tip="${esc(i.tip)}">
+      <span class="v">${i.v}</span>
+      <div class="b" style="height:${Math.round((i.v / max) * altura)}px"></div>
+      <span class="a">${esc(i.r)}</span>
+    </div>`).join("")}</div>`;
+}
+
+function barrasH(itens) {
+  const max = Math.max(1, ...itens.map((i) => i.v));
+  return `<div class="hbarras">${itens.map((i) => `
+    <span class="r">${esc(i.r)}</span>
+    <div class="t" data-tip="${esc(i.tip)}"><div style="width:${(i.v / max) * 100}%"></div></div>
+    <span class="v">${i.v}</span>`).join("")}</div>`;
+}
+
+const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
+const cartao = (titulo, sub, corpo) =>
+  `<div class="gcard"><h3>${titulo}</h3><div class="sub">${sub}</div>${corpo}</div>`;
+
+function renderGraficos(lista) {
+  const ver = $("verGraficos").checked;
+  $("graficos").hidden = !ver;
+  document.querySelector("main").classList.toggle("com-graficos", ver);
+  if (!ver) return;
+  if (!lista.length) { $("graficos").innerHTML = `<div class="gcard vazio">Nenhum artigo com os filtros atuais.</div>`; return; }
+
+  const anos = [...new Set(lista.map((a) => a.ano))].sort((x, y) => x - y);
+  const porAno = (f) => anos.map((ano) => lista.filter((a) => a.ano === ano).reduce((s, a) => s + f(a), 0));
+
+  const nArt = porAno(() => 1);
+  const nCit = porAno((a) => a.citantes.length);
+  const g1 = barrasV(anos.map((ano, k) => ({ r: ano, v: nArt[k], tip: `${ano}: ${nArt[k]} artigos` })));
+  const g2 = barrasV(anos.map((ano, k) => ({ r: ano, v: nCit[k],
+    tip: `${ano}: ${nCit[k]} citações em ${nArt[k]} artigos (média ${(nCit[k] / nArt[k]).toFixed(2)})` })));
+
+  const rotMatch = { doi: "DOI", titulo: "título", titulo_aproximado: "título aprox.", nao_encontrado: "não encontrado" };
+  const contMatch = {};
+  lista.forEach((a) => { const k = a.match || "nao_encontrado"; contMatch[k] = (contMatch[k] || 0) + 1; });
+  const g3 = barrasH(Object.keys(rotMatch).filter((k) => contMatch[k]).map((k) => ({
+    r: rotMatch[k], v: contMatch[k],
+    tip: `${rotMatch[k]}: ${contMatch[k]} artigos (${Math.round((contMatch[k] / lista.length) * 100)}%)` })));
+
+  const nAut = lista.map((a) => autoresDe(a).length);
+  const faixas = [1, 2, 3, 4, 5, 6, 7, 8];
+  const hist = faixas.map((f) => nAut.filter((n) => (f === 8 ? n >= 8 : n === f)).length);
+  const media = nAut.reduce((s, n) => s + n, 0) / nAut.length;
+  const distintos = new Set(lista.flatMap(autoresDe)).size;
+  const g4 = barrasV(faixas.map((f, k) => ({ r: f === 8 ? "8+" : f, v: hist[k],
+    tip: `${hist[k]} artigos com ${f === 8 ? "8 ou mais" : f} autor${f === 1 ? "" : "es"}` })));
+
+  $("graficos").innerHTML =
+    cartao("Artigos por ano", `${plural(lista.length, "artigo SBES", "artigos SBES")}`, g1) +
+    cartao("Citações por ano de publicação", `${plural(nCit.reduce((s, n) => s + n, 0), "citação recebida", "citações recebidas")} pelos artigos de cada ano`, g2) +
+    cartao("Como os artigos foram encontrados", "no Semantic Scholar", g3) +
+    cartao("Número de autores por artigo", `média ${media.toFixed(1)} · ${plural(distintos, "autor distinto", "autores distintos")}`, g4);
+}
+
 function renderLista() {
   const lista = filtrados();
   renderKpis(lista);
+  renderGraficos(lista);
   $("chips").innerHTML = autorFiltro
     ? `<button class="chip" id="limparAutor" title="Remover filtro">Autor: ${esc(autorFiltro)} <span aria-hidden="true">✕</span></button>`
     : "";
@@ -596,6 +679,12 @@ $("anosAcoes").addEventListener("click", (e) => {
 });
 $("ordem").addEventListener("change", renderLista);
 $("busca").addEventListener("input", renderLista);
+
+try { $("verGraficos").checked = localStorage.getItem("verGraficos") === "1"; } catch (e) {}
+$("verGraficos").addEventListener("change", () => {
+  try { localStorage.setItem("verGraficos", $("verGraficos").checked ? "1" : "0"); } catch (e) {}
+  renderLista();
+});
 
 renderAnos();
 renderLista();
