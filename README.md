@@ -57,7 +57,7 @@ No dashboard, um artigo recebe o badge **similar** quando o título no Semantic 
 
 O Semantic Scholar às vezes mantém registros separados para o mesmo trabalho, por exemplo o preprint no arXiv e a versão publicada em conferência. Entre os artigos que citam um mesmo artigo SBES, dois registros são marcados como **duplicata** quando:
 
-- os títulos normalizados têm pelo menos 80% de semelhança (`difflib.SequenceMatcher`); **e**
+- os títulos normalizados têm pelo menos 75% de semelhança (`difflib.SequenceMatcher`); **e**
 - há pelo menos um sobrenome de autor em comum.
 
 Os registros continuam na contagem de citações (que segue o `citationCount` do Semantic Scholar), mas o dashboard mostra também o número de **trabalhos distintos**, marca os registros agrupados e os de venue arXiv (**preprint**) e permite filtrar os artigos que têm duplicatas. A lista para revisão fica em `output/possiveis_duplicatas.csv`.
@@ -65,7 +65,6 @@ Os registros continuam na contagem de citações (que segue o `citationCount` do
 ### Recursos do dashboard
 
 - Faixa de anos de publicação abaixo dos cards do topo: todos marcados por padrão; clicar desmarca (ou marca de novo) um ano, com atalhos para marcar ou desmarcar todos.
-- Rodapé com link para a página do autor (Rafael Parizi).
 - Tour guiado ([Shepherd.js](https://shepherdjs.dev/) 11.2.0, licença MIT) que abre na primeira visita; o botão **Não quero mais ver** grava a preferência no navegador e **Ver tour**, no topo, abre o tour de novo.
 - **Ver gráficos** abre uma terceira coluna com artigos por ano, citações por ano de publicação, como os artigos foram encontrados (DOI/título) e número de autores por artigo; os gráficos acompanham os filtros ativos, e cada barra é um filtro (clique para aplicar, clique de novo ou use o ✕ acima da lista para remover).
 - Nos detalhes de um artigo, o gráfico **Citações por ano** também filtra: clicar em um ano mostra só as citações daquele ano.

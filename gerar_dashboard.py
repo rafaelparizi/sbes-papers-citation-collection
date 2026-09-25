@@ -44,7 +44,7 @@ def titulo_base(t) -> str:
 
 # Dois artigos citantes são tratados como o mesmo trabalho (ex.: preprint no arXiv
 # e versão publicada) quando os títulos são parecidos E há autor em comum.
-SIMILARIDADE_DUP = 0.8
+SIMILARIDADE_DUP = 0.75
 
 
 def normalizar(t) -> str:
@@ -207,9 +207,6 @@ body {
 header { padding: 18px 24px 8px; }
 header h1 { margin: 0; font-size: 20px; }
 header p { margin: 4px 0 0; color: var(--muted); }
-.rodape { border-top: 1px solid var(--line); background: var(--panel); color: var(--muted); font-size: 13px; text-align: center; padding: 14px 24px; margin-top: 8px; }
-.rodape a { color: var(--accent); text-decoration: none; font-weight: 600; }
-.rodape a:hover { text-decoration: underline; }
 header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
 #abrirTour { font: inherit; font-size: 13px; color: var(--accent); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
 #abrirTour:hover { border-color: var(--accent); }
@@ -390,9 +387,6 @@ button.filtro { background: none; border: 0; padding: 0; font: inherit; color: i
   </section>
   <section class="graficos" id="graficos" hidden></section>
 </main>
-<footer class="rodape">
-  <a href="https://rafaelparizi.github.io/" target="_blank" rel="noopener">Rafael Parizi</a>
-</footer>
 <script>
 const DADOS = __DADOS__;
 const $ = (id) => document.getElementById(id);
