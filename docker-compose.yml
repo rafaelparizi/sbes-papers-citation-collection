@@ -9,6 +9,8 @@ services:
       - "8000:8000"
     volumes:
       - ./output:/app/output
+      - "./Computação_Classificação de Eventos 2025.xlsx:/app/Computação_Classificação de Eventos 2025.xlsx:ro"
+      - ./qualis_apelidos.csv:/app/qualis_apelidos.csv:ro
     restart: unless-stopped
 
   coleta:

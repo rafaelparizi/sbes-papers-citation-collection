@@ -73,6 +73,20 @@ Os registros continuam na contagem de citações (que segue o `citationCount` do
 - Nos detalhes de um artigo, o card **venues** lista as venues dos artigos citantes, todas marcadas por padrão. Clicar desmarca (ou marca de novo) uma venue, e os demais cards, o gráfico e a tabela são recalculados. Clicar no nome de uma venue na tabela mostra só aquela venue.
 - A tabela de quem citou traz ano, título, autores, venue e DOI de cada artigo citante.
 
+### Qualis das venues citantes
+
+A venue de cada artigo citante é classificada pelo **Qualis CAPES de eventos de Computação (2025)**, a partir da planilha `Computação_Classificação de Eventos 2025.xlsx`. O casamento é feito em camadas, da mais para a menos segura:
+
+1. **apelido** definido à mão em `qualis_apelidos.csv` (ex.: "Brazilian Symposium on Software Quality" → SBQS), para eventos cujo nome no Semantic Scholar difere do nome na planilha;
+2. trilhas no formato `X@Y`, aceitas só se `Y-X` estiver na lista (ex.: SEET@ICSE → ICSE-SEET);
+3. **nome** igual após normalizar (sem acentos, ano, edição, "Proceedings of"/"Anais do", IEEE/ACM e pontuação);
+4. **sigla** entre parênteses (ex.: "(EDUCOMP 2026)") ou a própria venue como sigla;
+5. nome quase igual (≥ 95% de semelhança).
+
+Workshops e trilhas satélite não herdam o Qualis do evento principal. Periódicos não são classificados, porque a planilha cobre só eventos; preprints do arXiv e citações sem venue também ficam sem Qualis. A classificação de cada venue fica em `output/venues_qualis.csv`, para conferência; casos errados ou ausentes podem ser corrigidos acrescentando uma linha em `qualis_apelidos.csv`.
+
+No dashboard, a tabela de quem citou tem a coluna **Qualis**, e os detalhes do artigo mostram o card **Qualis das citações**, com a contagem por estrato (A1 a B4 e "sem"). Clicar em um estrato mostra só aquelas citações.
+
 ### Limitações
 
 - A cobertura depende do Semantic Scholar: citações que ele não indexou não aparecem, e artigos antigos tendem a ter menos citações registradas.
@@ -87,6 +101,7 @@ Os registros continuam na contagem de citações (que segue o `citationCount` do
 | `sbes_s2_paper_ids.csv` | Artigos SBES com o `paperId` no Semantic Scholar e o método de identificação (`doi`, `titulo`, `titulo_aproximado`, `nao_encontrado`) |
 | `sbes_citations.csv` / `.xlsx` | Uma linha por par (artigo SBES citado, artigo citante) |
 | `erros_coleta.csv` | Artigos pulados porque a API não respondeu após 5 tentativas (só existe quando há erros) |
+| `venues_qualis.csv` | Cada venue citante com o estrato Qualis (eventos 2025), a sigla e como foi identificada |
 | `possiveis_duplicatas.csv` | Artigos citantes que parecem ser o mesmo trabalho (ex.: preprint e versão publicada), para revisão |
 | `dashboard.html` | Dashboard interativo (mesmo conteúdo de `docs/index.html`) |
 

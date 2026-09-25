@@ -13,6 +13,7 @@ que a coleta avançar.
 import itertools
 import json
 import re
+import unicodedata
 from difflib import SequenceMatcher
 from pathlib import Path
 
@@ -25,6 +26,11 @@ ARQ_CIT = SAIDA_DIR / "sbes_citations.csv"
 ARQ_HTML = SAIDA_DIR / "dashboard.html"
 ARQ_DUP = SAIDA_DIR / "possiveis_duplicatas.csv"
 ARQ_ERROS = SAIDA_DIR / "erros_coleta.csv"  # artigos pulados pela coleta (API indisponível)
+RAIZ = Path(__file__).resolve().parent
+ARQ_QUALIS = RAIZ / "Computação_Classificação de Eventos 2025.xlsx"  # Qualis CAPES Computação, eventos
+ARQ_APELIDOS = RAIZ / "qualis_apelidos.csv"  # venue do Semantic Scholar -> sigla do Qualis (casos manuais)
+ARQ_VENUES = SAIDA_DIR / "venues_qualis.csv"  # como cada venue foi classificada, para conferência
+ESTRATOS = ["A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4"]
 # cópia publicada pelo GitHub Pages (pasta docs/ do repositório)
 ARQ_PAGES = Path(__file__).resolve().parent / "docs" / "index.html"
 
@@ -97,12 +103,116 @@ def ordenar_citantes(citantes: list[dict]) -> list[dict]:
     return sorted(citantes, key=chave)
 
 
+# ---------------------------------------------------------------------------
+# Qualis dos eventos: venue do artigo citante -> estrato
+# ---------------------------------------------------------------------------
+
+def sem_acento(t: str) -> str:
+    return "".join(c for c in unicodedata.normalize("NFKD", t) if not unicodedata.combining(c))
+
+
+def normalizar_evento(t) -> str:
+    """Nome do evento sem edição, ano, organização e pontuação."""
+    t = sem_acento(str(t)).lower().replace("&", " and ")
+    t = re.sub(r"\(.*?\)", " ", t)
+    t = re.sub(r"\b(proceedings of the|proceedings of|proceedings|anais estendidos d[oa]s?|anais d[oa]s?)\b", " ", t)
+    t = re.sub(r"\b(ieee/acm|acm/ieee|ieee|acm|sbc|usenix)\b", " ", t)
+    t = re.sub(r"\b(19|20)\d{2}\b", " ", t)
+    t = re.sub(r"\b\d+(st|nd|rd|th|a|o)?\b", " ", t)
+    t = re.sub(r"\b[ivxlc]{1,6}\b", " ", t)  # edição em algarismos romanos
+    t = re.sub(r"[^a-z0-9]+", " ", t)
+    return re.sub(r"\s+", " ", t).strip()
+
+
+class Qualis:
+    """Classifica venues pelo Qualis de eventos, em camadas, da mais para a menos segura."""
+
+    def __init__(self):
+        self.ok = ARQ_QUALIS.exists()
+        self.cache = {}
+        if not self.ok:
+            return
+        q = pd.read_excel(ARQ_QUALIS)
+        q = q[q["QUALIS"].isin(ESTRATOS)]
+        self.por_sigla = {str(r.SIGLA).strip().upper(): r for r in q.itertuples()}
+        self.por_nome = {normalizar_evento(r.NOME): r for r in q.itertuples()}
+        self.apelidos = {}
+        if ARQ_APELIDOS.exists():
+            for _, r in pd.read_csv(ARQ_APELIDOS).iterrows():
+                self.apelidos[normalizar_evento(r["venue"])] = str(r["sigla"]).strip().upper()
+
+    def _resultado(self, r, como):
+        return {"estrato": r.QUALIS, "sigla": r.SIGLA, "nome": r.NOME, "como": como}
+
+    def classificar(self, venue) -> dict:
+        if venue in self.cache:
+            return self.cache[venue]
+        self.cache[venue] = res = self._classificar(venue)
+        return res
+
+    def _classificar(self, venue) -> dict:
+        if not isinstance(venue, str) or not venue.strip():
+            return {"estrato": None, "categoria": "sem venue"}
+        if "arxiv" in venue.lower():
+            return {"estrato": None, "categoria": "preprint"}
+        if not self.ok:
+            return {"estrato": None, "categoria": "sem planilha Qualis"}
+        v = venue.strip()
+        n = normalizar_evento(v)
+        # 1) apelido definido à mão
+        if n in self.apelidos and self.apelidos[n] in self.por_sigla:
+            return self._resultado(self.por_sigla[self.apelidos[n]], "apelido")
+        # 2) trilha/workshop "X@Y": só vale se "Y-X" estiver na lista (ex.: SEET@ICSE -> ICSE-SEET)
+        if "@" in v:
+            x, y = [p.strip().upper() for p in v.split("@", 1)]
+            if f"{y}-{x}" in self.por_sigla:
+                return self._resultado(self.por_sigla[f"{y}-{x}"], "sigla")
+            return {"estrato": None, "categoria": "workshop/trilha"}
+        workshop = re.search(r"\b(workshops?|companion)\b", v, re.I)
+        # 3) nome igual (após normalizar)
+        if n in self.por_nome:
+            r = self.por_nome[n]
+            if not workshop or re.search(r"\bworkshop", r.NOME, re.I):
+                return self._resultado(r, "nome")
+        # 4) sigla entre parênteses, ex.: "(EDUCOMP 2026)"
+        for m in re.finditer(r"\(([A-Za-z][A-Za-z&\-]+)(?:\s+(?:19|20)\d{2})?\)", v):
+            if m.group(1).upper() in self.por_sigla:
+                return self._resultado(self.por_sigla[m.group(1).upper()], "sigla")
+        # 5) a própria venue é uma sigla
+        if v.upper() in self.por_sigla:
+            return self._resultado(self.por_sigla[v.upper()], "sigla")
+        if workshop:
+            return {"estrato": None, "categoria": "workshop/trilha"}
+        # 6) nome quase igual (>= 95%): só diferenças mínimas de grafia
+        melhor = max(self.por_nome, key=lambda k: SequenceMatcher(None, n, k).ratio())
+        if SequenceMatcher(None, n, melhor).ratio() >= 0.95:
+            return self._resultado(self.por_nome[melhor], "nome aproximado")
+        return {"estrato": None, "categoria": "não listado"}
+
+
+def salvar_venues(qualis: "Qualis", cit: pd.DataFrame) -> None:
+    cont = cit["citing_venue"].value_counts(dropna=False)
+    linhas = []
+    for venue, n in cont.items():
+        r = qualis.classificar(venue)
+        linhas.append({
+            "venue": venue, "citacoes": int(n), "estrato": r.get("estrato"),
+            "sigla": r.get("sigla"), "nome_qualis": r.get("nome"),
+            "como": r.get("como") or r.get("categoria"),
+        })
+    pd.DataFrame(linhas).to_csv(ARQ_VENUES, index=False)
+
+
 def montar_dados() -> list[dict]:
     ids = pd.read_csv(ARQ_IDS)
     cit = pd.read_csv(ARQ_CIT) if ARQ_CIT.exists() else pd.DataFrame(columns=["sbes_idx"])
 
     erros = pd.read_csv(ARQ_ERROS) if ARQ_ERROS.exists() else pd.DataFrame(columns=["idx", "etapa", "quando"])
     erro_de = {int(r["idx"]): f'{r["etapa"]} ({r["quando"]})' for _, r in erros.iterrows()}
+
+    qualis = Qualis()
+    if len(cit):
+        salvar_venues(qualis, cit)
 
     por_artigo = {k: g for k, g in cit.groupby("sbes_idx")}
     artigos = []
@@ -119,6 +229,7 @@ def montar_dados() -> list[dict]:
                     "venue": limpar(c["citing_venue"]),
                     "doi": limpar(c["citing_doi"]),
                     "preprint": eh_preprint(c["citing_venue"], c["citing_doi"]),
+                    "qualis": qualis.classificar(limpar(c["citing_venue"])),
                 })
             agrupar_duplicatas(citantes)
             citantes = ordenar_citantes(citantes)
@@ -332,6 +443,26 @@ button.filtro { background: none; border: 0; padding: 0; font: inherit; color: i
 .filtro.sel .a, .filtro.sel .r { color: var(--accent); font-weight: 700; }
 .filtro:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .chips .chip + .chip { margin-left: 4px; }
+:root {
+  --q-A1: #0b2e6f; --q-A2: #15428f; --q-A3: #2257b0; --q-A4: #356fcc;
+  --q-B1: #7ea6e5; --q-B2: #a1bfed; --q-B3: #c0d6f4; --q-B4: #dfeafa;
+}
+.qtag, .qchip { display: inline-flex; align-items: center; gap: 4px; font: inherit; font-size: 11px; font-weight: 700; border-radius: 4px; padding: 1px 6px; border: 1px solid transparent; white-space: nowrap; }
+.q-A1, .q-A2, .q-A3, .q-A4 { background: var(--q-A1); color: #fff; }
+.q-A2 { background: var(--q-A2); } .q-A3 { background: var(--q-A3); } .q-A4 { background: var(--q-A4); }
+.q-B1, .q-B2, .q-B3, .q-B4 { background: var(--q-B1); color: #0b2e6f; }
+.q-B2 { background: var(--q-B2); }
+.q-B3 { background: var(--q-B3); } .q-B4 { background: var(--q-B4); }
+.q-sem { background: var(--bg); color: var(--muted); border-color: var(--line); }
+.kpi-qualis { flex: 1 1 300px; max-width: 460px; }
+.kpi-qualis > span { display: block; }
+.qchips { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 4px; }
+.qchip { cursor: pointer; padding: 3px 7px; font-size: 12px; }
+.kpi .qchip b { display: inline; font-size: 12px; font-weight: 600; opacity: .85; }
+.qchip.apagada, .qchip.zero { opacity: .3; }
+.qchip.sel { outline: 2px solid var(--accent); outline-offset: 1px; }
+.qresumo { color: var(--muted); font-size: 12px; }
+.limpar-qualis { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; }
 .detalhe .col.filtro { border-radius: 4px; padding: 0 2px; }
 .detalhe .col.filtro:hover { background: var(--accent-soft); }
 .dica-h3 { color: var(--muted); font-weight: 400; font-size: 12px; }
@@ -441,7 +572,26 @@ document.addEventListener("mouseover", (e) => {
 document.addEventListener("scroll", () => tip.classList.remove("on"), true);
 
 const venuesOff = new Set();
-let anoCitFiltro = null;  // ano de citação clicado no gráfico do artigo (null = todos)
+let anoCitFiltro = null;
+let qualisFiltro = null;  // estrato clicado no card Qualis (null = todos)
+const ESTRATOS = ["A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4"];
+const SEM_QUALIS = "sem";
+const estratoDe = (c) => (c.qualis && c.qualis.estrato) || SEM_QUALIS;
+const MOTIVO_SEM = {
+  "não listado": "Venue fora da lista de eventos do Qualis (em geral, um periódico ou um evento não classificado).",
+  "preprint": "Preprint no arXiv: não é classificado pelo Qualis.",
+  "sem venue": "O Semantic Scholar não informa a venue desta citação.",
+  "workshop/trilha": "Workshop ou trilha satélite de um evento; não herda o Qualis do evento principal.",
+  "sem planilha Qualis": "A planilha do Qualis não foi encontrada ao gerar o dashboard.",
+};
+function tagQualis(c) {
+  const q = c.qualis || {};
+  if (q.estrato) {
+    const como = { nome: "pelo nome", sigla: "pela sigla", apelido: "por apelido definido à mão", "nome aproximado": "por nome quase igual" }[q.como] || "";
+    return `<span class="qtag q-${q.estrato}" data-tip="${esc(`${q.sigla} — ${q.nome}. Qualis ${q.estrato} (eventos de Computação, 2025), identificado ${como}.`)}">${q.estrato}</span>`;
+  }
+  return `<span class="qtag q-sem" data-tip="${esc(MOTIVO_SEM[q.categoria] || "Sem Qualis.")}">—</span>`;
+}  // ano de citação clicado no gráfico do artigo (null = todos)
 const anoCitDe = (c) => String(c.ano ?? "s/ano");  // venues desmarcadas no card (vazio = todas marcadas)
 const porTitulo = (a) => a.match === "titulo" || a.match === "titulo_aproximado";
 const autoresDe = (a) => String(a.autores ?? "").split(", ").filter(Boolean);
@@ -644,6 +794,26 @@ function renderDetalhe(a) {
 const SEM_VENUE = "__sem_venue__";
 const venueDe = (c) => c.venue || SEM_VENUE;
 
+// Resumo por estrato Qualis das citações visíveis; cada estrato é um filtro
+function cardQualis(cits) {
+  if (!cits.length) return "";
+  const cont = {};
+  cits.forEach((c) => { const k = estratoDe(c); cont[k] = (cont[k] || 0) + 1; });
+  const comQualis = cits.length - (cont[SEM_QUALIS] || 0);
+  const chip = (k, rotulo, tip) => `
+    <button class="qchip q-${k}${cont[k] ? "" : " zero"}${qualisFiltro === k ? " sel" : ""}${qualisFiltro && qualisFiltro !== k ? " apagada" : ""}" data-qualis="${k}"
+      data-tip="${esc(tip)} · clique para ${qualisFiltro === k ? "remover o filtro" : "ver só estas citações"}">${rotulo} <b>${cont[k] || 0}</b></button>`;
+  return `
+    <div class="kpi kpi-qualis">
+      <span>Qualis das citações (eventos 2025) ${qualisFiltro ? `· <button class="limpar-qualis">todos</button>` : ""}</span>
+      <div class="qchips">
+        ${ESTRATOS.map((e) => chip(e, e, `${plural(cont[e] || 0, "citação", "citações")} em eventos ${e}`)).join("")}
+        ${chip(SEM_QUALIS, "sem", `${plural(cont[SEM_QUALIS] || 0, "citação", "citações")} sem Qualis de evento (periódicos, preprints, eventos não listados)`)}
+      </div>
+      <span class="qresumo">${comQualis} de ${cits.length} com Qualis de evento</span>
+    </div>`;
+}
+
 // Cards, gráfico e tabela, recalculados conforme as venues selecionadas
 function renderPainel(a) {
   const cont = {};
@@ -652,7 +822,9 @@ function renderPainel(a) {
   const opcoes = Object.keys(cont).sort((x, y) => cont[y] - cont[x] || x.localeCompare(y));
   const porVenue = a.citantes.filter((c) => !venuesOff.has(venueDe(c)));
   if (anoCitFiltro && !porVenue.some((c) => anoCitDe(c) === anoCitFiltro)) anoCitFiltro = null;
-  const linhas = porVenue.filter((c) => !anoCitFiltro || anoCitDe(c) === anoCitFiltro);
+  const porAnoCit = porVenue.filter((c) => !anoCitFiltro || anoCitDe(c) === anoCitFiltro);
+  if (qualisFiltro && !porAnoCit.some((c) => estratoDe(c) === qualisFiltro)) qualisFiltro = null;
+  const linhas = porAnoCit.filter((c) => !qualisFiltro || estratoDe(c) === qualisFiltro);
 
   const n = linhas.length;
   const distintos = new Set(linhas.map((c) => (c.grupo ? `g${c.grupo}` : c.id))).size;
@@ -689,9 +861,9 @@ function renderPainel(a) {
   const tabela = !a.citantes.length
     ? `<p class="vazio" style="padding:12px 0">Nenhuma citação registrada no Semantic Scholar.</p>`
     : `
-    <h3>Quem citou (${venuesOff.size || anoCitFiltro ? `${n} de ${a.citantes.length}` : n}${anoCitFiltro ? ` · citações de ${esc(anoCitFiltro)}` : ""})</h3>
+    <h3>Quem citou (${venuesOff.size || anoCitFiltro || qualisFiltro ? `${n} de ${a.citantes.length}` : n}${anoCitFiltro ? ` · citações de ${esc(anoCitFiltro)}` : ""}${qualisFiltro ? ` · Qualis ${qualisFiltro === SEM_QUALIS ? "sem classificação" : qualisFiltro}` : ""})</h3>
     <div class="tabela"><table>
-      <thead><tr><th>Ano</th><th>Artigo citante</th><th>Autores</th><th>Venue</th><th>DOI</th></tr></thead>
+      <thead><tr><th>Ano</th><th>Artigo citante</th><th>Autores</th><th>Venue</th><th>Qualis</th><th>DOI</th></tr></thead>
       <tbody>${linhas.map((c) => {
         const outros = c.grupo ? a.citantes.filter((o) => o.grupo === c.grupo && o !== c).map((o) => o.titulo) : [];
         return `
@@ -704,6 +876,7 @@ function renderPainel(a) {
           <td class="sm">${c.venue
             ? `<button class="venue" data-venue="${esc(c.venue)}" title="Mostrar só esta venue">${esc(c.venue)}</button>`
             : "—"}</td>
+          <td>${tagQualis(c)}</td>
           <td class="sm doi">${c.doi
             ? `<a href="https://doi.org/${esc(c.doi)}" target="_blank" rel="noopener">${esc(c.doi)}</a>`
             : "—"}</td>
@@ -719,6 +892,7 @@ function renderPainel(a) {
       ${kpi(primeiro, "primeira citação")}
       ${kpi(nVenues, "venues distintos")}
       ${kpi(encontrado, "encontrado por")}
+      ${cardQualis(porAnoCit)}
       ${cardVenues}
     </div>
     ${grafico}
@@ -731,11 +905,23 @@ $("lista").addEventListener("click", (e) => {
   selecionado = Number(item.dataset.idx);
   venuesOff.clear();
   anoCitFiltro = null;
+  qualisFiltro = null;
   renderDetalhe(DADOS.find((a) => a.idx === selecionado));
   renderLista();
 });
 $("detalhe").addEventListener("click", (e) => {
   const atual = () => DADOS.find((a) => a.idx === selecionado);
+  const qc = e.target.closest(".qchip");
+  if (qc) {
+    qualisFiltro = qualisFiltro === qc.dataset.qualis ? null : qc.dataset.qualis;
+    renderPainel(atual());
+    return;
+  }
+  if (e.target.closest(".limpar-qualis")) {
+    qualisFiltro = null;
+    renderPainel(atual());
+    return;
+  }
   const barra = e.target.closest(".anocit");
   if (barra) {
     anoCitFiltro = anoCitFiltro === barra.dataset.anocit ? null : barra.dataset.anocit;
