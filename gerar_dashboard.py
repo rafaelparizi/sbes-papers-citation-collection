@@ -391,7 +391,7 @@ button.filtro { background: none; border: 0; padding: 0; font: inherit; color: i
   <section class="graficos" id="graficos" hidden></section>
 </main>
 <footer class="rodape">
-  Developed by <a href="https://rafaelparizi.github.io/" target="_blank" rel="noopener">Rafael Parizi</a>
+  <a href="https://rafaelparizi.github.io/" target="_blank" rel="noopener">Rafael Parizi</a>
 </footer>
 <script>
 const DADOS = __DADOS__;

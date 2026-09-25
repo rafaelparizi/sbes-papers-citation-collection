@@ -65,7 +65,7 @@ Os registros continuam na contagem de citações (que segue o `citationCount` do
 ### Recursos do dashboard
 
 - Faixa de anos de publicação abaixo dos cards do topo: todos marcados por padrão; clicar desmarca (ou marca de novo) um ano, com atalhos para marcar ou desmarcar todos.
-- Rodapé com crédito: "Developed by Rafael Parizi".
+- Rodapé com link para a página do autor (Rafael Parizi).
 - Tour guiado ([Shepherd.js](https://shepherdjs.dev/) 11.2.0, licença MIT) que abre na primeira visita; o botão **Não quero mais ver** grava a preferência no navegador e **Ver tour**, no topo, abre o tour de novo.
 - **Ver gráficos** abre uma terceira coluna com artigos por ano, citações por ano de publicação, como os artigos foram encontrados (DOI/título) e número de autores por artigo; os gráficos acompanham os filtros ativos, e cada barra é um filtro (clique para aplicar, clique de novo ou use o ✕ acima da lista para remover).
 - Nos detalhes de um artigo, o gráfico **Citações por ano** também filtra: clicar em um ano mostra só as citações daquele ano.
