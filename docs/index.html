@@ -205,7 +205,7 @@ button.filtro { background: none; border: 0; padding: 0; font: inherit; color: i
 <header>
   <div>
     <h1>Citações dos artigos do SBES</h1>
-    <p>Fonte: Semantic Scholar · gerado em 25/09/2026 16:28</p>
+    <p>Fonte: Semantic Scholar · gerado em 25/09/2026 16:37</p>
   </div>
   <button id="abrirTour" type="button">Ver tour</button>
 </header>
@@ -738,7 +738,6 @@ renderLista();
 // ---- Tour guiado (Shepherd.js) ----
 // Abre sozinho na primeira visita; "Não quero mais ver" grava a preferência no navegador.
 const CHAVE_TOUR = "tourOculto";
-let graficosPeloTour = false;
 const tourOculto = () => { try { return localStorage.getItem(CHAVE_TOUR) === "1"; } catch (e) { return false; } };
 
 function criarTour() {
@@ -763,37 +762,46 @@ function criarTour() {
   const proximo = { text: "Próximo", action() { this.next(); } };
   const concluir = { text: "Concluir", action() { this.complete(); } };
 
-  const passos = [
-    { id: "inicio", title: "Quem cita os artigos do SBES?",
+  // Gráficos ficam FECHADOS durante o tour e só aparecem nas últimas etapas.
+  const setGraficos = (abrir) => { if ($("verGraficos").checked !== abrir) $("verGraficos").click(); };
+  const fecharGraficos = () => new Promise((ok) => { setGraficos(false); setTimeout(ok, 30); });
+  const abrirArtigo = () => new Promise((ok) => {
+    setGraficos(false);
+    if (selecionado === null) document.querySelector("#lista .item")?.click();
+    setTimeout(ok, 50);
+  });
+
+  // Etapas gerais (novas etapas entram aqui, nunca depois dos gráficos)
+  const passosGerais = [
+    { id: "inicio", title: "Quem cita os artigos do SBES?", beforeShowPromise: fecharGraficos,
       text: "Este painel reúne, a partir do Semantic Scholar, os trabalhos que citaram os artigos publicados no Simpósio Brasileiro de Engenharia de Software. Em menos de um minuto, veja como explorar os dados." },
-    { id: "cards", title: "Resumo", attachTo: { element: "#kpis", on: "bottom" },
+    { id: "cards", title: "Resumo", attachTo: { element: "#kpis", on: "bottom" }, beforeShowPromise: fecharGraficos,
       text: "Totais dos artigos visíveis: quantos artigos, quantos foram citados, total de citações e artigos citantes distintos. Mudam conforme os filtros." },
-    { id: "anos", title: "Anos de publicação", attachTo: { element: ".anos-barra", on: "bottom" },
+    { id: "anos", title: "Anos de publicação", attachTo: { element: ".anos-barra", on: "bottom" }, beforeShowPromise: fecharGraficos,
       text: "Todos os anos vêm marcados. Clique em um ano para desmarcá-lo; use <b>desmarcar todos</b> e depois marque só o ano que quer ver." },
-    { id: "filtros", title: "Busca e filtros", attachTo: { element: ".filtros", on: "right" },
+    { id: "filtros", title: "Busca e filtros", attachTo: { element: ".filtros", on: "right" }, beforeShowPromise: fecharGraficos,
       text: "Busque por título ou autor, ordene por número de citações e filtre pelos badges. Passe o mouse sobre um badge para ver o que ele significa." },
-    { id: "lista", title: "Artigos", attachTo: { element: "#lista", on: "right" },
+    { id: "lista", title: "Artigos", attachTo: { element: "#lista", on: "right" }, beforeShowPromise: fecharGraficos,
       text: "Clique em um artigo para ver os detalhes. O número à direita é a quantidade de citações." },
-    { id: "detalhe", title: "Detalhes e quem citou", attachTo: { element: "#detalhe", on: "left" },
-      beforeShowPromise: () => new Promise((ok) => {
-        if (selecionado === null) document.querySelector("#lista .item")?.click();
-        setTimeout(ok, 50);
-      }),
-      text: "Clique no nome de um autor para ver os artigos dele. No card <b>venues</b>, clique para desmarcar uma venue, e no gráfico <b>Citações por ano</b>, clique em um ano para ver só as citações daquele ano. Os cards e a tabela são recalculados." },
-    { id: "graficos", title: "Ver gráficos", attachTo: { element: ".anos-topo .toggle", on: "left" },
+    { id: "detalhe", title: "Detalhes e quem citou", attachTo: { element: "#detalhe", on: "left" }, beforeShowPromise: abrirArtigo,
+      text: "Clique no nome de um autor para ver os artigos dele. No gráfico <b>Citações por ano</b>, clique em um ano para ver só as citações daquele ano. Os cards e a tabela são recalculados." },
+    { id: "qualis", title: "Qualis e venues das citações", attachTo: { element: ".resumo", on: "bottom" }, beforeShowPromise: abrirArtigo,
+      text: "O card <b>Qualis</b> resume as citações por estrato (A1 a C; ◆ indica periódico) e o card <b>venues</b> lista onde elas foram publicadas. Clique em um estrato para ver só aquelas citações, ou em uma venue para desmarcá-la." },
+  ];
+
+  // Gráficos: sempre as últimas etapas
+  const passosGraficos = [
+    { id: "graficos", title: "Ver gráficos", attachTo: { element: ".anos-topo .toggle", on: "left" }, beforeShowPromise: fecharGraficos,
       text: "Marque <b>Ver gráficos</b> para abrir uma terceira coluna com artigos e citações por ano, como os artigos foram encontrados e número de autores." },
     { id: "painel-graficos", title: "Gráficos que filtram", attachTo: { element: "#graficos", on: "left" },
-      beforeShowPromise: () => new Promise((ok) => {
-        if (!$("verGraficos").checked) { graficosPeloTour = true; $("verGraficos").click(); }
-        setTimeout(ok, 80);
-      }),
+      beforeShowPromise: () => new Promise((ok) => { setGraficos(true); setTimeout(ok, 80); }),
       text: "Aqui ficam artigos e citações por ano, como os artigos foram encontrados e o número de autores. <b>Cada barra é um filtro:</b> clique para ver só aqueles artigos; clique de novo para remover. Os filtros ativos aparecem acima da lista, com um ✕ para limpar.<br><br>Para rever este tour, use <b>Ver tour</b> no topo da página." },
   ];
-  // se o tour abriu os gráficos só para mostrá-los, fecha de novo ao terminar
-  const restaurar = () => {
-    if (graficosPeloTour && $("verGraficos").checked) $("verGraficos").click();
-    graficosPeloTour = false;
-  };
+  const passos = [...passosGerais, ...passosGraficos];
+
+  // ao terminar (ou fechar), devolve os gráficos ao estado em que estavam antes do tour
+  const graficosAntes = $("verGraficos").checked;
+  const restaurar = () => setGraficos(graficosAntes);
   tour.on("complete", restaurar);
   tour.on("cancel", restaurar);
   passos.forEach((p, i) => {
