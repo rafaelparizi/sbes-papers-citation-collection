@@ -10,8 +10,10 @@ output/dashboard.html e docs/index.html (GitHub Pages). Rode de novo sempre
 que a coleta avançar.
 """
 
+import itertools
 import json
 import re
+from difflib import SequenceMatcher
 from pathlib import Path
 
 import pandas as pd
@@ -21,6 +23,7 @@ SAIDA_DIR = Path(__file__).resolve().parent / "output"
 ARQ_IDS = SAIDA_DIR / "sbes_s2_paper_ids.csv"
 ARQ_CIT = SAIDA_DIR / "sbes_citations.csv"
 ARQ_HTML = SAIDA_DIR / "dashboard.html"
+ARQ_DUP = SAIDA_DIR / "possiveis_duplicatas.csv"
 # cópia publicada pelo GitHub Pages (pasta docs/ do repositório)
 ARQ_PAGES = Path(__file__).resolve().parent / "docs" / "index.html"
 
@@ -36,6 +39,60 @@ def limpar(v):
 def titulo_base(t) -> str:
     """Título sem espaços repetidos e sem o ponto final (padrão do DBLP)."""
     return re.sub(r"\s+", " ", str(t)).strip().rstrip(".").strip()
+
+
+# Dois artigos citantes são tratados como o mesmo trabalho (ex.: preprint no arXiv
+# e versão publicada) quando os títulos são parecidos E há autor em comum.
+SIMILARIDADE_DUP = 0.8
+
+
+def normalizar(t) -> str:
+    return re.sub(r"[^a-z0-9]+", " ", str(t).lower()).strip()
+
+
+def sobrenomes(autores) -> set[str]:
+    return {n.split()[-1].lower() for n in str(autores or "").split(", ") if n.strip()}
+
+
+def eh_preprint(venue) -> bool:
+    return "arxiv" in str(venue or "").lower()
+
+
+def agrupar_duplicatas(citantes: list[dict]) -> None:
+    """Preenche 'grupo' (int ou None) nos citantes que parecem ser o mesmo trabalho."""
+    pai = list(range(len(citantes)))
+
+    def raiz(i):
+        while pai[i] != i:
+            pai[i] = pai[pai[i]]
+            i = pai[i]
+        return i
+
+    for i, j in itertools.combinations(range(len(citantes)), 2):
+        a, b = citantes[i], citantes[j]
+        parecidos = SequenceMatcher(None, normalizar(a["titulo"]), normalizar(b["titulo"])).ratio() >= SIMILARIDADE_DUP
+        if parecidos and sobrenomes(a["autores"]) & sobrenomes(b["autores"]):
+            pai[raiz(j)] = raiz(i)
+
+    membros = {}
+    for i in range(len(citantes)):
+        membros.setdefault(raiz(i), []).append(i)
+    grupos = [m for m in membros.values() if len(m) > 1]
+    for c in citantes:
+        c["grupo"] = None
+    for n, m in enumerate(grupos, 1):
+        for i in m:
+            citantes[i]["grupo"] = n
+
+
+def ordenar_citantes(citantes: list[dict]) -> list[dict]:
+    """Mais recentes primeiro, mantendo os registros de um mesmo grupo juntos."""
+    ano_grupo = {}
+    for c in citantes:
+        if c["grupo"]:
+            ano_grupo[c["grupo"]] = max(ano_grupo.get(c["grupo"], 0), c["ano"] or 0)
+    chave = lambda c: (-(ano_grupo.get(c["grupo"]) or c["ano"] or 0), c["grupo"] or 0, -(c["ano"] or 0))
+    return sorted(citantes, key=chave)
 
 
 def montar_dados() -> list[dict]:
@@ -56,7 +113,10 @@ def montar_dados() -> list[dict]:
                     "autores": limpar(c["citing_authors"]),
                     "venue": limpar(c["citing_venue"]),
                     "doi": limpar(c["citing_doi"]),
+                    "preprint": eh_preprint(c["citing_venue"]),
                 })
+            agrupar_duplicatas(citantes)
+            citantes = ordenar_citantes(citantes)
         artigos.append({
             "idx": int(a["idx"]),
             "ano": limpar(a["ano"]),
@@ -69,8 +129,23 @@ def montar_dados() -> list[dict]:
             # título no Semantic Scholar não é idêntico ao da planilha
             "similar": bool(limpar(a["s2_title"])) and titulo_base(a["titulo"]) != titulo_base(a["s2_title"]),
             "citantes": citantes,
+            # trabalhos distintos: cada grupo de duplicatas conta uma vez
+            "distintos": len({c["grupo"] or f"_{k}" for k, c in enumerate(citantes)}),
         })
     return artigos
+
+
+def salvar_duplicatas(artigos: list[dict]) -> int:
+    linhas = [
+        {
+            "sbes_idx": a["idx"], "sbes_titulo": a["titulo"], "grupo": c["grupo"],
+            "citing_s2_paper_id": c["id"], "citing_title": c["titulo"], "citing_year": c["ano"],
+            "citing_venue": c["venue"], "citing_authors": c["autores"], "preprint": c["preprint"],
+        }
+        for a in artigos for c in a["citantes"] if c["grupo"]
+    ]
+    pd.DataFrame(linhas).to_csv(ARQ_DUP, index=False)
+    return len({(l["sbes_idx"], l["grupo"]) for l in linhas})
 
 
 HTML = r"""<!doctype html>
@@ -90,8 +165,14 @@ HTML = r"""<!doctype html>
     --line: #2c323d; --accent: #7fa2ff; --accent-soft: #243150; --bar: #7fa2ff;
   }
   :root:not([data-theme="light"]) .tag { color: #ffd27a; background: #3a2e12; border-color: #6b5420; }
+  :root:not([data-theme="light"]) .tag.dup { color: #ff9f95; background: #3d1c19; border-color: #7a3630; }
+  :root:not([data-theme="light"]) .tag.pre { color: var(--muted); background: var(--bg); border-color: var(--line); }
+  :root:not([data-theme="light"]) tr.dup td { background: #2a1d1c; }
 }
 :root[data-theme="dark"] .tag { color: #ffd27a; background: #3a2e12; border-color: #6b5420; }
+:root[data-theme="dark"] .tag.dup { color: #ff9f95; background: #3d1c19; border-color: #7a3630; }
+:root[data-theme="dark"] .tag.pre { color: var(--muted); background: var(--bg); border-color: var(--line); }
+:root[data-theme="dark"] tr.dup td { background: #2a1d1c; }
 :root[data-theme="dark"] {
   --bg: #14171d; --panel: #1c2028; --text: #e6e9ef; --muted: #99a2b3;
   --line: #2c323d; --accent: #7fa2ff; --accent-soft: #243150; --bar: #7fa2ff;
@@ -124,6 +205,9 @@ input[type="search"]:focus { outline: 2px solid var(--accent); outline-offset: -
 .chips { padding: 8px 12px; border-bottom: 1px solid var(--line); }
 .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-soft); color: var(--text); border: 1px solid var(--accent); border-radius: 14px; padding: 2px 10px; font: inherit; font-size: 13px; cursor: pointer; }
 .tag { display: inline-block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; color: #8a5a00; background: #fff3d6; border: 1px solid #f0c865; border-radius: 4px; padding: 0 5px; margin-left: 4px; vertical-align: 1px; }
+.tag.dup { color: #a3261b; background: #fde8e6; border-color: #f2a79f; }
+.tag.pre { color: var(--muted); background: var(--bg); border-color: var(--line); }
+tr.dup td { background: #fdf3f2; }
 .nota { background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; margin: 10px 0 0; font-size: 13px; }
 .nota b { color: var(--muted); font-weight: 600; }
 .nota strong { font-weight: 700; color: var(--text); background: #fff3d6; border-radius: 3px; padding: 0 2px; }
@@ -184,6 +268,7 @@ td.sm { color: var(--muted); font-size: 12px; }
       <input id="busca" type="search" placeholder="🔍  Buscar por título ou autor…">
       <label class="toggle"><input id="soCitados" type="checkbox"> Só com citações</label>
       <label class="toggle"><input id="soSimilares" type="checkbox"> Só <span class="tag">similar</span></label>
+      <label class="toggle"><input id="soDuplicatas" type="checkbox"> Só com <span class="tag dup">duplicata</span></label>
     </div>
     <div class="chips" id="chips"></div>
     <div class="lista" id="lista"></div>
@@ -245,11 +330,13 @@ function filtrados() {
   const q = $("busca").value.trim().toLowerCase();
   const soCitados = $("soCitados").checked;
   const soSimilares = $("soSimilares").checked;
+  const soDuplicatas = $("soDuplicatas").checked;
   const ordem = $("ordem").value;
   const lista = DADOS.filter((a) =>
     (!ano || String(a.ano) === ano) &&
     (!soCitados || a.citantes.length > 0) &&
     (!soSimilares || a.similar) &&
+    (!soDuplicatas || a.distintos < a.citantes.length) &&
     (!autorFiltro || autoresDe(a).includes(autorFiltro)) &&
     (!q || (a.titulo + " " + a.autores).toLowerCase().includes(q)));
   // empates mantêm a ordem da planilha (sort estável)
@@ -268,7 +355,7 @@ function renderLista() {
   $("lista").innerHTML = lista.map((a) => `
     <div class="item${a.idx === selecionado ? " ativo" : ""}" data-idx="${a.idx}">
       <div class="t">
-        <div>${esc(a.titulo)}${a.similar ? ` <span class="tag" title="Título no Semantic Scholar diferente do da planilha">similar</span>` : ""}</div>
+        <div>${esc(a.titulo)}${a.similar ? ` <span class="tag" title="Título no Semantic Scholar diferente do da planilha">similar</span>` : ""}${a.distintos < a.citantes.length ? ` <span class="tag dup" title="Há citações que parecem ser o mesmo trabalho (ex.: preprint e versão publicada)">duplicata</span>` : ""}</div>
         <div class="meta">${esc(a.ano)} · ${esc(a.autores)}</div>
       </div>
       <div class="badge${a.citantes.length ? " tem" : ""}" title="citações">${a.citantes.length}</div>
@@ -304,13 +391,18 @@ function renderDetalhe(a) {
     <h3>Quem citou (${n})</h3>
     <div class="tabela"><table>
       <thead><tr><th>Ano</th><th>Artigo citante</th><th>Autores</th><th>Venue</th></tr></thead>
-      <tbody>${a.citantes.map((c) => `
-        <tr>
+      <tbody>${a.citantes.map((c) => {
+        const outros = c.grupo ? a.citantes.filter((o) => o.grupo === c.grupo && o !== c).map((o) => o.titulo) : [];
+        return `
+        <tr${c.grupo ? ' class="dup"' : ""}>
           <td>${esc(c.ano ?? "—")}</td>
-          <td><a href="https://www.semanticscholar.org/paper/${esc(c.id)}" target="_blank" rel="noopener">${esc(c.titulo)}</a></td>
+          <td><a href="https://www.semanticscholar.org/paper/${esc(c.id)}" target="_blank" rel="noopener">${esc(c.titulo)}</a>${
+            c.grupo ? ` <span class="tag dup" title="Provavelmente o mesmo trabalho que: ${esc(outros.join(" | "))}">duplicata ${c.grupo}</span>` : ""}${
+            c.preprint ? ` <span class="tag pre">preprint</span>` : ""}</td>
           <td class="sm">${esc(c.autores)}</td>
           <td class="sm">${esc(c.venue || "—")}</td>
-        </tr>`).join("")}
+        </tr>`;
+      }).join("")}
       </tbody>
     </table></div>` : `<p class="vazio" style="padding:12px 0">Nenhuma citação registrada no Semantic Scholar.</p>`;
 
@@ -322,7 +414,8 @@ function renderDetalhe(a) {
       <div class="links">${links}</div>
       ${a.similar ? `<div class="nota"><b>Título no Semantic Scholar:</b> ${destacarDiferencas(a.titulo, a.s2_titulo)}</div>` : ""}
       <div class="resumo">
-        ${kpi(n, "citações")}
+        ${kpi(n, "citações (registros)")}
+        ${kpi(a.distintos, "trabalhos distintos")}
         ${kpi(primeiro, "primeira citação")}
         ${kpi(venues, "venues distintos")}
         ${kpi({doi: "DOI", titulo: "título", titulo_aproximado: "título aprox."}[a.match] || "não encontrado", "encontrado por")}
@@ -353,6 +446,7 @@ $("chips").addEventListener("click", (e) => {
 });
 $("soCitados").addEventListener("change", renderLista);
 $("soSimilares").addEventListener("change", renderLista);
+$("soDuplicatas").addEventListener("change", renderLista);
 $("ano").addEventListener("change", renderLista);
 $("ordem").addEventListener("change", renderLista);
 $("busca").addEventListener("input", renderLista);
@@ -374,7 +468,9 @@ def main():
     ARQ_PAGES.parent.mkdir(parents=True, exist_ok=True)
     ARQ_PAGES.write_text(html, encoding="utf-8")
     total = sum(len(a["citantes"]) for a in artigos)
+    grupos = salvar_duplicatas(artigos)
     print(f"Dashboard gerado: {ARQ_HTML} ({len(artigos)} artigos, {total} citações)")
+    print(f"Possíveis duplicatas: {grupos} grupo(s) em {ARQ_DUP.name}")
 
 
 if __name__ == "__main__":

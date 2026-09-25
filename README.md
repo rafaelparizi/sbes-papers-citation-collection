@@ -52,6 +52,15 @@ O progresso é gravado em `output/checkpoint_ids.jsonl` (etapa 1) e `output/chec
 
 No dashboard, um artigo recebe o badge **similar** quando o título no Semantic Scholar não é idêntico ao da planilha, ignorando só o ponto final (padrão do DBLP) e espaços repetidos. Isso vale para qualquer método de identificação, inclusive DOI. Nos detalhes do artigo, as palavras diferentes aparecem em negrito, e esses artigos podem ser filtrados.
 
+### Possíveis duplicatas entre os artigos citantes
+
+O Semantic Scholar às vezes mantém registros separados para o mesmo trabalho, por exemplo o preprint no arXiv e a versão publicada em conferência. Entre os artigos que citam um mesmo artigo SBES, dois registros são marcados como **duplicata** quando:
+
+- os títulos normalizados têm pelo menos 80% de semelhança (`difflib.SequenceMatcher`); **e**
+- há pelo menos um sobrenome de autor em comum.
+
+Os registros continuam na contagem de citações (que segue o `citationCount` do Semantic Scholar), mas o dashboard mostra também o número de **trabalhos distintos**, marca os registros agrupados e os de venue arXiv (**preprint**) e permite filtrar os artigos que têm duplicatas. A lista para revisão fica em `output/possiveis_duplicatas.csv`.
+
 ### Limitações
 
 - A cobertura depende do Semantic Scholar: citações que ele não indexou não aparecem, e artigos antigos tendem a ter menos citações registradas.
@@ -65,6 +74,7 @@ No dashboard, um artigo recebe o badge **similar** quando o título no Semantic 
 |---|---|
 | `sbes_s2_paper_ids.csv` | Artigos SBES com o `paperId` no Semantic Scholar e o método de identificação (`doi`, `titulo`, `titulo_aproximado`, `nao_encontrado`) |
 | `sbes_citations.csv` / `.xlsx` | Uma linha por par (artigo SBES citado, artigo citante) |
+| `possiveis_duplicatas.csv` | Artigos citantes que parecem ser o mesmo trabalho (ex.: preprint e versão publicada), para revisão |
 | `dashboard.html` | Dashboard interativo (mesmo conteúdo de `docs/index.html`) |
 
 ## Uso

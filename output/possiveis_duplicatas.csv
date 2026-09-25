@@ -1,0 +1,3 @@
+sbes_idx,sbes_titulo,grupo,citing_s2_paper_id,citing_title,citing_year,citing_venue,citing_authors,preprint
+28,Combining TSL and LLM to Automate REST API Testing: A Comparative Study.,1,566d4bfd140e0f23f5852445e92fd1a26d9c8ae3,MASTEST: A LLM-Based Multi-Agent System For Testing RESTful APIs,2026,International Conference on Artificial Intelligence Testing,"Xiaoke Han, Hong Zhu",False
+28,Combining TSL and LLM to Automate REST API Testing: A Comparative Study.,1,3c2522b5a047d89ce5594533aee88f2b1e203194,MASTEST: A LLM-Based Multi-Agent System For RESTful API Tests,2025,arXiv.org,"Xiaoke Han, Hong Zhu",True
