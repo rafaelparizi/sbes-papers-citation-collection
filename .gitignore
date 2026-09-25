@@ -1,0 +1,10 @@
+# Segredos
+.env
+
+# Sistema / Python
+.DS_Store
+__pycache__/
+*.pyc
+
+# Arquivos temporários do Excel
+~$*

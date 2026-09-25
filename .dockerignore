@@ -1,0 +1,8 @@
+.env
+.git
+output/
+Artifacts Folders and Files/
+*.xlsx
+~$*
+.DS_Store
+__pycache__/

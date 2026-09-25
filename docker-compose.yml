@@ -1,0 +1,23 @@
+# Dashboard:  docker compose up -d            -> http://localhost:8000
+# Coleta:     docker compose run --rm coleta --inicio 20 --limit 10
+# Após mudar o código: docker compose build && docker compose up -d
+services:
+  dashboard:
+    build: .
+    image: sbes-citacoes
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./output:/app/output
+    restart: unless-stopped
+
+  coleta:
+    image: sbes-citacoes
+    profiles: ["coleta"]
+    entrypoint: ["python", "semantic_scholar_citations.py"]
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./output:/app/output
+      - ./articles_first_webscraping_collection.xlsx:/app/articles_first_webscraping_collection.xlsx:ro
