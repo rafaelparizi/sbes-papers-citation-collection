@@ -10,6 +10,7 @@ output/dashboard.html e docs/index.html (GitHub Pages). Rode de novo sempre
 que a coleta avançar.
 """
 
+import html
 import itertools
 import json
 import re
@@ -42,6 +43,8 @@ def limpar(v):
         return None
     if isinstance(v, float) and v.is_integer():
         return int(v)
+    if isinstance(v, str):
+        return html.unescape(v)  # o Semantic Scholar às vezes manda "&amp;" já escapado
     return v
 
 
@@ -452,7 +455,24 @@ tr.dup td { background: #f7f2fd; }
 .detalhe .autores { color: var(--muted); margin-bottom: 8px; }
 .links a { color: var(--accent); margin-right: 14px; text-decoration: none; }
 .links a:hover { text-decoration: underline; }
-.resumo { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
+.resumo { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0 10px; align-items: flex-start; }
+.resumo .kpi { min-width: 110px; padding: 8px 12px; }
+.blocos { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 10px; margin-bottom: 8px; align-items: start; }
+.bloco { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; min-width: 0; }
+.bloco-cab { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.bloco-cab > span:first-child { color: var(--text); font-weight: 600; }
+.vlista { max-height: 196px; overflow-y: auto; display: flex; flex-direction: column; gap: 1px; margin: 0 -4px; padding: 0 4px; }
+.vrow { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; align-items: center; gap: 8px; width: 100%; text-align: left; font: inherit; font-size: 12px; color: var(--muted); background: none; border: 0; border-radius: 4px; padding: 4px 6px; cursor: pointer; }
+.vrow:hover { background: var(--accent-soft); }
+.vrow .ck { width: 14px; height: 14px; border: 1.5px solid var(--line); border-radius: 3px; display: grid; place-items: center; font-size: 10px; line-height: 1; }
+.vrow.on { color: var(--text); }
+.vrow.on .ck { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+.vrow.on .ck::after { content: "✓"; font-weight: 700; }
+.vrow .vn { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vrow .vc { font-weight: 600; font-variant-numeric: tabular-nums; }
+.acao-venues { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; }
+.acao-venues:hover, .limpar-qualis:hover { text-decoration: underline; }
+@media (max-width: 1100px) { .blocos { grid-template-columns: 1fr; } }
 h3 { font-size: 14px; margin: 18px 0 8px; }
 .grafico { display: flex; align-items: flex-end; gap: 6px; height: 110px; padding: 4px 0; border-bottom: 1px solid var(--line); overflow-x: auto; }
 .col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 34px; }
@@ -470,11 +490,9 @@ td.doi { min-width: 120px; word-break: break-all; }
 td.doi a { color: var(--accent); }
 .venue { background: none; border: 0; padding: 0; font: inherit; color: var(--text); text-align: left; cursor: pointer; }
 .venue:hover { color: var(--accent); text-decoration: underline; }
-.kpi-venues { flex: 1 1 260px; max-width: 520px; }
 .vchips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
 .vchip { font: inherit; font-size: 12px; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 2px 9px; cursor: pointer; }
 .vchip b, .kpi .vchip b { display: inline; font-size: 12px; color: var(--muted); font-weight: 600; margin-left: 2px; }
-.kpi-venues > span { display: block; }
 .vchip:hover { border-color: var(--accent); }
 .vchip { color: var(--muted); }
 .vchip.on { background: var(--accent); border-color: var(--accent); color: var(--panel); font-weight: 600; }
@@ -518,11 +536,9 @@ button.filtro { background: none; border: 0; padding: 0; font: inherit; color: i
 .q-C { background: #d9d9de; color: #2b2b33; }
 .qtag.per::before { content: "◆"; font-size: 8px; margin-right: 1px; }
 .q-sem { background: var(--bg); color: var(--muted); border-color: var(--line); }
-.kpi-qualis { flex: 1 1 300px; max-width: 460px; }
-.kpi-qualis > span { display: block; }
 .qchips { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 4px; }
 .qchip { cursor: pointer; padding: 3px 7px; font-size: 12px; }
-.kpi .qchip b { display: inline; font-size: 12px; font-weight: 600; opacity: .85; }
+.qchip b { display: inline; font-size: 12px; font-weight: 600; opacity: .85; }
 .qchip.apagada, .qchip.zero { opacity: .3; }
 .qchip.sel { outline: 2px solid var(--accent); outline-offset: 1px; }
 .qresumo { color: var(--muted); font-size: 12px; }
@@ -534,7 +550,6 @@ button.filtro { background: none; border: 0; padding: 0; font: inherit; color: i
 .anos-cab { color: var(--muted); font-size: 12px; margin-bottom: 2px; }
 .anos-cab button { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; }
 .anos-cab button:hover { text-decoration: underline; }
-.limpar-venues { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; }
 @media (max-width: 820px) {
   header, .kpis, .anos-barra { padding-left: 16px; padding-right: 16px; }
   main.com-graficos { grid-template-columns: 1fr; }
@@ -875,8 +890,8 @@ function cardQualis(cits) {
     <button class="qchip q-${k}${cont[k] ? "" : " zero"}${qualisFiltro === k ? " sel" : ""}${qualisFiltro && qualisFiltro !== k ? " apagada" : ""}" data-qualis="${k}"
       data-tip="${esc(tip)} · clique para ${qualisFiltro === k ? "remover o filtro" : "ver só estas citações"}">${rotulo} <b>${cont[k] || 0}</b></button>`;
   return `
-    <div class="kpi kpi-qualis">
-      <span>Qualis das citações (eventos e periódicos) ${qualisFiltro ? `· <button class="limpar-qualis">todos</button>` : ""}</span>
+    <div class="bloco bloco-qualis">
+      <div class="bloco-cab"><span>Qualis das citações <span class="dica-h3">· eventos e periódicos</span></span><span>${qualisFiltro ? `<button class="limpar-qualis">mostrar todos</button>` : ""}</span></div>
       <div class="qchips">
         ${ESTRATOS.map((e) => chip(e, e, `${plural(cont[e] || 0, "citação", "citações")} em venues ${e}${nTipo(e)}`)).join("")}
         ${chip(SEM_QUALIS, "sem", `${plural(cont[SEM_QUALIS] || 0, "citação", "citações")} sem Qualis (preprints, workshops, sem venue ou venue não listada)`)}
@@ -904,12 +919,20 @@ function renderPainel(a) {
   const nVenues = new Set(linhas.map((c) => c.venue).filter(Boolean)).size;
   const encontrado = {doi: "DOI", titulo: "título", titulo_aproximado: "título aprox.", erro: "erro ao coletar"}[a.match] || "não encontrado";
 
+  const acoesVenues = [
+    venuesOff.size && `<button class="acao-venues" data-acao="todas">marcar todas</button>`,
+    venuesOff.size < opcoes.length && `<button class="acao-venues" data-acao="nenhuma">desmarcar todas</button>`,
+  ].filter(Boolean).join(" · ");
   const cardVenues = opcoes.length ? `
-    <div class="kpi kpi-venues">
-      <span>venues ${venuesOff.size ? `· <button class="limpar-venues">marcar todas</button>` : "(clique para desmarcar)"}</span>
-      <div class="vchips">${opcoes.map((v) => `
-        <button class="vchip${venuesOff.has(v) ? "" : " on"}" data-venue="${esc(v)}" aria-pressed="${!venuesOff.has(v)}">${
-          v === SEM_VENUE ? "(sem venue)" : esc(v)} <b>${cont[v]}</b></button>`).join("")}
+    <div class="bloco bloco-venues">
+      <div class="bloco-cab"><span>Venues (${opcoes.length}) <span class="dica-h3">· clique para desmarcar</span></span><span>${acoesVenues}</span></div>
+      <div class="vlista">${opcoes.map((v) => {
+        const nome = v === SEM_VENUE ? "(sem venue)" : v;
+        return `
+        <button class="vrow${venuesOff.has(v) ? "" : " on"}" data-venue="${esc(v)}" aria-pressed="${!venuesOff.has(v)}" title="${esc(nome)}">
+          <span class="ck" aria-hidden="true"></span><span class="vn">${esc(nome)}</span><span class="vc">${cont[v]}</span>
+        </button>`;
+      }).join("")}
       </div>
     </div>` : "";
 
@@ -963,6 +986,8 @@ function renderPainel(a) {
       ${kpi(primeiro, "primeira citação")}
       ${kpi(nVenues, "venues distintos")}
       ${kpi(encontrado, "encontrado por")}
+    </div>
+    <div class="blocos">
       ${cardQualis(porAnoCit)}
       ${cardVenues}
     </div>
@@ -1004,7 +1029,7 @@ $("detalhe").addEventListener("click", (e) => {
     renderPainel(atual());
     return;
   }
-  const chip = e.target.closest(".vchip");
+  const chip = e.target.closest(".vrow");
   if (chip) {
     // clique desmarca (ou volta a marcar) a venue
     const k = chip.dataset.venue;
@@ -1023,9 +1048,12 @@ $("detalhe").addEventListener("click", (e) => {
     renderPainel(a);
     return;
   }
-  if (e.target.closest(".limpar-venues")) {
+  const acao = e.target.closest(".acao-venues");
+  if (acao) {
+    const a = atual();
     venuesOff.clear();
-    renderPainel(atual());
+    if (acao.dataset.acao === "nenhuma") a.citantes.forEach((c) => venuesOff.add(venueDe(c)));
+    renderPainel(a);
     return;
   }
   const b = e.target.closest(".autor");
@@ -1127,8 +1155,8 @@ function criarTour() {
       text: "Clique em um artigo para ver os detalhes. O número à direita é a quantidade de citações." },
     { id: "detalhe", title: "Detalhes e quem citou", attachTo: { element: "#detalhe", on: "left" }, beforeShowPromise: abrirArtigo,
       text: "Clique no nome de um autor para ver os artigos dele. No gráfico <b>Citações por ano</b>, clique em um ano para ver só as citações daquele ano. Os cards e a tabela são recalculados." },
-    { id: "qualis", title: "Qualis e venues das citações", attachTo: { element: ".resumo", on: "bottom" }, beforeShowPromise: abrirArtigo,
-      text: "O card <b>Qualis</b> resume as citações por estrato (A1 a C; ◆ indica periódico) e o card <b>venues</b> lista onde elas foram publicadas. Clique em um estrato para ver só aquelas citações, ou em uma venue para desmarcá-la." },
+    { id: "qualis", title: "Qualis e venues das citações", attachTo: { element: ".blocos", on: "bottom" }, beforeShowPromise: abrirArtigo,
+      text: "O card <b>Qualis</b> resume as citações por estrato (A1 a C; ◆ indica periódico) e a lista de <b>venues</b> mostra onde elas foram publicadas. Clique em um estrato para ver só aquelas citações, ou em uma venue para desmarcá-la (há também <b>marcar/desmarcar todas</b>)." },
   ];
 
   // Gráficos: sempre as últimas etapas
