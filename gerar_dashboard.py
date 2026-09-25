@@ -28,9 +28,11 @@ ARQ_DUP = SAIDA_DIR / "possiveis_duplicatas.csv"
 ARQ_ERROS = SAIDA_DIR / "erros_coleta.csv"  # artigos pulados pela coleta (API indisponível)
 RAIZ = Path(__file__).resolve().parent
 ARQ_QUALIS = RAIZ / "Computação_Classificação de Eventos 2025.xlsx"  # Qualis CAPES Computação, eventos
-ARQ_APELIDOS = RAIZ / "qualis_apelidos.csv"  # venue do Semantic Scholar -> sigla do Qualis (casos manuais)
+ARQ_QUALIS_PER = RAIZ / "classificacoes_publicadas_computacao_2026_1768259614570.xlsx"  # Qualis periódicos
+ARQ_APELIDOS = RAIZ / "qualis_apelidos.csv"  # venue do Semantic Scholar -> sigla (evento) ou ISSN (periódico)
+ARQ_VENUES_S2 = SAIDA_DIR / "venues_s2.jsonl"  # venue estruturada dos citantes (tipo, ISSN), da coleta
 ARQ_VENUES = SAIDA_DIR / "venues_qualis.csv"  # como cada venue foi classificada, para conferência
-ESTRATOS = ["A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4"]
+ESTRATOS = ["A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4", "C"]
 # cópia publicada pelo GitHub Pages (pasta docs/ do repositório)
 ARQ_PAGES = Path(__file__).resolve().parent / "docs" / "index.html"
 
@@ -124,83 +126,143 @@ def normalizar_evento(t) -> str:
     return re.sub(r"\s+", " ", t).strip()
 
 
+RE_ISSN = re.compile(r"^\d{4}-\d{3}[\dXx]$")
+
+
+def normalizar_periodico(t) -> str:
+    return re.sub(r"^the ", "", normalizar_evento(t))
+
+
 class Qualis:
-    """Classifica venues pelo Qualis de eventos, em camadas, da mais para a menos segura."""
+    """Classifica a venue de uma citação pelo Qualis: primeiro como evento, depois como periódico.
+
+    Camadas (da mais para a menos segura):
+      eventos    — apelido manual, trilha "X@Y", nome igual, sigla, nome quase igual (>= 95%)
+      periódicos — ISSN da venue no Semantic Scholar, apelido manual (ISSN), nome igual
+    """
 
     def __init__(self):
-        self.ok = ARQ_QUALIS.exists()
         self.cache = {}
-        if not self.ok:
-            return
-        q = pd.read_excel(ARQ_QUALIS)
-        q = q[q["QUALIS"].isin(ESTRATOS)]
-        self.por_sigla = {str(r.SIGLA).strip().upper(): r for r in q.itertuples()}
-        self.por_nome = {normalizar_evento(r.NOME): r for r in q.itertuples()}
-        self.apelidos = {}
+        self.ok = ARQ_QUALIS.exists()
+        self.ok_per = ARQ_QUALIS_PER.exists()
+        self.por_sigla, self.por_nome, self.per_issn, self.per_nome, self.apelidos = {}, {}, {}, {}, {}
+        if self.ok:
+            q = pd.read_excel(ARQ_QUALIS)
+            q = q[q["QUALIS"].isin(ESTRATOS)]
+            self.por_sigla = {str(r.SIGLA).strip().upper(): r for r in q.itertuples()}
+            self.por_nome = {normalizar_evento(r.NOME): r for r in q.itertuples()}
+        if self.ok_per:
+            p = pd.read_excel(ARQ_QUALIS_PER)
+            p = p[p["Estrato"].isin(ESTRATOS)]
+            for r in p.itertuples():
+                self.per_issn[str(r.ISSN).strip().upper()] = r
+                self.per_nome.setdefault(normalizar_periodico(r.Título), r)
         if ARQ_APELIDOS.exists():
             for _, r in pd.read_csv(ARQ_APELIDOS).iterrows():
-                self.apelidos[normalizar_evento(r["venue"])] = str(r["sigla"]).strip().upper()
+                self.apelidos[normalizar_evento(r.iloc[0])] = str(r.iloc[1]).strip().upper()
+        # venue estruturada (tipo, ISSN, nomes alternativos) buscada pela coleta
+        self.venue_s2 = {}
+        if ARQ_VENUES_S2.exists():
+            for linha in ARQ_VENUES_S2.read_text(encoding="utf-8").splitlines():
+                if linha.strip():
+                    r = json.loads(linha)
+                    self.venue_s2[r["paperId"]] = r
 
-    def _resultado(self, r, como):
-        return {"estrato": r.QUALIS, "sigla": r.SIGLA, "nome": r.NOME, "como": como}
+    @staticmethod
+    def _evento(r, como):
+        return {"estrato": r.QUALIS, "tipo": "evento", "sigla": r.SIGLA, "nome": r.NOME, "como": como}
 
-    def classificar(self, venue) -> dict:
-        if venue in self.cache:
-            return self.cache[venue]
-        self.cache[venue] = res = self._classificar(venue)
-        return res
+    @staticmethod
+    def _periodico(r, como):
+        return {"estrato": r.Estrato, "tipo": "periódico", "sigla": r.ISSN, "nome": r.Título, "como": como}
 
-    def _classificar(self, venue) -> dict:
-        if not isinstance(venue, str) or not venue.strip():
-            return {"estrato": None, "categoria": "sem venue"}
-        if "arxiv" in venue.lower():
-            return {"estrato": None, "categoria": "preprint"}
-        if not self.ok:
-            return {"estrato": None, "categoria": "sem planilha Qualis"}
-        v = venue.strip()
+    def classificar(self, venue, paper_id=None) -> dict:
+        chave = (venue, paper_id)
+        if chave not in self.cache:
+            self.cache[chave] = self._classificar(venue, self.venue_s2.get(paper_id) or {})
+        return self.cache[chave]
+
+    def _evento_por_nome(self, v: str):
+        """Casamento de evento a partir de um nome de venue; None se não houver."""
         n = normalizar_evento(v)
-        # 1) apelido definido à mão
-        if n in self.apelidos and self.apelidos[n] in self.por_sigla:
-            return self._resultado(self.por_sigla[self.apelidos[n]], "apelido")
-        # 2) trilha/workshop "X@Y": só vale se "Y-X" estiver na lista (ex.: SEET@ICSE -> ICSE-SEET)
+        ap = self.apelidos.get(n)
+        if ap and ap in self.por_sigla:
+            return self._evento(self.por_sigla[ap], "apelido")
         if "@" in v:
             x, y = [p.strip().upper() for p in v.split("@", 1)]
             if f"{y}-{x}" in self.por_sigla:
-                return self._resultado(self.por_sigla[f"{y}-{x}"], "sigla")
+                return self._evento(self.por_sigla[f"{y}-{x}"], "sigla")
             return {"estrato": None, "categoria": "workshop/trilha"}
         workshop = re.search(r"\b(workshops?|companion)\b", v, re.I)
-        # 3) nome igual (após normalizar)
         if n in self.por_nome:
             r = self.por_nome[n]
             if not workshop or re.search(r"\bworkshop", r.NOME, re.I):
-                return self._resultado(r, "nome")
-        # 4) sigla entre parênteses, ex.: "(EDUCOMP 2026)"
+                return self._evento(r, "nome")
         for m in re.finditer(r"\(([A-Za-z][A-Za-z&\-]+)(?:\s+(?:19|20)\d{2})?\)", v):
             if m.group(1).upper() in self.por_sigla:
-                return self._resultado(self.por_sigla[m.group(1).upper()], "sigla")
-        # 5) a própria venue é uma sigla
-        if v.upper() in self.por_sigla:
-            return self._resultado(self.por_sigla[v.upper()], "sigla")
+                return self._evento(self.por_sigla[m.group(1).upper()], "sigla")
+        if len(v.strip()) >= 3 and v.strip().upper() in self.por_sigla:  # siglas de 2 letras são ambíguas
+            return self._evento(self.por_sigla[v.strip().upper()], "sigla")
         if workshop:
             return {"estrato": None, "categoria": "workshop/trilha"}
-        # 6) nome quase igual (>= 95%): só diferenças mínimas de grafia
-        melhor = max(self.por_nome, key=lambda k: SequenceMatcher(None, n, k).ratio())
-        if SequenceMatcher(None, n, melhor).ratio() >= 0.95:
-            return self._resultado(self.por_nome[melhor], "nome aproximado")
+        if self.por_nome:
+            melhor = max(self.por_nome, key=lambda k: SequenceMatcher(None, n, k).ratio())
+            if SequenceMatcher(None, n, melhor).ratio() >= 0.95:
+                return self._evento(self.por_nome[melhor], "nome aproximado")
+        return None
+
+    def _periodico_por(self, nomes: list, issns: list):
+        for issn in issns:
+            if issn and issn.upper() in self.per_issn:
+                return self._periodico(self.per_issn[issn.upper()], "ISSN")
+        for nome in nomes:
+            ap = self.apelidos.get(normalizar_evento(nome))
+            if ap and RE_ISSN.match(ap) and ap in self.per_issn:
+                return self._periodico(self.per_issn[ap], "apelido")
+            r = self.per_nome.get(normalizar_periodico(nome))
+            if r is not None:
+                return self._periodico(r, "nome")
+        return None
+
+    def _classificar(self, venue, s2: dict) -> dict:
+        venue = venue if isinstance(venue, str) and venue.strip() else None
+        nomes = [x for x in [venue, s2.get("pv_nome"), s2.get("journal")] if x]
+        if not nomes:
+            return {"estrato": None, "categoria": "sem venue"}
+        if "arxiv" in nomes[0].lower():
+            return {"estrato": None, "categoria": "preprint"}
+        if not (self.ok or self.ok_per):
+            return {"estrato": None, "categoria": "sem planilha Qualis"}
+        alternativos = s2.get("nomes_alternativos") or []
+
+        # 1) evento (a menos que o Semantic Scholar diga que a venue é um periódico).
+        #    Os nomes alternativos do Semantic Scholar não são usados aqui: às vezes misturam
+        #    venues diferentes (ex.: "Applied Informatics" com "AI", da Canadian Conf. on AI).
+        if s2.get("pv_tipo") != "journal":
+            for nome in nomes:
+                r = self._evento_por_nome(nome)
+                if r:  # evento com Qualis, ou workshop/trilha (que não herda Qualis)
+                    return r
+        # 2) periódico
+        r = self._periodico_por(nomes + alternativos, [s2.get("issn")])
+        if r:
+            return r
         return {"estrato": None, "categoria": "não listado"}
 
 
 def salvar_venues(qualis: "Qualis", cit: pd.DataFrame) -> None:
-    cont = cit["citing_venue"].value_counts(dropna=False)
-    linhas = []
-    for venue, n in cont.items():
-        r = qualis.classificar(venue)
-        linhas.append({
-            "venue": venue, "citacoes": int(n), "estrato": r.get("estrato"),
-            "sigla": r.get("sigla"), "nome_qualis": r.get("nome"),
+    linhas = {}
+    for _, c in cit.iterrows():
+        v = c["citing_venue"]
+        r = qualis.classificar(limpar(v), limpar(c["citing_s2_paper_id"]))
+        chave = (v if isinstance(v, str) else "", r.get("estrato"), r.get("sigla"))
+        l = linhas.setdefault(chave, {
+            "venue": v, "citacoes": 0, "estrato": r.get("estrato"), "tipo": r.get("tipo"),
+            "sigla_ou_issn": r.get("sigla"), "nome_qualis": r.get("nome"),
             "como": r.get("como") or r.get("categoria"),
         })
-    pd.DataFrame(linhas).to_csv(ARQ_VENUES, index=False)
+        l["citacoes"] += 1
+    pd.DataFrame(linhas.values()).sort_values("citacoes", ascending=False).to_csv(ARQ_VENUES, index=False)
 
 
 def montar_dados() -> list[dict]:
@@ -229,7 +291,7 @@ def montar_dados() -> list[dict]:
                     "venue": limpar(c["citing_venue"]),
                     "doi": limpar(c["citing_doi"]),
                     "preprint": eh_preprint(c["citing_venue"], c["citing_doi"]),
-                    "qualis": qualis.classificar(limpar(c["citing_venue"])),
+                    "qualis": qualis.classificar(limpar(c["citing_venue"]), limpar(c["citing_s2_paper_id"])),
                 })
             agrupar_duplicatas(citantes)
             citantes = ordenar_citantes(citantes)
@@ -453,6 +515,8 @@ button.filtro { background: none; border: 0; padding: 0; font: inherit; color: i
 .q-B1, .q-B2, .q-B3, .q-B4 { background: var(--q-B1); color: #0b2e6f; }
 .q-B2 { background: var(--q-B2); }
 .q-B3 { background: var(--q-B3); } .q-B4 { background: var(--q-B4); }
+.q-C { background: #d9d9de; color: #2b2b33; }
+.qtag.per::before { content: "◆"; font-size: 8px; margin-right: 1px; }
 .q-sem { background: var(--bg); color: var(--muted); border-color: var(--line); }
 .kpi-qualis { flex: 1 1 300px; max-width: 460px; }
 .kpi-qualis > span { display: block; }
@@ -574,11 +638,11 @@ document.addEventListener("scroll", () => tip.classList.remove("on"), true);
 const venuesOff = new Set();
 let anoCitFiltro = null;
 let qualisFiltro = null;  // estrato clicado no card Qualis (null = todos)
-const ESTRATOS = ["A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4"];
+const ESTRATOS = ["A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4", "C"];
 const SEM_QUALIS = "sem";
 const estratoDe = (c) => (c.qualis && c.qualis.estrato) || SEM_QUALIS;
 const MOTIVO_SEM = {
-  "não listado": "Venue fora da lista de eventos do Qualis (em geral, um periódico ou um evento não classificado).",
+  "não listado": "Venue não encontrada nas listas do Qualis de Computação (eventos 2025 e periódicos).",
   "preprint": "Preprint no arXiv: não é classificado pelo Qualis.",
   "sem venue": "O Semantic Scholar não informa a venue desta citação.",
   "workshop/trilha": "Workshop ou trilha satélite de um evento; não herda o Qualis do evento principal.",
@@ -587,8 +651,10 @@ const MOTIVO_SEM = {
 function tagQualis(c) {
   const q = c.qualis || {};
   if (q.estrato) {
-    const como = { nome: "pelo nome", sigla: "pela sigla", apelido: "por apelido definido à mão", "nome aproximado": "por nome quase igual" }[q.como] || "";
-    return `<span class="qtag q-${q.estrato}" data-tip="${esc(`${q.sigla} — ${q.nome}. Qualis ${q.estrato} (eventos de Computação, 2025), identificado ${como}.`)}">${q.estrato}</span>`;
+    const como = { nome: "pelo nome", sigla: "pela sigla", apelido: "por apelido definido à mão", "nome aproximado": "por nome quase igual", ISSN: "pelo ISSN" }[q.como] || "";
+    const lista = q.tipo === "periódico" ? "periódicos de Computação" : "eventos de Computação, 2025";
+    const id = q.tipo === "periódico" ? `ISSN ${q.sigla}` : q.sigla;
+    return `<span class="qtag q-${q.estrato}${q.tipo === "periódico" ? " per" : ""}" data-tip="${esc(`${q.tipo === "periódico" ? "Periódico" : "Evento"}: ${id} — ${q.nome}. Qualis ${q.estrato} (${lista}), identificado ${como}.`)}">${q.estrato}</span>`;
   }
   return `<span class="qtag q-sem" data-tip="${esc(MOTIVO_SEM[q.categoria] || "Sem Qualis.")}">—</span>`;
 }  // ano de citação clicado no gráfico do artigo (null = todos)
@@ -800,17 +866,22 @@ function cardQualis(cits) {
   const cont = {};
   cits.forEach((c) => { const k = estratoDe(c); cont[k] = (cont[k] || 0) + 1; });
   const comQualis = cits.length - (cont[SEM_QUALIS] || 0);
+  const nTipo = (e) => {
+    const ev = cits.filter((c) => estratoDe(c) === e && c.qualis.tipo === "evento").length;
+    const pe = cits.filter((c) => estratoDe(c) === e && c.qualis.tipo === "periódico").length;
+    return ev + pe ? ` (${plural(ev, "evento", "eventos")}, ${plural(pe, "periódico", "periódicos")})` : "";
+  };
   const chip = (k, rotulo, tip) => `
     <button class="qchip q-${k}${cont[k] ? "" : " zero"}${qualisFiltro === k ? " sel" : ""}${qualisFiltro && qualisFiltro !== k ? " apagada" : ""}" data-qualis="${k}"
       data-tip="${esc(tip)} · clique para ${qualisFiltro === k ? "remover o filtro" : "ver só estas citações"}">${rotulo} <b>${cont[k] || 0}</b></button>`;
   return `
     <div class="kpi kpi-qualis">
-      <span>Qualis das citações (eventos 2025) ${qualisFiltro ? `· <button class="limpar-qualis">todos</button>` : ""}</span>
+      <span>Qualis das citações (eventos e periódicos) ${qualisFiltro ? `· <button class="limpar-qualis">todos</button>` : ""}</span>
       <div class="qchips">
-        ${ESTRATOS.map((e) => chip(e, e, `${plural(cont[e] || 0, "citação", "citações")} em eventos ${e}`)).join("")}
-        ${chip(SEM_QUALIS, "sem", `${plural(cont[SEM_QUALIS] || 0, "citação", "citações")} sem Qualis de evento (periódicos, preprints, eventos não listados)`)}
+        ${ESTRATOS.map((e) => chip(e, e, `${plural(cont[e] || 0, "citação", "citações")} em venues ${e}${nTipo(e)}`)).join("")}
+        ${chip(SEM_QUALIS, "sem", `${plural(cont[SEM_QUALIS] || 0, "citação", "citações")} sem Qualis (preprints, workshops, sem venue ou venue não listada)`)}
       </div>
-      <span class="qresumo">${comQualis} de ${cits.length} com Qualis de evento</span>
+      <span class="qresumo">${comQualis} de ${cits.length} com Qualis · ◆ = periódico na tabela</span>
     </div>`;
 }
 

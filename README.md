@@ -75,17 +75,26 @@ Os registros continuam na contagem de citações (que segue o `citationCount` do
 
 ### Qualis das venues citantes
 
-A venue de cada artigo citante é classificada pelo **Qualis CAPES de eventos de Computação (2025)**, a partir da planilha `Computação_Classificação de Eventos 2025.xlsx`. O casamento é feito em camadas, da mais para a menos segura:
+A venue de cada artigo citante é classificada pelo **Qualis CAPES de Computação**, usando duas planilhas:
 
-1. **apelido** definido à mão em `qualis_apelidos.csv` (ex.: "Brazilian Symposium on Software Quality" → SBQS), para eventos cujo nome no Semantic Scholar difere do nome na planilha;
-2. trilhas no formato `X@Y`, aceitas só se `Y-X` estiver na lista (ex.: SEET@ICSE → ICSE-SEET);
-3. **nome** igual após normalizar (sem acentos, ano, edição, "Proceedings of"/"Anais do", IEEE/ACM e pontuação);
-4. **sigla** entre parênteses (ex.: "(EDUCOMP 2026)") ou a própria venue como sigla;
-5. nome quase igual (≥ 95% de semelhança).
+- eventos (2025): `Computação_Classificação de Eventos 2025.xlsx`;
+- periódicos: `classificacoes_publicadas_computacao_2026_1768259614570.xlsx` (ISSN, título e estrato, de A1 a C).
 
-Workshops e trilhas satélite não herdam o Qualis do evento principal. Periódicos não são classificados, porque a planilha cobre só eventos; preprints do arXiv e citações sem venue também ficam sem Qualis. A classificação de cada venue fica em `output/venues_qualis.csv`, para conferência; casos errados ou ausentes podem ser corrigidos acrescentando uma linha em `qualis_apelidos.csv`.
+Para identificar periódicos com segurança, a coleta busca no Semantic Scholar a **venue estruturada** de cada artigo citante (tipo, ISSN e nomes alternativos), em lotes de até 500 artigos, e guarda o resultado em `output/venues_s2.jsonl` (só artigos novos são consultados).
 
-No dashboard, a tabela de quem citou tem a coluna **Qualis**, e os detalhes do artigo mostram o card **Qualis das citações**, com a contagem por estrato (A1 a B4 e "sem"). Clicar em um estrato mostra só aquelas citações.
+A classificação é feita em camadas, da mais para a menos segura:
+
+1. **Evento** (exceto quando o Semantic Scholar indica que a venue é um periódico):
+   1. apelido definido à mão em `qualis_apelidos.csv` (ex.: "Brazilian Symposium on Software Quality" → SBQS);
+   2. trilhas no formato `X@Y`, aceitas só se `Y-X` estiver na lista (ex.: SEET@ICSE → ICSE-SEET);
+   3. nome igual após normalizar (sem acentos, ano, edição, "Proceedings of"/"Anais do", IEEE/ACM e pontuação);
+   4. sigla entre parênteses (ex.: "(EDUCOMP 2026)") ou a própria venue como sigla (com 3 ou mais letras);
+   5. nome quase igual (≥ 95% de semelhança).
+2. **Periódico**: ISSN da venue no Semantic Scholar; apelido manual com ISSN (ex.: "Int. J. Hum. Comput. Stud." → 1071-5819); nome igual (ignorando "The" e sufixos como "(Print)").
+
+Workshops e trilhas satélite não herdam o Qualis do evento principal. Os nomes alternativos do Semantic Scholar não são usados para eventos, porque às vezes misturam venues diferentes. Preprints do arXiv e citações sem venue ficam sem Qualis. A classificação de cada venue fica em `output/venues_qualis.csv`, para conferência; casos errados ou ausentes podem ser corrigidos com uma linha em `qualis_apelidos.csv` (`venue,sigla_ou_issn`).
+
+No dashboard, a tabela de quem citou tem a coluna **Qualis** (◆ indica periódico; o tooltip mostra sigla ou ISSN, nome oficial e como foi identificado), e os detalhes do artigo mostram o card **Qualis das citações**, com a contagem por estrato (A1 a C e "sem"). Clicar em um estrato mostra só aquelas citações.
 
 ### Limitações
 
@@ -101,7 +110,8 @@ No dashboard, a tabela de quem citou tem a coluna **Qualis**, e os detalhes do a
 | `sbes_s2_paper_ids.csv` | Artigos SBES com o `paperId` no Semantic Scholar e o método de identificação (`doi`, `titulo`, `titulo_aproximado`, `nao_encontrado`) |
 | `sbes_citations.csv` / `.xlsx` | Uma linha por par (artigo SBES citado, artigo citante) |
 | `erros_coleta.csv` | Artigos pulados porque a API não respondeu após 5 tentativas (só existe quando há erros) |
-| `venues_qualis.csv` | Cada venue citante com o estrato Qualis (eventos 2025), a sigla e como foi identificada |
+| `venues_qualis.csv` | Cada venue citante com o estrato Qualis, o tipo (evento/periódico), a sigla ou ISSN e como foi identificada |
+| `venues_s2.jsonl` | Venue estruturada de cada artigo citante no Semantic Scholar (tipo, ISSN, nomes alternativos), usada no Qualis de periódicos |
 | `possiveis_duplicatas.csv` | Artigos citantes que parecem ser o mesmo trabalho (ex.: preprint e versão publicada), para revisão |
 | `dashboard.html` | Dashboard interativo (mesmo conteúdo de `docs/index.html`) |
 

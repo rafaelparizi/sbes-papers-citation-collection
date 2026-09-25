@@ -278,6 +278,38 @@ def coletar_citacoes(session: requests.Session, paper_id: str) -> list[dict]:
     return citacoes
 
 
+def enriquecer_venues(session: requests.Session, ckpt_cit: Path, arq: Path) -> None:
+    """Busca, em lote, a venue estruturada (tipo, ISSN, nomes alternativos) dos artigos citantes.
+
+    Usada para classificar periódicos pelo Qualis. Fica em cache: só artigos novos são consultados.
+    """
+    feitos = {r["paperId"] for r in carregar_jsonl(arq)}
+    ids = sorted({c["citing_s2_paper_id"] for r in carregar_jsonl(ckpt_cit) for c in r["citacoes"]} - feitos)
+    if not ids:
+        return
+    print(f"[Venues] buscando ISSN e tipo de venue de {len(ids)} artigo(s) citante(s)")
+    for i in range(0, len(ids), LOTE_DOI):
+        lote = ids[i:i + LOTE_DOI]
+        try:
+            resp = requisitar(session, "POST", f"{API}/paper/batch",
+                              params={"fields": "venue,publicationVenue,journal"}, json={"ids": lote})
+        except FalhaAPI:
+            print("  API indisponível — venues ficam para a próxima execução")
+            return
+        regs = []
+        for pid, p in zip(lote, resp or [None] * len(lote)):
+            pv = (p or {}).get("publicationVenue") or {}
+            regs.append({
+                "paperId": pid,
+                "pv_nome": pv.get("name"),
+                "pv_tipo": pv.get("type"),
+                "issn": pv.get("issn"),
+                "nomes_alternativos": pv.get("alternate_names") or [],
+                "journal": ((p or {}).get("journal") or {}).get("name"),
+            })
+        anexar_jsonl(arq, regs)
+
+
 def atualizar_erros(arq: Path, df_total: pd.DataFrame, ckpt_ids: Path, ckpt_cit: Path) -> int:
     """Mantém erros_coleta.csv: soma os pulados desta execução e remove os que já foram concluídos."""
     ids = {r["idx"]: r for r in carregar_jsonl(ckpt_ids)}
@@ -294,7 +326,11 @@ def atualizar_erros(arq: Path, df_total: pd.DataFrame, ckpt_ids: Path, ckpt_cit:
     novos = pd.DataFrame([{"idx": i, "etapa": e, "quando": agora} for i, e in PULADOS.items()],
                          columns=["idx", "etapa", "quando"])
     erros = pd.concat([anteriores[["idx", "etapa", "quando"]], novos]).drop_duplicates("idx", keep="last")
-    erros = erros[~erros["idx"].map(lambda i: concluido(int(i)))]
+    feito = erros["idx"].map(lambda i: concluido(int(i))).astype(bool)
+    erros = erros.loc[~feito].astype({"idx": int})
+    if erros.empty:
+        arq.unlink(missing_ok=True)  # o arquivo só existe quando há erros
+        return 0
     info = df_total[["idx", "ano", "titulo", "autores", "doi_url", "ee_url"]]
     erros = info.merge(erros, on="idx", how="inner").sort_values("idx")
     erros.to_csv(arq, index=False)
@@ -349,6 +385,8 @@ def main():
         anexar_jsonl(ckpt_cit, [{"cited_s2_paper_id": pid, "citacoes": cits}])
         if n % 10 == 0 or n == len(pendentes):
             print(f"  {n}/{len(pendentes)} artigos — último com {len(cits)} citações")
+
+    enriquecer_venues(session, ckpt_cit, args.saida / "venues_s2.jsonl")
 
     # Saídas finais acumulam tudo o que já está nos checkpoints (todas as execuções)
     mapa = pd.DataFrame(carregar_jsonl(ckpt_ids)).drop_duplicates("idx", keep="last")

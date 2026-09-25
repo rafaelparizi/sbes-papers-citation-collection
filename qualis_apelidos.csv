@@ -1,4 +1,4 @@
-venue,sigla
+venue,sigla_ou_issn
 Brazilian Symposium on Software Quality,SBQS
 Brazilian Symposium on Information Systems,SBSI
 Brazilian Symposium on Collaborative Systems,SBSC
@@ -8,3 +8,8 @@ Brazilian Symposium on Computer Networks and Distributed Systems,SBRC
 IEEE Symposium on Visual Languages / Human-Centric Computing Languages and Environments,VLHCC
 Annual International Computer Software and Applications Conference,COMPSAC
 International Conference on Software and Data Technologies,ICSOFT
+International Conference on Human Factors in Computing Systems,CHI
+Conference of the Centre for Advanced Studies on Collaborative Research,CASCON
+Int. J. Hum. Comput. Stud.,1071-5819
+Braz. J. Inf. Syst.,1984-2902
+International Conference on Software Quality. Process Automation in Software Development,SWQD
