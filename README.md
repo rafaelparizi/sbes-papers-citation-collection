@@ -4,7 +4,7 @@ Coleta, no [Semantic Scholar](https://www.semanticscholar.org/), dos artigos que
 
 **Dashboard:** https://rafaelparizi.github.io/sbes-papers-citation-collection/
 
-**Situação atual:** coletados os 118 artigos de 2025 (linhas 0 a 117 da planilha), em 25/09/2026.
+**Situação atual:** coletados os 205 artigos de 2025 e 2024 (linhas 0 a 204 da planilha), em 25/09/2026.
 
 ## Como a coleta é realizada
 
@@ -39,8 +39,9 @@ Pares repetidos (mesmo artigo citado e mesmo artigo citante) são removidos. O t
 
 ### Limite de requisições e novas tentativas
 
-- A API aceita **1 requisição por segundo** por chave, somando todos os endpoints. O script espera 1,2 s após o fim de cada resposta (3 s sem chave, porque o limite sem chave é compartilhado entre todos os usuários).
-- Respostas 429 (limite excedido) e erros 5xx são repetidos até 8 vezes, com espera crescente (5 s, 10 s, 20 s… até 120 s).
+- A API aceita **1 requisição por segundo** por chave, somando todos os endpoints. O script espera 2 s após o fim de cada resposta (3 s sem chave, porque o limite sem chave é compartilhado entre todos os usuários).
+- Respostas 429 (limite excedido) e erros 5xx são repetidos até **5 vezes**, com espera crescente (5 s, 10 s, 20 s, 40 s).
+- Se as 5 tentativas falharem, o artigo é **pulado** e a coleta segue para o próximo. Nada dele é gravado nos checkpoints, então a próxima execução tenta de novo. Os artigos pulados ficam em `output/erros_coleta.csv` (com a etapa e o horário) e aparecem no dashboard com o badge **erro ao coletar**; saem do arquivo assim que forem coletados.
 
 ### Retomada da coleta
 
@@ -86,6 +87,7 @@ Os registros continuam na contagem de citações (que segue o `citationCount` do
 |---|---|
 | `sbes_s2_paper_ids.csv` | Artigos SBES com o `paperId` no Semantic Scholar e o método de identificação (`doi`, `titulo`, `titulo_aproximado`, `nao_encontrado`) |
 | `sbes_citations.csv` / `.xlsx` | Uma linha por par (artigo SBES citado, artigo citante) |
+| `erros_coleta.csv` | Artigos pulados porque a API não respondeu após 5 tentativas (só existe quando há erros) |
 | `possiveis_duplicatas.csv` | Artigos citantes que parecem ser o mesmo trabalho (ex.: preprint e versão publicada), para revisão |
 | `dashboard.html` | Dashboard interativo (mesmo conteúdo de `docs/index.html`) |
 

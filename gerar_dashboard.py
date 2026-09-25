@@ -24,6 +24,7 @@ ARQ_IDS = SAIDA_DIR / "sbes_s2_paper_ids.csv"
 ARQ_CIT = SAIDA_DIR / "sbes_citations.csv"
 ARQ_HTML = SAIDA_DIR / "dashboard.html"
 ARQ_DUP = SAIDA_DIR / "possiveis_duplicatas.csv"
+ARQ_ERROS = SAIDA_DIR / "erros_coleta.csv"  # artigos pulados pela coleta (API indisponível)
 # cópia publicada pelo GitHub Pages (pasta docs/ do repositório)
 ARQ_PAGES = Path(__file__).resolve().parent / "docs" / "index.html"
 
@@ -100,6 +101,9 @@ def montar_dados() -> list[dict]:
     ids = pd.read_csv(ARQ_IDS)
     cit = pd.read_csv(ARQ_CIT) if ARQ_CIT.exists() else pd.DataFrame(columns=["sbes_idx"])
 
+    erros = pd.read_csv(ARQ_ERROS) if ARQ_ERROS.exists() else pd.DataFrame(columns=["idx", "etapa", "quando"])
+    erro_de = {int(r["idx"]): f'{r["etapa"]} ({r["quando"]})' for _, r in erros.iterrows()}
+
     por_artigo = {k: g for k, g in cit.groupby("sbes_idx")}
     artigos = []
     for _, a in ids.sort_values("idx").iterrows():
@@ -132,7 +136,21 @@ def montar_dados() -> list[dict]:
             "citantes": citantes,
             # trabalhos distintos: cada grupo de duplicatas conta uma vez
             "distintos": len({c["grupo"] or f"_{k}" for k, c in enumerate(citantes)}),
+            "erro": erro_de.get(int(a["idx"])),
         })
+
+    # artigos que falharam já na identificação não estão em sbes_s2_paper_ids.csv
+    presentes = {a["idx"] for a in artigos}
+    for _, e in erros.iterrows():
+        if int(e["idx"]) in presentes:
+            continue
+        artigos.append({
+            "idx": int(e["idx"]), "ano": limpar(e["ano"]), "titulo": limpar(e["titulo"]),
+            "autores": limpar(e["autores"]), "doi_url": limpar(e["doi_url"]) or limpar(e["ee_url"]),
+            "s2_id": None, "match": "erro", "s2_titulo": None, "similar": False,
+            "citantes": [], "distintos": 0, "erro": erro_de[int(e["idx"])],
+        })
+    artigos.sort(key=lambda a: a["idx"])
     return artigos
 
 
@@ -232,6 +250,11 @@ input[type="search"]:focus { outline: 2px solid var(--accent); outline-offset: -
 .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-soft); color: var(--text); border: 1px solid var(--accent); border-radius: 14px; padding: 2px 10px; font: inherit; font-size: 13px; cursor: pointer; }
 .tag { display: inline-block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; color: #8a5a00; background: #fff3d6; border: 1px solid #f0c865; border-radius: 4px; padding: 0 5px; margin-left: 4px; vertical-align: 1px; }
 .tag.tit { color: #a3261b; background: #fde8e6; border-color: #f2a79f; }
+.tag.erro { color: #fff; background: #c0392b; border-color: #c0392b; }
+.badge.falha { background: #c0392b; border-color: #c0392b; color: #fff; }
+.erro-nota { border-color: #f2a79f; background: #fde8e6; color: #7a1d14; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .erro-nota { background: #3d1c19; border-color: #7a3630; color: #ffc9c2; } }
+:root[data-theme="dark"] .erro-nota { background: #3d1c19; border-color: #7a3630; color: #ffc9c2; }
 .tag.dup { color: #6b3fa0; background: #f1e9fb; border-color: #c9aef0; }
 .tag.pre { color: var(--muted); background: var(--bg); border-color: var(--line); }
 tr.dup td { background: #f7f2fd; }
@@ -356,6 +379,7 @@ button.filtro { background: none; border: 0; padding: 0; font: inherit; color: i
       <label class="toggle"><input id="soCitados" type="checkbox"> Só com citações</label>
       <label class="toggle"><input id="soSimilares" type="checkbox"> Só <span class="tag" data-tip="O título no Semantic Scholar não é idêntico ao da planilha (ignorando ponto final e espaços).">similar</span></label>
       <label class="toggle"><input id="soDuplicatas" type="checkbox"> Só com <span class="tag dup" data-tip="Há citações que parecem ser o mesmo trabalho em registros separados (ex.: preprint no arXiv e versão publicada).">duplicata</span></label>
+      <label class="toggle"><input id="soErro" type="checkbox"> Só com <span class="tag erro" data-tip="A API do Semantic Scholar não respondeu após 5 tentativas; o artigo será coletado de novo na próxima execução.">erro ao coletar</span></label>
       <label class="toggle"><input id="soTitulo" type="checkbox"> Só encontrados por <span class="tag tit" data-tip="Encontrado no Semantic Scholar pela busca por título, porque o DOI da planilha não foi reconhecido.">título</span></label>
     </div>
     <div class="chips" id="chips"></div>
@@ -398,6 +422,7 @@ const TIP = {
   titulo: (a) => a.match === "titulo_aproximado"
     ? "Encontrado pela busca por título, com título apenas parecido (≥ 90% de semelhança): vale conferir."
     : "Encontrado no Semantic Scholar pela busca por título, porque o DOI da planilha não foi reconhecido.",
+  erro: (a) => `Erro ao coletar na etapa de ${a.erro}. A API não respondeu após 5 tentativas; rode a coleta de novo para completar este artigo.`,
   preprint: "Preprint: publicado no arXiv (venue arXiv ou DOI com prefixo 10.48550).",
 };
 
@@ -461,7 +486,7 @@ function renderAnos() {
 let matchFiltro = null;    // "doi" | "titulo" | "titulo_aproximado" | "nao_encontrado"
 let autoresFiltro = null;  // 1..8 (8 = 8 ou mais)
 const faixaAutores = (a) => Math.min(autoresDe(a).length, 8);
-const ROT_MATCH = { doi: "DOI", titulo: "título", titulo_aproximado: "título aprox.", nao_encontrado: "não encontrado" };
+const ROT_MATCH = { doi: "DOI", titulo: "título", titulo_aproximado: "título aprox.", nao_encontrado: "não encontrado", erro: "erro ao coletar" };
 
 // `ignorar` deixa de aplicar um filtro: cada gráfico ignora o próprio, para
 // continuar mostrando todas as barras (com a selecionada em destaque)
@@ -471,6 +496,7 @@ function filtrados(ignorar = null) {
   const soSimilares = $("soSimilares").checked;
   const soDuplicatas = $("soDuplicatas").checked;
   const soTitulo = $("soTitulo").checked;
+  const soErro = $("soErro").checked;
   const ordem = $("ordem").value;
   const lista = DADOS.filter((a) =>
     (ignorar === "ano" || !anosOff.has(String(a.ano))) &&
@@ -480,6 +506,7 @@ function filtrados(ignorar = null) {
     (!soSimilares || a.similar) &&
     (!soDuplicatas || a.distintos < a.citantes.length) &&
     (!soTitulo || porTitulo(a)) &&
+    (!soErro || a.erro) &&
     (!autorFiltro || autoresDe(a).includes(autorFiltro)) &&
     (!q || (a.titulo + " " + a.autores).toLowerCase().includes(q)));
   // empates mantêm a ordem da planilha (sort estável)
@@ -594,10 +621,10 @@ function renderLista() {
   $("lista").innerHTML = lista.map((a) => `
     <div class="item${a.idx === selecionado ? " ativo" : ""}" data-idx="${a.idx}">
       <div class="t">
-        <div>${esc(a.titulo)}${a.similar ? ` <span class="tag" data-tip="${TIP.similar}">similar</span>` : ""}${a.distintos < a.citantes.length ? ` <span class="tag dup" data-tip="${TIP.dup}">duplicata</span>` : ""}${porTitulo(a) ? ` <span class="tag tit" data-tip="${TIP.titulo(a)}">título</span>` : ""}</div>
+        <div>${esc(a.titulo)}${a.similar ? ` <span class="tag" data-tip="${TIP.similar}">similar</span>` : ""}${a.distintos < a.citantes.length ? ` <span class="tag dup" data-tip="${TIP.dup}">duplicata</span>` : ""}${porTitulo(a) ? ` <span class="tag tit" data-tip="${TIP.titulo(a)}">título</span>` : ""}${a.erro ? ` <span class="tag erro" data-tip="${esc(TIP.erro(a))}">erro ao coletar</span>` : ""}</div>
         <div class="meta">${esc(a.ano)} · ${esc(a.autores)}</div>
       </div>
-      <div class="badge${a.citantes.length ? " tem" : ""}" title="citações">${a.citantes.length}</div>
+      <div class="badge${a.citantes.length ? " tem" : ""}${a.erro ? " falha" : ""}" title="citações">${a.erro ? "!" : a.citantes.length}</div>
     </div>`).join("");
 }
 
@@ -609,11 +636,12 @@ function renderDetalhe(a) {
 
   $("detalhe").innerHTML = `
     <div class="detalhe">
-      <h2>${esc(a.titulo)}${a.similar ? ` <span class="tag" data-tip="${TIP.similar}">similar</span>` : ""}${a.distintos < a.citantes.length ? ` <span class="tag dup" data-tip="${TIP.dup}">duplicata</span>` : ""}${porTitulo(a) ? ` <span class="tag tit" data-tip="${TIP.titulo(a)}">título</span>` : ""}</h2>
+      <h2>${esc(a.titulo)}${a.similar ? ` <span class="tag" data-tip="${TIP.similar}">similar</span>` : ""}${a.distintos < a.citantes.length ? ` <span class="tag dup" data-tip="${TIP.dup}">duplicata</span>` : ""}${porTitulo(a) ? ` <span class="tag tit" data-tip="${TIP.titulo(a)}">título</span>` : ""}${a.erro ? ` <span class="tag erro" data-tip="${esc(TIP.erro(a))}">erro ao coletar</span>` : ""}</h2>
       <div class="autores">${autoresDe(a).map((n) =>
         `<button class="autor" data-autor="${esc(n)}" title="Ver artigos deste autor">${esc(n)}</button>`).join(", ")} · SBES ${esc(a.ano)}</div>
       <div class="links">${links}</div>
       ${a.similar ? `<div class="nota"><b>Título no Semantic Scholar:</b> ${destacarDiferencas(a.titulo, a.s2_titulo)}</div>` : ""}
+      ${a.erro ? `<div class="nota erro-nota"><b>Erro ao coletar:</b> a API do Semantic Scholar não respondeu na etapa de ${esc(a.erro)}. Os dados deste artigo estão incompletos; rode a coleta de novo.</div>` : ""}
       <div id="painel"></div>
     </div>`;
   renderPainel(a);
@@ -637,7 +665,7 @@ function renderPainel(a) {
   const anosValidos = linhas.map((c) => c.ano).filter(Boolean);
   const primeiro = anosValidos.length ? Math.min(...anosValidos) : "—";
   const nVenues = new Set(linhas.map((c) => c.venue).filter(Boolean)).size;
-  const encontrado = {doi: "DOI", titulo: "título", titulo_aproximado: "título aprox."}[a.match] || "não encontrado";
+  const encontrado = {doi: "DOI", titulo: "título", titulo_aproximado: "título aprox.", erro: "erro ao coletar"}[a.match] || "não encontrado";
 
   const cardVenues = opcoes.length ? `
     <div class="kpi kpi-venues">
@@ -768,6 +796,7 @@ $("soCitados").addEventListener("change", renderLista);
 $("soSimilares").addEventListener("change", renderLista);
 $("soDuplicatas").addEventListener("change", renderLista);
 $("soTitulo").addEventListener("change", renderLista);
+$("soErro").addEventListener("change", renderLista);
 $("anos").addEventListener("click", (e) => {
   const b = e.target.closest(".vchip");
   if (!b) return;

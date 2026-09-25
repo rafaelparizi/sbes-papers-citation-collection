@@ -56,8 +56,15 @@ if API_KEY:
 # Limite com chave: 1 requisição por segundo, somando todos os endpoints.
 # O intervalo é contado a partir do fim da resposta anterior, com folga.
 # Sem chave, o limite é compartilhado entre todos os usuários e bem mais baixo.
-INTERVALO = 1.2 if API_KEY else 3.0
-MAX_TENTATIVAS = 8
+INTERVALO = 2.0 if API_KEY else 3.0
+MAX_TENTATIVAS = 5  # esgotadas as tentativas, o artigo é pulado e fica para a próxima execução
+
+
+class FalhaAPI(RuntimeError):
+    """A API não respondeu com sucesso após MAX_TENTATIVAS."""
+
+
+PULADOS: dict[int, str] = {}  # idx -> etapa em que o artigo foi pulado nesta execução
 
 CAMPOS_PAPER = "paperId,title,year,citationCount,externalIds"
 CAMPOS_CITACAO = "paperId,title,year,authors,venue,externalIds"
@@ -84,7 +91,8 @@ def requisitar(session: requests.Session, metodo: str, url: str, **kwargs):
             r = session.request(metodo, url, headers=HEADERS, timeout=60, **kwargs)
         except requests.RequestException as e:
             print(f"  [rede] {e} — tentativa {tentativa}/{MAX_TENTATIVAS}")
-            time.sleep(espera)
+            if tentativa < MAX_TENTATIVAS:
+                time.sleep(espera)
             espera = min(espera * 2, 120)
             continue
         finally:
@@ -93,14 +101,17 @@ def requisitar(session: requests.Session, metodo: str, url: str, **kwargs):
         if r.status_code == 404:
             return None
         if r.status_code == 429 or r.status_code >= 500:
-            print(f"  [{r.status_code}] aguardando {espera:.0f}s — tentativa {tentativa}/{MAX_TENTATIVAS}")
-            time.sleep(espera)
+            if tentativa < MAX_TENTATIVAS:
+                print(f"  [{r.status_code}] aguardando {espera:.0f}s — tentativa {tentativa}/{MAX_TENTATIVAS}")
+                time.sleep(espera)
+            else:
+                print(f"  [{r.status_code}] tentativa {tentativa}/{MAX_TENTATIVAS} — desistindo deste artigo")
             espera = min(espera * 2, 120)
             continue
         r.raise_for_status()
         return r.json()
 
-    raise RuntimeError(f"Falhou após {MAX_TENTATIVAS} tentativas: {url}")
+    raise FalhaAPI(f"Falhou após {MAX_TENTATIVAS} tentativas: {url}")
 
 
 def extrair_doi(row) -> str | None:
@@ -167,6 +178,10 @@ def resolver_ids(session: requests.Session, df: pd.DataFrame, ckpt: Path) -> pd.
             if e.response is None or e.response.status_code != 400:
                 raise
             resp = [None] * len(lote)
+        except FalhaAPI:
+            print(f"  lote DOI {i // LOTE_DOI + 1}: API indisponível — lote pulado")
+            PULADOS.update({int(x): "identificação (DOI)" for x in lote["idx"]})
+            continue
 
         regs = []
         for (_, row), paper in zip(lote.iterrows(), resp):
@@ -184,14 +199,19 @@ def resolver_ids(session: requests.Session, df: pd.DataFrame, ckpt: Path) -> pd.
         print(f"  lote DOI {i // LOTE_DOI + 1}: {len(regs)}/{len(lote)} encontrados")
 
     # 1b) fallback por título (sem DOI ou DOI não indexado)
-    restantes = df[~df["idx"].isin(feitos)]
+    restantes = df[~df["idx"].isin(feitos) & ~df["idx"].isin(PULADOS)]
     print(f"  {len(restantes)} artigos para busca por título")
     for n, (_, row) in enumerate(restantes.iterrows(), 1):
         titulo = str(row["titulo"]).strip().rstrip(".")
-        resp = requisitar(
-            session, "GET", f"{API}/paper/search/match",
-            params={"query": titulo, "fields": CAMPOS_PAPER},
-        )
+        try:
+            resp = requisitar(
+                session, "GET", f"{API}/paper/search/match",
+                params={"query": titulo, "fields": CAMPOS_PAPER},
+            )
+        except FalhaAPI:
+            print(f"  idx {int(row['idx'])}: API indisponível — pulado")
+            PULADOS[int(row["idx"])] = "identificação (título)"
+            continue
         paper = (resp or {}).get("data", [None])[0] if resp else None
 
         match = comparar_titulos(titulo, paper.get("title", "")) if paper else None
@@ -258,6 +278,29 @@ def coletar_citacoes(session: requests.Session, paper_id: str) -> list[dict]:
     return citacoes
 
 
+def atualizar_erros(arq: Path, df_total: pd.DataFrame, ckpt_ids: Path, ckpt_cit: Path) -> int:
+    """Mantém erros_coleta.csv: soma os pulados desta execução e remove os que já foram concluídos."""
+    ids = {r["idx"]: r for r in carregar_jsonl(ckpt_ids)}
+    citados = {r["cited_s2_paper_id"] for r in carregar_jsonl(ckpt_cit)}
+
+    def concluido(idx: int) -> bool:
+        r = ids.get(idx)
+        if not r or r["metodo_match"] == "nao_encontrado":
+            return False
+        return r["s2_paper_id"] in citados
+
+    anteriores = pd.read_csv(arq) if arq.exists() else pd.DataFrame(columns=["idx", "etapa", "quando"])
+    agora = pd.Timestamp.now().strftime("%Y-%m-%d %H:%M")
+    novos = pd.DataFrame([{"idx": i, "etapa": e, "quando": agora} for i, e in PULADOS.items()],
+                         columns=["idx", "etapa", "quando"])
+    erros = pd.concat([anteriores[["idx", "etapa", "quando"]], novos]).drop_duplicates("idx", keep="last")
+    erros = erros[~erros["idx"].map(lambda i: concluido(int(i)))]
+    info = df_total[["idx", "ano", "titulo", "autores", "doi_url", "ee_url"]]
+    erros = info.merge(erros, on="idx", how="inner").sort_values("idx")
+    erros.to_csv(arq, index=False)
+    return len(erros)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--entrada", type=Path, default=ENTRADA)
@@ -296,7 +339,13 @@ def main():
     print(f"[Etapa 2] {len(concluidos)} já coletados, {len(pendentes)} pendentes")
 
     for n, pid in enumerate(pendentes, 1):
-        cits = coletar_citacoes(session, pid)
+        try:
+            cits = coletar_citacoes(session, pid)
+        except FalhaAPI:
+            # nada é gravado: o artigo volta como pendente na próxima execução
+            print(f"  {n}/{len(pendentes)} paperId {pid}: API indisponível — pulado")
+            PULADOS.update({int(x): "citações" for x in resolvidos.loc[resolvidos["s2_paper_id"] == pid, "idx"]})
+            continue
         anexar_jsonl(ckpt_cit, [{"cited_s2_paper_id": pid, "citacoes": cits}])
         if n % 10 == 0 or n == len(pendentes):
             print(f"  {n}/{len(pendentes)} artigos — último com {len(cits)} citações")
@@ -323,6 +372,11 @@ def main():
     cit.to_excel(args.saida / "sbes_citations.xlsx", index=False)
     print(f"\nConcluído: {len(cit)} citações de {cit['cited_s2_paper_id'].nunique()} artigos SBES")
     print(f"Arquivos em: {args.saida}")
+    erros = atualizar_erros(args.saida / "erros_coleta.csv", df_total, ckpt_ids, ckpt_cit)
+    if erros:
+        print(f"\n{erros} artigo(s) com erro ao coletar (em erros_coleta.csv); rode a coleta de novo para completá-los.")
+        for idx, etapa in sorted(PULADOS.items()):
+            print(f"  - idx {idx}: {etapa}")
 
 
 if __name__ == "__main__":
