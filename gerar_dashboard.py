@@ -166,14 +166,16 @@ HTML = r"""<!doctype html>
     --line: #2c323d; --accent: #7fa2ff; --accent-soft: #243150; --bar: #7fa2ff;
   }
   :root:not([data-theme="light"]) .tag { color: #ffd27a; background: #3a2e12; border-color: #6b5420; }
-  :root:not([data-theme="light"]) .tag.dup { color: #ff9f95; background: #3d1c19; border-color: #7a3630; }
+  :root:not([data-theme="light"]) .tag.tit { color: #ff9f95; background: #3d1c19; border-color: #7a3630; }
+  :root:not([data-theme="light"]) .tag.dup { color: #cfb2ff; background: #2c2140; border-color: #5b4585; }
   :root:not([data-theme="light"]) .tag.pre { color: var(--muted); background: var(--bg); border-color: var(--line); }
-  :root:not([data-theme="light"]) tr.dup td { background: #2a1d1c; }
+  :root:not([data-theme="light"]) tr.dup td { background: #241d30; }
 }
 :root[data-theme="dark"] .tag { color: #ffd27a; background: #3a2e12; border-color: #6b5420; }
-:root[data-theme="dark"] .tag.dup { color: #ff9f95; background: #3d1c19; border-color: #7a3630; }
+:root[data-theme="dark"] .tag.tit { color: #ff9f95; background: #3d1c19; border-color: #7a3630; }
+:root[data-theme="dark"] .tag.dup { color: #cfb2ff; background: #2c2140; border-color: #5b4585; }
 :root[data-theme="dark"] .tag.pre { color: var(--muted); background: var(--bg); border-color: var(--line); }
-:root[data-theme="dark"] tr.dup td { background: #2a1d1c; }
+:root[data-theme="dark"] tr.dup td { background: #241d30; }
 :root[data-theme="dark"] {
   --bg: #14171d; --panel: #1c2028; --text: #e6e9ef; --muted: #99a2b3;
   --line: #2c323d; --accent: #7fa2ff; --accent-soft: #243150; --bar: #7fa2ff;
@@ -206,9 +208,13 @@ input[type="search"]:focus { outline: 2px solid var(--accent); outline-offset: -
 .chips { padding: 8px 12px; border-bottom: 1px solid var(--line); }
 .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-soft); color: var(--text); border: 1px solid var(--accent); border-radius: 14px; padding: 2px 10px; font: inherit; font-size: 13px; cursor: pointer; }
 .tag { display: inline-block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; color: #8a5a00; background: #fff3d6; border: 1px solid #f0c865; border-radius: 4px; padding: 0 5px; margin-left: 4px; vertical-align: 1px; }
-.tag.dup { color: #a3261b; background: #fde8e6; border-color: #f2a79f; }
+.tag.tit { color: #a3261b; background: #fde8e6; border-color: #f2a79f; }
+.tag.dup { color: #6b3fa0; background: #f1e9fb; border-color: #c9aef0; }
 .tag.pre { color: var(--muted); background: var(--bg); border-color: var(--line); }
-tr.dup td { background: #fdf3f2; }
+tr.dup td { background: #f7f2fd; }
+[data-tip] { cursor: help; }
+#tip { position: fixed; z-index: 10; max-width: 280px; padding: 6px 9px; border-radius: 6px; font-size: 12px; line-height: 1.4; font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--panel); background: var(--text); pointer-events: none; opacity: 0; transition: opacity .12s; }
+#tip.on { opacity: 1; }
 .nota { background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; margin: 10px 0 0; font-size: 13px; }
 .nota b { color: var(--muted); font-weight: 600; }
 .nota strong { font-weight: 700; color: var(--text); background: #fff3d6; border-radius: 3px; padding: 0 2px; }
@@ -244,8 +250,21 @@ th { color: var(--muted); font-weight: 600; font-size: 12px; }
 td a { color: var(--text); text-decoration: none; }
 td a:hover { color: var(--accent); text-decoration: underline; }
 td.sm { color: var(--muted); font-size: 12px; }
-td.doi { word-break: break-all; min-width: 110px; }
+td.doi { min-width: 120px; word-break: break-all; }
 td.doi a { color: var(--accent); }
+.venue { background: none; border: 0; padding: 0; font: inherit; color: var(--text); text-align: left; cursor: pointer; }
+.venue:hover { color: var(--accent); text-decoration: underline; }
+.kpi-venues { flex: 1 1 260px; max-width: 520px; }
+.vchips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.vchip { font: inherit; font-size: 12px; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 2px 9px; cursor: pointer; }
+.kpi .vchip b { display: inline; font-size: 12px; color: var(--muted); font-weight: 600; margin-left: 2px; }
+.kpi-venues > span { display: block; }
+.vchip:hover { border-color: var(--accent); }
+.vchip { color: var(--muted); }
+.vchip.on { background: var(--accent); border-color: var(--accent); color: var(--panel); font-weight: 600; }
+.vchip.on::before { content: "✓ "; }
+.kpi .vchip.on b { color: var(--panel); }
+.limpar-venues { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; }
 @media (max-width: 820px) {
   header, .kpis { padding-left: 16px; padding-right: 16px; }
   main { grid-template-columns: 1fr; padding: 0 16px 16px; }
@@ -270,8 +289,9 @@ td.doi a { color: var(--accent); }
       </select>
       <input id="busca" type="search" placeholder="🔍  Buscar por título ou autor…">
       <label class="toggle"><input id="soCitados" type="checkbox"> Só com citações</label>
-      <label class="toggle"><input id="soSimilares" type="checkbox"> Só <span class="tag">similar</span></label>
-      <label class="toggle"><input id="soDuplicatas" type="checkbox"> Só com <span class="tag dup">duplicata</span></label>
+      <label class="toggle"><input id="soSimilares" type="checkbox"> Só <span class="tag" data-tip="O título no Semantic Scholar não é idêntico ao da planilha (ignorando ponto final e espaços).">similar</span></label>
+      <label class="toggle"><input id="soDuplicatas" type="checkbox"> Só com <span class="tag dup" data-tip="Há citações que parecem ser o mesmo trabalho em registros separados (ex.: preprint no arXiv e versão publicada).">duplicata</span></label>
+      <label class="toggle"><input id="soTitulo" type="checkbox"> Só encontrados por <span class="tag tit" data-tip="Encontrado no Semantic Scholar pela busca por título, porque o DOI da planilha não foi reconhecido.">título</span></label>
     </div>
     <div class="chips" id="chips"></div>
     <div class="lista" id="lista"></div>
@@ -303,6 +323,37 @@ function destacarDiferencas(orig, novo) {
 
 let selecionado = null;
 let autorFiltro = null;
+const TIP = {
+  similar: "O título no Semantic Scholar não é idêntico ao da planilha (ignorando ponto final e espaços).",
+  dup: "Há citações que parecem ser o mesmo trabalho em registros separados (ex.: preprint no arXiv e versão publicada).",
+  titulo: (a) => a.match === "titulo_aproximado"
+    ? "Encontrado pela busca por título, com título apenas parecido (≥ 90% de semelhança): vale conferir."
+    : "Encontrado no Semantic Scholar pela busca por título, porque o DOI da planilha não foi reconhecido.",
+  preprint: "Preprint: publicado no arXiv (venue arXiv ou DOI com prefixo 10.48550).",
+};
+
+// Tooltip flutuante para qualquer elemento com data-tip
+const tip = document.createElement("div");
+tip.id = "tip";
+tip.setAttribute("role", "tooltip");
+document.body.appendChild(tip);
+document.addEventListener("mouseover", (e) => {
+  const alvo = e.target.closest("[data-tip]");
+  if (!alvo) { tip.classList.remove("on"); return; }
+  tip.textContent = alvo.dataset.tip;
+  tip.classList.add("on");
+  const r = alvo.getBoundingClientRect();
+  const t = tip.getBoundingClientRect();
+  let x = Math.min(Math.max(8, r.left + r.width / 2 - t.width / 2), window.innerWidth - t.width - 8);
+  let y = r.top - t.height - 8;
+  if (y < 8) y = r.bottom + 8;
+  tip.style.left = `${x}px`;
+  tip.style.top = `${y}px`;
+});
+document.addEventListener("scroll", () => tip.classList.remove("on"), true);
+
+const venuesOff = new Set();  // venues desmarcadas no card (vazio = todas marcadas)
+const porTitulo = (a) => a.match === "titulo" || a.match === "titulo_aproximado";
 const autoresDe = (a) => String(a.autores ?? "").split(", ").filter(Boolean);
 
 function kpi(valor, rotulo) {
@@ -334,12 +385,14 @@ function filtrados() {
   const soCitados = $("soCitados").checked;
   const soSimilares = $("soSimilares").checked;
   const soDuplicatas = $("soDuplicatas").checked;
+  const soTitulo = $("soTitulo").checked;
   const ordem = $("ordem").value;
   const lista = DADOS.filter((a) =>
     (!ano || String(a.ano) === ano) &&
     (!soCitados || a.citantes.length > 0) &&
     (!soSimilares || a.similar) &&
     (!soDuplicatas || a.distintos < a.citantes.length) &&
+    (!soTitulo || porTitulo(a)) &&
     (!autorFiltro || autoresDe(a).includes(autorFiltro)) &&
     (!q || (a.titulo + " " + a.autores).toLowerCase().includes(q)));
   // empates mantêm a ordem da planilha (sort estável)
@@ -358,7 +411,7 @@ function renderLista() {
   $("lista").innerHTML = lista.map((a) => `
     <div class="item${a.idx === selecionado ? " ativo" : ""}" data-idx="${a.idx}">
       <div class="t">
-        <div>${esc(a.titulo)}${a.similar ? ` <span class="tag" title="Título no Semantic Scholar diferente do da planilha">similar</span>` : ""}${a.distintos < a.citantes.length ? ` <span class="tag dup" title="Há citações que parecem ser o mesmo trabalho (ex.: preprint e versão publicada)">duplicata</span>` : ""}</div>
+        <div>${esc(a.titulo)}${a.similar ? ` <span class="tag" data-tip="${TIP.similar}">similar</span>` : ""}${a.distintos < a.citantes.length ? ` <span class="tag dup" data-tip="${TIP.dup}">duplicata</span>` : ""}${porTitulo(a) ? ` <span class="tag tit" data-tip="${TIP.titulo(a)}">título</span>` : ""}</div>
         <div class="meta">${esc(a.ano)} · ${esc(a.autores)}</div>
       </div>
       <div class="badge${a.citantes.length ? " tem" : ""}" title="citações">${a.citantes.length}</div>
@@ -366,20 +419,54 @@ function renderLista() {
 }
 
 function renderDetalhe(a) {
-  const n = a.citantes.length;
-  const porAno = {};
-  a.citantes.forEach((c) => { const k = c.ano ?? "s/ano"; porAno[k] = (porAno[k] || 0) + 1; });
-  const anos = Object.keys(porAno).sort();
-  const max = Math.max(1, ...Object.values(porAno));
-  const anosValidos = a.citantes.map((c) => c.ano).filter(Boolean);
-  const primeiro = anosValidos.length ? Math.min(...anosValidos) : "—";
-  const venues = new Set(a.citantes.map((c) => c.venue).filter(Boolean)).size;
-
   const links = [
     a.doi_url && `<a href="${esc(a.doi_url)}" target="_blank" rel="noopener">DOI ↗</a>`,
     a.s2_id && `<a href="https://www.semanticscholar.org/paper/${esc(a.s2_id)}" target="_blank" rel="noopener">Semantic Scholar ↗</a>`,
   ].filter(Boolean).join("");
 
+  $("detalhe").innerHTML = `
+    <div class="detalhe">
+      <h2>${esc(a.titulo)}${a.similar ? ` <span class="tag" data-tip="${TIP.similar}">similar</span>` : ""}${a.distintos < a.citantes.length ? ` <span class="tag dup" data-tip="${TIP.dup}">duplicata</span>` : ""}${porTitulo(a) ? ` <span class="tag tit" data-tip="${TIP.titulo(a)}">título</span>` : ""}</h2>
+      <div class="autores">${autoresDe(a).map((n) =>
+        `<button class="autor" data-autor="${esc(n)}" title="Ver artigos deste autor">${esc(n)}</button>`).join(", ")} · SBES ${esc(a.ano)}</div>
+      <div class="links">${links}</div>
+      ${a.similar ? `<div class="nota"><b>Título no Semantic Scholar:</b> ${destacarDiferencas(a.titulo, a.s2_titulo)}</div>` : ""}
+      <div id="painel"></div>
+    </div>`;
+  renderPainel(a);
+}
+
+const SEM_VENUE = "__sem_venue__";
+const venueDe = (c) => c.venue || SEM_VENUE;
+
+// Cards, gráfico e tabela, recalculados conforme as venues selecionadas
+function renderPainel(a) {
+  const cont = {};
+  a.citantes.forEach((c) => { cont[venueDe(c)] = (cont[venueDe(c)] || 0) + 1; });
+  [...venuesOff].forEach((v) => { if (!(v in cont)) venuesOff.delete(v); });
+  const opcoes = Object.keys(cont).sort((x, y) => cont[y] - cont[x] || x.localeCompare(y));
+  const linhas = a.citantes.filter((c) => !venuesOff.has(venueDe(c)));
+
+  const n = linhas.length;
+  const distintos = new Set(linhas.map((c) => (c.grupo ? `g${c.grupo}` : c.id))).size;
+  const anosValidos = linhas.map((c) => c.ano).filter(Boolean);
+  const primeiro = anosValidos.length ? Math.min(...anosValidos) : "—";
+  const nVenues = new Set(linhas.map((c) => c.venue).filter(Boolean)).size;
+  const encontrado = {doi: "DOI", titulo: "título", titulo_aproximado: "título aprox."}[a.match] || "não encontrado";
+
+  const cardVenues = opcoes.length ? `
+    <div class="kpi kpi-venues">
+      <span>venues ${venuesOff.size ? `· <button class="limpar-venues">marcar todas</button>` : "(clique para desmarcar)"}</span>
+      <div class="vchips">${opcoes.map((v) => `
+        <button class="vchip${venuesOff.has(v) ? "" : " on"}" data-venue="${esc(v)}" aria-pressed="${!venuesOff.has(v)}">${
+          v === SEM_VENUE ? "(sem venue)" : esc(v)} <b>${cont[v]}</b></button>`).join("")}
+      </div>
+    </div>` : "";
+
+  const porAno = {};
+  linhas.forEach((c) => { const k = c.ano ?? "s/ano"; porAno[k] = (porAno[k] || 0) + 1; });
+  const anos = Object.keys(porAno).sort();
+  const max = Math.max(1, ...Object.values(porAno));
   const grafico = n ? `
     <h3>Citações por ano</h3>
     <div class="grafico">${anos.map((k) => `
@@ -390,53 +477,79 @@ function renderDetalhe(a) {
       </div>`).join("")}
     </div>` : "";
 
-  const tabela = n ? `
-    <h3>Quem citou (${n})</h3>
+  const tabela = !a.citantes.length
+    ? `<p class="vazio" style="padding:12px 0">Nenhuma citação registrada no Semantic Scholar.</p>`
+    : `
+    <h3>Quem citou (${venuesOff.size ? `${n} de ${a.citantes.length}` : n})</h3>
     <div class="tabela"><table>
       <thead><tr><th>Ano</th><th>Artigo citante</th><th>Autores</th><th>Venue</th><th>DOI</th></tr></thead>
-      <tbody>${a.citantes.map((c) => {
+      <tbody>${linhas.map((c) => {
         const outros = c.grupo ? a.citantes.filter((o) => o.grupo === c.grupo && o !== c).map((o) => o.titulo) : [];
         return `
         <tr${c.grupo ? ' class="dup"' : ""}>
           <td>${esc(c.ano ?? "—")}</td>
           <td><a href="https://www.semanticscholar.org/paper/${esc(c.id)}" target="_blank" rel="noopener">${esc(c.titulo)}</a>${
-            c.grupo ? ` <span class="tag dup" title="Provavelmente o mesmo trabalho que: ${esc(outros.join(" | "))}">duplicata ${c.grupo}</span>` : ""}${
-            c.preprint ? ` <span class="tag pre">preprint</span>` : ""}</td>
+            c.grupo ? ` <span class="tag dup" data-tip="Provavelmente o mesmo trabalho que: ${esc(outros.join(" | "))}">duplicata ${c.grupo}</span>` : ""}${
+            c.preprint ? ` <span class="tag pre" data-tip="${TIP.preprint}">preprint</span>` : ""}</td>
           <td class="sm">${esc(c.autores)}</td>
-          <td class="sm">${esc(c.venue || "—")}</td>
-          <td class="sm doi">${c.doi ? `<a href="https://doi.org/${esc(c.doi)}" target="_blank" rel="noopener">${esc(c.doi)}</a>` : "—"}</td>
+          <td class="sm">${c.venue
+            ? `<button class="venue" data-venue="${esc(c.venue)}" title="Mostrar só esta venue">${esc(c.venue)}</button>`
+            : "—"}</td>
+          <td class="sm doi">${c.doi
+            ? `<a href="https://doi.org/${esc(c.doi)}" target="_blank" rel="noopener">${esc(c.doi)}</a>`
+            : "—"}</td>
         </tr>`;
       }).join("")}
       </tbody>
-    </table></div>` : `<p class="vazio" style="padding:12px 0">Nenhuma citação registrada no Semantic Scholar.</p>`;
+    </table></div>`;
 
-  $("detalhe").innerHTML = `
-    <div class="detalhe">
-      <h2>${esc(a.titulo)}${a.similar ? ` <span class="tag">similar</span>` : ""}</h2>
-      <div class="autores">${autoresDe(a).map((n) =>
-        `<button class="autor" data-autor="${esc(n)}" title="Ver artigos deste autor">${esc(n)}</button>`).join(", ")} · SBES ${esc(a.ano)}</div>
-      <div class="links">${links}</div>
-      ${a.similar ? `<div class="nota"><b>Título no Semantic Scholar:</b> ${destacarDiferencas(a.titulo, a.s2_titulo)}</div>` : ""}
-      <div class="resumo">
-        ${kpi(n, "citações (registros)")}
-        ${kpi(a.distintos, "trabalhos distintos")}
-        ${kpi(primeiro, "primeira citação")}
-        ${kpi(venues, "venues distintos")}
-        ${kpi({doi: "DOI", titulo: "título", titulo_aproximado: "título aprox."}[a.match] || "não encontrado", "encontrado por")}
-      </div>
-      ${grafico}
-      ${tabela}
-    </div>`;
+  $("painel").innerHTML = `
+    <div class="resumo">
+      ${kpi(n, "citações (registros)")}
+      ${kpi(distintos, "trabalhos distintos")}
+      ${kpi(primeiro, "primeira citação")}
+      ${kpi(nVenues, "venues distintos")}
+      ${kpi(encontrado, "encontrado por")}
+      ${cardVenues}
+    </div>
+    ${grafico}
+    ${tabela}`;
 }
 
 $("lista").addEventListener("click", (e) => {
   const item = e.target.closest(".item");
   if (!item) return;
   selecionado = Number(item.dataset.idx);
+  venuesOff.clear();
   renderDetalhe(DADOS.find((a) => a.idx === selecionado));
   renderLista();
 });
 $("detalhe").addEventListener("click", (e) => {
+  const atual = () => DADOS.find((a) => a.idx === selecionado);
+  const chip = e.target.closest(".vchip");
+  if (chip) {
+    // clique desmarca (ou volta a marcar) a venue
+    const k = chip.dataset.venue;
+    venuesOff.has(k) ? venuesOff.delete(k) : venuesOff.add(k);
+    renderPainel(atual());
+    return;
+  }
+  const v = e.target.closest(".venue");
+  if (v) {
+    // na tabela: mostra só esta venue (clicar de novo volta a mostrar todas)
+    const a = atual();
+    const outras = new Set(a.citantes.map(venueDe).filter((k) => k !== v.dataset.venue));
+    const soEsta = [...outras].every((k) => venuesOff.has(k)) && !venuesOff.has(v.dataset.venue);
+    venuesOff.clear();
+    if (!soEsta) outras.forEach((k) => venuesOff.add(k));
+    renderPainel(a);
+    return;
+  }
+  if (e.target.closest(".limpar-venues")) {
+    venuesOff.clear();
+    renderPainel(atual());
+    return;
+  }
   const b = e.target.closest(".autor");
   if (!b) return;
   autorFiltro = b.dataset.autor;
@@ -451,6 +564,7 @@ $("chips").addEventListener("click", (e) => {
 $("soCitados").addEventListener("change", renderLista);
 $("soSimilares").addEventListener("change", renderLista);
 $("soDuplicatas").addEventListener("change", renderLista);
+$("soTitulo").addEventListener("change", renderLista);
 $("ano").addEventListener("change", renderLista);
 $("ordem").addEventListener("change", renderLista);
 $("busca").addEventListener("input", renderLista);

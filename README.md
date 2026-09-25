@@ -61,6 +61,13 @@ O Semantic Scholar às vezes mantém registros separados para o mesmo trabalho, 
 
 Os registros continuam na contagem de citações (que segue o `citationCount` do Semantic Scholar), mas o dashboard mostra também o número de **trabalhos distintos**, marca os registros agrupados e os de venue arXiv (**preprint**) e permite filtrar os artigos que têm duplicatas. A lista para revisão fica em `output/possiveis_duplicatas.csv`.
 
+### Recursos do dashboard
+
+- Filtros por ano, busca por título/autor, ordenação por número de citações e clique no nome de um autor para ver os artigos dele.
+- Badges com explicação ao passar o mouse: **similar** (título diferente no Semantic Scholar), **título** (encontrado pela busca por título, porque o DOI não foi reconhecido), **duplicata** e **preprint**. Cada badge da lista tem um filtro correspondente.
+- Nos detalhes de um artigo, o card **venues** lista as venues dos artigos citantes, todas marcadas por padrão. Clicar desmarca (ou marca de novo) uma venue, e os demais cards, o gráfico e a tabela são recalculados. Clicar no nome de uma venue na tabela mostra só aquela venue.
+- A tabela de quem citou traz ano, título, autores, venue e DOI de cada artigo citante.
+
 ### Limitações
 
 - A cobertura depende do Semantic Scholar: citações que ele não indexou não aparecem, e artigos antigos tendem a ter menos citações registradas.
