@@ -117,7 +117,7 @@ select, input {
 }
 input[type="search"] { flex: 1 1 100%; order: -1; min-width: 0; padding: 9px 12px; font-size: 15px; }
 input[type="search"]:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
-#ano { padding: 7px 8px; }
+#ano, #ordem { padding: 7px 8px; }
 .filtros { flex-wrap: wrap; align-items: center; }
 .toggle { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; cursor: pointer; user-select: none; }
 .chips:empty { display: none; }
@@ -176,6 +176,11 @@ td.sm { color: var(--muted); font-size: 12px; }
   <section class="panel">
     <div class="filtros">
       <select id="ano" aria-label="Ano de publicação"></select>
+      <select id="ordem" aria-label="Ordenar">
+        <option value="">Ordem da planilha</option>
+        <option value="desc">Mais citados primeiro</option>
+        <option value="asc">Menos citados primeiro</option>
+      </select>
       <input id="busca" type="search" placeholder="🔍  Buscar por título ou autor…">
       <label class="toggle"><input id="soCitados" type="checkbox"> Só com citações</label>
       <label class="toggle"><input id="soSimilares" type="checkbox"> Só <span class="tag">similar</span></label>
@@ -240,12 +245,17 @@ function filtrados() {
   const q = $("busca").value.trim().toLowerCase();
   const soCitados = $("soCitados").checked;
   const soSimilares = $("soSimilares").checked;
-  return DADOS.filter((a) =>
+  const ordem = $("ordem").value;
+  const lista = DADOS.filter((a) =>
     (!ano || String(a.ano) === ano) &&
     (!soCitados || a.citantes.length > 0) &&
     (!soSimilares || a.similar) &&
     (!autorFiltro || autoresDe(a).includes(autorFiltro)) &&
     (!q || (a.titulo + " " + a.autores).toLowerCase().includes(q)));
+  // empates mantêm a ordem da planilha (sort estável)
+  if (ordem === "desc") lista.sort((x, y) => y.citantes.length - x.citantes.length);
+  if (ordem === "asc") lista.sort((x, y) => x.citantes.length - y.citantes.length);
+  return lista;
 }
 
 function renderLista() {
@@ -344,6 +354,7 @@ $("chips").addEventListener("click", (e) => {
 $("soCitados").addEventListener("change", renderLista);
 $("soSimilares").addEventListener("change", renderLista);
 $("ano").addEventListener("change", renderLista);
+$("ordem").addEventListener("change", renderLista);
 $("busca").addEventListener("input", renderLista);
 
 montarAnos();
