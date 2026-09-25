@@ -201,7 +201,7 @@ select, input {
 }
 input[type="search"] { flex: 1 1 100%; order: -1; min-width: 0; padding: 9px 12px; font-size: 15px; }
 input[type="search"]:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
-#ano, #ordem { padding: 7px 8px; }
+#ordem { padding: 7px 8px; }
 .filtros { flex-wrap: wrap; align-items: center; }
 .toggle { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; cursor: pointer; user-select: none; }
 .chips:empty { display: none; }
@@ -257,16 +257,20 @@ td.doi a { color: var(--accent); }
 .kpi-venues { flex: 1 1 260px; max-width: 520px; }
 .vchips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
 .vchip { font: inherit; font-size: 12px; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 2px 9px; cursor: pointer; }
-.kpi .vchip b { display: inline; font-size: 12px; color: var(--muted); font-weight: 600; margin-left: 2px; }
+.vchip b, .kpi .vchip b { display: inline; font-size: 12px; color: var(--muted); font-weight: 600; margin-left: 2px; }
 .kpi-venues > span { display: block; }
 .vchip:hover { border-color: var(--accent); }
 .vchip { color: var(--muted); }
 .vchip.on { background: var(--accent); border-color: var(--accent); color: var(--panel); font-weight: 600; }
 .vchip.on::before { content: "✓ "; }
-.kpi .vchip.on b { color: var(--panel); }
+.vchip.on b, .kpi .vchip.on b { color: var(--panel); }
+.anos-barra { padding: 0 24px 16px; }
+.anos-cab { color: var(--muted); font-size: 12px; margin-bottom: 2px; }
+.anos-cab button { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; }
+.anos-cab button:hover { text-decoration: underline; }
 .limpar-venues { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; }
 @media (max-width: 820px) {
-  header, .kpis { padding-left: 16px; padding-right: 16px; }
+  header, .kpis, .anos-barra { padding-left: 16px; padding-right: 16px; }
   main { grid-template-columns: 1fr; padding: 0 16px 16px; }
   .lista { max-height: 50vh; }
 }
@@ -278,10 +282,13 @@ td.doi a { color: var(--accent); }
   <p>Fonte: Semantic Scholar · gerado em __GERADO__</p>
 </header>
 <div class="kpis" id="kpis"></div>
+<div class="anos-barra">
+  <div class="anos-cab">Anos de publicação <span id="anosAcoes"></span></div>
+  <div class="vchips" id="anos"></div>
+</div>
 <main>
   <section class="panel">
     <div class="filtros">
-      <select id="ano" aria-label="Ano de publicação"></select>
       <select id="ordem" aria-label="Ordenar">
         <option value="">Ordem da planilha</option>
         <option value="desc">Mais citados primeiro</option>
@@ -371,16 +378,22 @@ function renderKpis(lista) {
     kpi(unicos, "artigos citantes distintos");
 }
 
-function montarAnos() {
-  const cont = {};
-  DADOS.forEach((a) => { cont[a.ano] = (cont[a.ano] || 0) + 1; });
-  const anos = Object.keys(cont).sort((a, b) => b - a);
-  $("ano").innerHTML = `<option value="">Todos os anos (${DADOS.length})</option>` +
-    anos.map((a) => `<option value="${a}">${a} (${cont[a]})</option>`).join("");
+// Anos: todos marcados por padrão; clique desmarca (ou marca de novo)
+const anosOff = new Set();
+const contAnos = {};
+DADOS.forEach((a) => { contAnos[a.ano] = (contAnos[a.ano] || 0) + 1; });
+const TODOS_ANOS = Object.keys(contAnos).sort((a, b) => b - a);
+
+function renderAnos() {
+  const acoes = [];
+  if (anosOff.size) acoes.push(`<button data-acao="todos">marcar todos</button>`);
+  if (anosOff.size < TODOS_ANOS.length) acoes.push(`<button data-acao="nenhum">desmarcar todos</button>`);
+  $("anosAcoes").innerHTML = TODOS_ANOS.length > 1 ? `· ${acoes.join(" · ")}` : "";
+  $("anos").innerHTML = TODOS_ANOS.map((a) => `
+    <button class="vchip${anosOff.has(a) ? "" : " on"}" data-ano="${a}" aria-pressed="${!anosOff.has(a)}">${a} <b>${contAnos[a]}</b></button>`).join("");
 }
 
 function filtrados() {
-  const ano = $("ano").value;
   const q = $("busca").value.trim().toLowerCase();
   const soCitados = $("soCitados").checked;
   const soSimilares = $("soSimilares").checked;
@@ -388,7 +401,7 @@ function filtrados() {
   const soTitulo = $("soTitulo").checked;
   const ordem = $("ordem").value;
   const lista = DADOS.filter((a) =>
-    (!ano || String(a.ano) === ano) &&
+    !anosOff.has(String(a.ano)) &&
     (!soCitados || a.citantes.length > 0) &&
     (!soSimilares || a.similar) &&
     (!soDuplicatas || a.distintos < a.citantes.length) &&
@@ -553,7 +566,8 @@ $("detalhe").addEventListener("click", (e) => {
   const b = e.target.closest(".autor");
   if (!b) return;
   autorFiltro = b.dataset.autor;
-  $("ano").value = "";  // mostra o autor em todos os anos
+  anosOff.clear();  // mostra o autor em todos os anos
+  renderAnos();
   renderLista();
 });
 $("chips").addEventListener("click", (e) => {
@@ -565,11 +579,25 @@ $("soCitados").addEventListener("change", renderLista);
 $("soSimilares").addEventListener("change", renderLista);
 $("soDuplicatas").addEventListener("change", renderLista);
 $("soTitulo").addEventListener("change", renderLista);
-$("ano").addEventListener("change", renderLista);
+$("anos").addEventListener("click", (e) => {
+  const b = e.target.closest(".vchip");
+  if (!b) return;
+  anosOff.has(b.dataset.ano) ? anosOff.delete(b.dataset.ano) : anosOff.add(b.dataset.ano);
+  renderAnos();
+  renderLista();
+});
+$("anosAcoes").addEventListener("click", (e) => {
+  const acao = e.target.dataset.acao;
+  if (!acao) return;
+  anosOff.clear();
+  if (acao === "nenhum") TODOS_ANOS.forEach((a) => anosOff.add(a));
+  renderAnos();
+  renderLista();
+});
 $("ordem").addEventListener("change", renderLista);
 $("busca").addEventListener("input", renderLista);
 
-montarAnos();
+renderAnos();
 renderLista();
 </script>
 </body>
