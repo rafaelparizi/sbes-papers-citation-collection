@@ -4,7 +4,7 @@ Coleta, no [Semantic Scholar](https://www.semanticscholar.org/), dos artigos que
 
 **Dashboard:** https://rafaelparizi.github.io/sbes-papers-citation-collection/
 
-**Situação atual:** coletados os 1.275 artigos de 1990 a 2025 (linhas 0 a 1274 da planilha), com 7.992 citações, em 26/09/2026.
+**Situação atual:** coleta completa dos 1.340 artigos do SBES (1987 a 2025): 1.338 identificados no Semantic Scholar e 7.999 citações, de 6.517 artigos citantes distintos, em 26/09/2026.
 
 ## Como a coleta é realizada
 
@@ -23,7 +23,8 @@ Para cada artigo, o objetivo é obter o `paperId` do Semantic Scholar.
    - os dois títulos são normalizados (minúsculas, sem pontuação e sem espaços);
    - se ficarem idênticos, o método é registrado como `titulo`;
    - se a semelhança for de pelo menos 90% (`difflib.SequenceMatcher`), o método é registrado como `titulo_aproximado`. Isso cobre diferenças pequenas, como "GitWorkflow" × "Git Workflow";
-   - abaixo disso, o artigo é registrado como `nao_encontrado`.
+   - o ano do registro no Semantic Scholar precisa estar a no máximo 3 anos do ano do SBES, para evitar casar títulos genéricos (como "Apresentação e Organização", a apresentação dos anais) com registros de outra época;
+   - fora disso, o artigo é registrado como `nao_encontrado`.
 3. Artigos marcados como `nao_encontrado` são buscados de novo a cada execução.
 
 ### Etapa 2: coletar os artigos citantes

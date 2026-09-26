@@ -1,9 +1,9 @@
 venue,citacoes,estrato,tipo,sigla_ou_issn,nome_qualis,como
 ,1181,,,,,sem venue
-Brazilian Symposium on Software Engineering,713,A3,evento,SBES,Brazilian Symposium on Software Engineering,nome
+Brazilian Symposium on Software Engineering,718,A3,evento,SBES,Brazilian Symposium on Software Engineering,nome
 Brazilian Symposium on Software Quality,257,A3,evento,SBQS,Simpósio Brasileiro de Qualidade de Software,apelido
 arXiv.org,238,,,,,preprint
-Journal of Systems and Software,234,A2,periódico,0164-1212,THE JOURNAL OF SYSTEMS AND SOFTWARE,ISSN
+Journal of Systems and Software,235,A2,periódico,0164-1212,THE JOURNAL OF SYSTEMS AND SOFTWARE,ISSN
 Information and Software Technology,180,A2,periódico,0950-5849,INFORMATION AND SOFTWARE TECHNOLOGY,ISSN
 Empirical Software Engineering,125,A2,periódico,1382-3256,EMPIRICAL SOFTWARE ENGINEERING,ISSN
 Journal of Software Engineering Research and Development,119,A4,periódico,2195-1721,JOURNAL OF SOFTWARE ENGINEERING RESEARCH AND DEVELOPMENT,ISSN
@@ -106,11 +106,12 @@ Anais do IV Simpósio Brasileiro de Educação em Computação (EDUCOMP 2024),9,
 Social Science Research Network,9,A1,periódico,1556-5068,COMPARATIVE LAW EJOURNAL,ISSN
 Braz. J. Inf. Syst.,9,A4,periódico,1984-2902,ISYS: REVISTA BRASILEIRA DE SISTEMAS DE INFORMAÇÃO,apelido
 International Workshop on Variability Modelling of Software-Intensive Systems,9,A3,evento,VAMOS,International Workshop on Variability Modelling of Software-intensive Systems,nome
+Brazilian Symposium on Games and Digital Entertainment,9,,,,,não listado
 Journal of King Saud University: Computer and Information Sciences,9,A1,periódico,1319-1578,JOURNAL OF KING SAUD UNIVERSITY - COMPUTER AND INFORMATION SCIENCES,ISSN
 ACM/IEEE International Conference on Model Driven Engineering Languages and Systems,9,A2,evento,MODELS,International Conference on Model Driven Engineering Languages and Systems,nome
 European Conference on Software Architecture,9,A3,evento,ECSA,European Conference on Software Architecture,nome
 Anais do VI Simpósio Brasileiro de Educação em Computação (EDUCOMP 2026),9,B1,evento,EDUCOMP,Simpósio Brasileiro de Educação em Computação,nome
-International Conference on Robot Intelligence Technology and Applications,8,A2,periódico,1932-8540,IEEE-RITA,nome
+Caderno Pedagógico,8,C,periódico,1983-0882,CADERNO PEDAGÓGICO (LAJEADO. ONLINE),nome
 CHASE@ICSE,8,,,,,workshop/trilha
 International Conference on Mobile Software Engineering and Systems,8,B2,evento,MOBILESOFT,International Conference on Mobile Software Engineering and Systems,nome
 IEEE Global Engineering Education Conference,8,A2,evento,EDUCON,IEEE Global Engineering Education Conference,nome
@@ -118,14 +119,13 @@ SN Computer Science,8,A2,periódico,2661-8907,SN COMPUTER SCIENCE,ISSN
 Anais do XXXIV Simpósio Brasileiro de Informática na Educação (SBIE 2023),8,A3,evento,SBIE,Simpósio Brasileiro de Informática na Educação,nome
 Journal of Software,8,,,,,não listado
 Hawaii International Conference on System Sciences,8,A1,evento,HICSS,Hawaii International Conference on System Sciences,nome
-Brazilian Symposium on Games and Digital Entertainment,8,,,,,não listado
-Aspect-Oriented Software Development,8,,,,,não listado
-The Arabian journal for science and engineering,8,A1,periódico,2193-567X,ARABIAN JOURNAL FOR SCIENCE AND ENGINEERING (IMPRESSO),nome
-Caderno Pedagógico,8,C,periódico,1983-0882,CADERNO PEDAGÓGICO (LAJEADO. ONLINE),nome
-European Conference on Software Maintenance and Reengineering,8,,,,,não listado
-IEEE Revista Iberoamericana de Tecnologias del Aprendizaje,8,A2,periódico,1932-8540,IEEE-RITA,ISSN
-International Conference on Advanced Information Systems Engineering,8,A2,evento,CAISE,International Conference on Advanced Information Systems Engineering,nome
+International Conference on Robot Intelligence Technology and Applications,8,A2,periódico,1932-8540,IEEE-RITA,nome
 IEEE Transactions on Education,8,A2,periódico,0018-9359,IEEE TRANSACTIONS ON EDUCATION,ISSN
+The Arabian journal for science and engineering,8,A1,periódico,2193-567X,ARABIAN JOURNAL FOR SCIENCE AND ENGINEERING (IMPRESSO),nome
+IEEE Revista Iberoamericana de Tecnologias del Aprendizaje,8,A2,periódico,1932-8540,IEEE-RITA,ISSN
+European Conference on Software Maintenance and Reengineering,8,,,,,não listado
+Aspect-Oriented Software Development,8,,,,,não listado
+International Conference on Advanced Information Systems Engineering,8,A2,evento,CAISE,International Conference on Advanced Information Systems Engineering,nome
 Anais Estendidos do VI Simpósio Brasileiro de Educação em Computação (EDUCOMP 2026),8,B1,evento,EDUCOMP,Simpósio Brasileiro de Educação em Computação,nome
 Education sciences,7,C,periódico,2227-7102,EDUCATION SCIENCES,nome
 Proc. ACM Program. Lang.,7,,,,,não listado

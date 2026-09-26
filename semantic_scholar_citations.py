@@ -73,6 +73,14 @@ LOTE_DOI = 500
 
 RE_DOI = re.compile(r"doi\.org/(.+)$", re.IGNORECASE)
 SIMILARIDADE_MIN = 0.9  # títulos com pequenas diferenças (espaços, preposições)
+MAX_DIF_ANO = 3  # casamento por título: ano no Semantic Scholar a no máximo 3 anos do ano do SBES
+
+
+def ano_compativel(ano_sbes, ano_s2) -> bool:
+    """Evita casar títulos genéricos (ex.: "Apresentação e Organização") com registros de outra época."""
+    if pd.isna(ano_sbes) or ano_s2 is None or pd.isna(ano_s2):
+        return True
+    return abs(int(ano_sbes) - int(ano_s2)) <= MAX_DIF_ANO
 
 
 _ultima_req = 0.0
@@ -160,6 +168,10 @@ def resolver_ids(session: requests.Session, df: pd.DataFrame, ckpt: Path) -> pd.
     # artigos não encontrados em execuções anteriores são tentados de novo
     feitos = {r["idx"]: r for r in carregar_jsonl(ckpt)}
     feitos = {k: r for k, r in feitos.items() if r["metodo_match"] != "nao_encontrado"}
+    # casamentos por título gravados antes da regra de ano são refeitos se o ano não for compatível
+    ano_de = dict(zip(df["idx"], df["ano"]))
+    feitos = {k: r for k, r in feitos.items()
+              if r["metodo_match"] == "doi" or k not in ano_de or ano_compativel(ano_de[k], r.get("s2_year"))}
     pendentes = df[~df["idx"].isin(feitos)]
     print(f"[Etapa 1] {len(feitos)} já resolvidos, {len(pendentes)} pendentes")
 
@@ -214,6 +226,8 @@ def resolver_ids(session: requests.Session, df: pd.DataFrame, ckpt: Path) -> pd.
             continue
         paper = (resp or {}).get("data", [None])[0] if resp else None
         match = comparar_titulos(titulo, paper.get("title", "")) if paper else None
+        if match and not ano_compativel(row["ano"], paper.get("year")):
+            match = None
 
         # 2ª tentativa: busca geral, para títulos com erros de digitação no Semantic Scholar
         # (ex.: "Identifyng Implicit Process Vairables..."), que a busca exata não encontra
@@ -227,6 +241,8 @@ def resolver_ids(session: requests.Session, df: pd.DataFrame, ckpt: Path) -> pd.
                 busca = {}
             for candidato in busca.get("data") or []:
                 m = comparar_titulos(titulo, candidato.get("title", ""))
+                if m and not ano_compativel(row["ano"], candidato.get("year")):
+                    m = None
                 if m:
                     paper, match = candidato, m
                     break
