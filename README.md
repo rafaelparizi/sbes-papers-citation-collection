@@ -4,7 +4,7 @@ Coleta, no [Semantic Scholar](https://www.semanticscholar.org/), dos artigos que
 
 **Dashboard:** https://rafaelparizi.github.io/sbes-papers-citation-collection/
 
-**Situação atual:** coletados os 897 artigos de 2005 a 2025 (linhas 0 a 896 da planilha), com 6.725 citações, em 26/09/2026.
+**Situação atual:** coletados os 1.035 artigos de 2000 a 2025 (linhas 0 a 1034 da planilha), com 7.663 citações, em 26/09/2026.
 
 ## Como a coleta é realizada
 
@@ -19,7 +19,7 @@ A coleta é feita pelo script `semantic_scholar_citations.py`, usando a [Academi
 Para cada artigo, o objetivo é obter o `paperId` do Semantic Scholar.
 
 1. **Por DOI, em lote.** O DOI é extraído de `doi_url` (ou de `ee_url`, se aquela estiver vazia). Os DOIs são enviados em lotes de até 500 ao endpoint `POST /paper/batch`. DOIs que o Semantic Scholar não reconhece voltam vazios; quando nenhum DOI de um lote é reconhecido, a API responde com erro 400, que é tratado como "nenhum encontrado".
-2. **Por título, quando o DOI falha.** Artigos sem DOI (anais antigos, publicados só no SOL/SBC) ou cujo DOI não está associado ao registro no Semantic Scholar são buscados pelo título em `GET /paper/search/match`. O resultado só é aceito se o título retornado for compatível com o da planilha:
+2. **Por título, quando o DOI falha.** Artigos sem DOI (anais antigos, publicados só no SOL/SBC) ou cujo DOI não está associado ao registro no Semantic Scholar são buscados pelo título em `GET /paper/search/match`; se essa busca exata não achar, uma segunda tentativa usa a busca geral (`GET /paper/search`, 5 primeiros resultados), o que recupera títulos com erros de digitação no Semantic Scholar. O resultado só é aceito se o título retornado for compatível com o da planilha:
    - os dois títulos são normalizados (minúsculas, sem pontuação e sem espaços);
    - se ficarem idênticos, o método é registrado como `titulo`;
    - se a semelhança for de pelo menos 90% (`difflib.SequenceMatcher`), o método é registrado como `titulo_aproximado`. Isso cobre diferenças pequenas, como "GitWorkflow" × "Git Workflow";

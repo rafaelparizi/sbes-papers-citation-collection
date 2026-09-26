@@ -213,8 +213,24 @@ def resolver_ids(session: requests.Session, df: pd.DataFrame, ckpt: Path) -> pd.
             PULADOS[int(row["idx"])] = "identificação (título)"
             continue
         paper = (resp or {}).get("data", [None])[0] if resp else None
-
         match = comparar_titulos(titulo, paper.get("title", "")) if paper else None
+
+        # 2ª tentativa: busca geral, para títulos com erros de digitação no Semantic Scholar
+        # (ex.: "Identifyng Implicit Process Vairables..."), que a busca exata não encontra
+        if not match:
+            try:
+                busca = requisitar(
+                    session, "GET", f"{API}/paper/search",
+                    params={"query": titulo, "fields": CAMPOS_PAPER, "limit": 5},
+                ) or {}
+            except FalhaAPI:
+                busca = {}
+            for candidato in busca.get("data") or []:
+                m = comparar_titulos(titulo, candidato.get("title", ""))
+                if m:
+                    paper, match = candidato, m
+                    break
+
         if match:
             reg = {
                 "idx": int(row["idx"]),
