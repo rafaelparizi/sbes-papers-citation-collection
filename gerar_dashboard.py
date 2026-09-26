@@ -15,7 +15,7 @@ import itertools
 import json
 import re
 import unicodedata
-from difflib import SequenceMatcher
+from difflib import SequenceMatcher, get_close_matches
 from pathlib import Path
 
 import pandas as pd
@@ -146,6 +146,7 @@ class Qualis:
 
     def __init__(self):
         self.cache = {}
+        self.cache_eventos = {}
         self.ok = ARQ_QUALIS.exists()
         self.ok_per = ARQ_QUALIS_PER.exists()
         self.por_sigla, self.por_nome, self.per_issn, self.per_nome, self.apelidos = {}, {}, {}, {}, {}
@@ -154,6 +155,7 @@ class Qualis:
             q = q[q["QUALIS"].isin(ESTRATOS)]
             self.por_sigla = {str(r.SIGLA).strip().upper(): r for r in q.itertuples()}
             self.por_nome = {normalizar_evento(r.NOME): r for r in q.itertuples()}
+        self.nomes_eventos = list(self.por_nome)
         if self.ok_per:
             p = pd.read_excel(ARQ_QUALIS_PER)
             p = p[p["Estrato"].isin(ESTRATOS)]
@@ -186,7 +188,12 @@ class Qualis:
         return self.cache[chave]
 
     def _evento_por_nome(self, v: str):
-        """Casamento de evento a partir de um nome de venue; None se não houver."""
+        """Casamento de evento a partir de um nome de venue; None se não houver (memorizado por nome)."""
+        if v not in self.cache_eventos:
+            self.cache_eventos[v] = self._evento_por_nome_sem_cache(v)
+        return self.cache_eventos[v]
+
+    def _evento_por_nome_sem_cache(self, v: str):
         n = normalizar_evento(v)
         ap = self.apelidos.get(n)
         if ap and ap in self.por_sigla:
@@ -208,10 +215,10 @@ class Qualis:
             return self._evento(self.por_sigla[v.strip().upper()], "sigla")
         if workshop:
             return {"estrato": None, "categoria": "workshop/trilha"}
-        if self.por_nome:
-            melhor = max(self.por_nome, key=lambda k: SequenceMatcher(None, n, k).ratio())
-            if SequenceMatcher(None, n, melhor).ratio() >= 0.95:
-                return self._evento(self.por_nome[melhor], "nome aproximado")
+        # get_close_matches descarta candidatos com estimativas baratas antes da comparação completa
+        parecidos = get_close_matches(n, self.nomes_eventos, n=1, cutoff=0.95)
+        if parecidos:
+            return self._evento(self.por_nome[parecidos[0]], "nome aproximado")
         return None
 
     def _periodico_por(self, nomes: list, issns: list):
