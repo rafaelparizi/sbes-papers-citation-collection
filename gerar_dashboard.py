@@ -516,6 +516,36 @@ td.doi a { color: var(--accent); }
 .gcard .col { min-width: 26px; }
 .gcard .col .b { width: 18px; }
 .gcard .col .b { border-radius: 4px 4px 0 0; }
+.gcab { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.gtools { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+.gtools .expandir, .exportar summary { font: inherit; font-size: 12px; color: var(--muted); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; cursor: pointer; list-style: none; line-height: 1.6; }
+.exportar summary::-webkit-details-marker { display: none; }
+.gtools .expandir:hover, .exportar summary:hover, .exportar[open] summary { color: var(--accent); border-color: var(--accent); }
+.exportar { position: relative; }
+.exportar .menu { position: absolute; right: 0; top: calc(100% + 4px); z-index: 5; display: flex; flex-direction: column; min-width: 90px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.14); padding: 4px; }
+.exportar .menu button { font: inherit; font-size: 12px; text-align: left; background: none; border: 0; border-radius: 4px; padding: 5px 8px; color: var(--text); cursor: pointer; }
+.exportar .menu button:hover { background: var(--accent-soft); }
+.sem-exportar .exportar { display: none; }
+.creditos { display: none; color: var(--muted); font-size: 11px; margin-top: 8px; }
+.gcard.exportando .creditos { display: block; }
+.gcard.exportando .filtro.apagada .b, .gcard.exportando .filtro.apagada .t span { opacity: .25; }
+.modal { position: fixed; inset: 0; z-index: 20; background: rgba(15, 18, 24, .55); display: grid; place-items: center; padding: 24px; }
+.modal[hidden] { display: none; }
+.modal-caixa { position: relative; width: min(1100px, 100%); max-height: calc(100vh - 48px); overflow: auto; background: var(--panel); border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,.3); padding: 8px; }
+.modal .fechar { position: absolute; top: 10px; right: 12px; z-index: 2; font: inherit; font-size: 16px; background: none; border: 0; color: var(--muted); cursor: pointer; }
+.modal .fechar:hover { color: var(--text); }
+.gcard.grande { border: 0; padding: 18px 44px 18px 22px; }
+.gcard.grande h3 { font-size: 18px; }
+.gcard.grande .sub { font-size: 13px; }
+.gcard.grande .grafico { height: 420px; gap: 10px; }
+.gcard.grande .col { min-width: 40px; }
+.gcard.grande .col .b { width: 32px; }
+.gcard.grande .col .v, .gcard.grande .col .a { font-size: 13px; }
+.gcard.grande .hlinha { grid-template-columns: 140px 1fr 56px; padding: 8px 6px; }
+.gcard.grande .hbarras .t span { height: 26px; }
+.gcard.grande .hbarras .r, .gcard.grande .hbarras .v { font-size: 14px; }
+.gcard.grande .gtools .expandir { display: none; }
+body.sem-rolagem { overflow: hidden; }
 .hbarras { display: flex; flex-direction: column; gap: 2px; }
 .hlinha { display: grid; grid-template-columns: 96px 1fr 40px; gap: 10px; align-items: center; width: 100%; padding: 4px 4px; border-radius: 4px; }
 .hlinha:hover { background: var(--accent-soft); }
@@ -604,6 +634,12 @@ button.filtro { background: none; border: 0; padding: 0; font: inherit; color: i
   </section>
   <section class="graficos" id="graficos" hidden></section>
 </main>
+<div class="modal" id="modalGrafico" hidden role="dialog" aria-modal="true" aria-label="Gráfico expandido">
+  <div class="modal-caixa">
+    <button id="fecharModal" class="fechar" aria-label="Fechar">✕</button>
+    <div id="modalCorpo"></div>
+  </div>
+</div>
 <script>
 const DADOS = __DADOS__;
 const $ = (id) => document.getElementById(id);
@@ -770,8 +806,19 @@ function barrasH(itens, f) {
 }
 
 const plural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
-const cartao = (titulo, sub, corpo) =>
-  `<div class="gcard"><h3>${titulo}</h3><div class="sub">${sub}</div>${corpo}</div>`;
+// Especificações dos gráficos atuais: { id, titulo, sub, desenhar(altura) } — usadas para expandir e exportar
+let GRAFICOS = [];
+const ferramentas = (id) => `
+  <div class="gtools">
+    <details class="exportar"><summary title="Exportar em alta resolução">Exportar</summary>
+      <div class="menu">${["png", "jpeg", "pdf"].map((f) => `<button data-exportar="${f}" data-g="${id}">${f.toUpperCase()}</button>`).join("")}</div>
+    </details>
+    <button class="expandir" data-expandir="${id}" title="Expandir" aria-label="Expandir gráfico">⤢</button>
+  </div>`;
+const cartao = (g, altura = 120) =>
+  `<div class="gcard" data-g="${g.id}"><div class="gcab"><div><h3>${g.titulo}</h3><div class="sub">${g.sub}</div></div>${ferramentas(g.id)}</div>
+    <div class="gcorpo">${g.desenhar(altura)}</div>
+    <div class="creditos">Fonte: Semantic Scholar · Citações dos artigos do SBES · ${new Date().toLocaleDateString("pt-BR")}</div></div>`;
 
 function renderGraficos(lista) {
   const ver = $("verGraficos").checked;
@@ -790,19 +837,19 @@ function renderGraficos(lista) {
   const nCit = porAno((a) => a.citantes.length);
   const itemAno = (ano, v, tip) => ({ chave: ano, r: ano, v, tip: tip + dica,
     apagada: anosOff.has(String(ano)), sel: soUmAno && !anosOff.has(String(ano)) });
-  const g1 = barrasV(anos.map((ano, k) => itemAno(ano, nArt[k], `${ano}: ${plural(nArt[k], "artigo", "artigos")}`)), "ano");
-  const g2 = barrasV(anos.map((ano, k) => itemAno(ano, nCit[k],
-    `${ano}: ${plural(nCit[k], "citação", "citações")} em ${plural(nArt[k], "artigo", "artigos")} (média ${(nCit[k] / nArt[k]).toFixed(2)})`)), "ano");
+  const i1 = anos.map((ano, k) => itemAno(ano, nArt[k], `${ano}: ${plural(nArt[k], "artigo", "artigos")}`));
+  const i2 = anos.map((ano, k) => itemAno(ano, nCit[k],
+    `${ano}: ${plural(nCit[k], "citação", "citações")} em ${plural(nArt[k], "artigo", "artigos")} (média ${(nCit[k] / nArt[k]).toFixed(2)})`));
   const citVisiveis = lista.reduce((s, a) => s + a.citantes.length, 0);
 
   // Como foram encontrados: sem o próprio filtro
   const lMatch = filtrados("match");
   const contMatch = {};
   lMatch.forEach((a) => { const k = a.match || "nao_encontrado"; contMatch[k] = (contMatch[k] || 0) + 1; });
-  const g3 = barrasH(Object.keys(ROT_MATCH).filter((k) => contMatch[k]).map((k) => ({
+  const i3 = Object.keys(ROT_MATCH).filter((k) => contMatch[k]).map((k) => ({
     chave: k, r: ROT_MATCH[k], v: contMatch[k],
     apagada: matchFiltro && matchFiltro !== k, sel: matchFiltro === k,
-    tip: `${ROT_MATCH[k]}: ${plural(contMatch[k], "artigo", "artigos")} (${Math.round((contMatch[k] / lMatch.length) * 100)}%)${dica}` })), "match");
+    tip: `${ROT_MATCH[k]}: ${plural(contMatch[k], "artigo", "artigos")} (${Math.round((contMatch[k] / lMatch.length) * 100)}%)${dica}` }));
 
   // Autores por artigo: sem o próprio filtro
   const lAut = filtrados("autores");
@@ -811,21 +858,73 @@ function renderGraficos(lista) {
   const nAut = lista.map((a) => autoresDe(a).length);
   const media = nAut.length ? nAut.reduce((s, n) => s + n, 0) / nAut.length : 0;
   const distintos = new Set(lista.flatMap(autoresDe)).size;
-  const g4 = barrasV(faixas.map((f, k) => ({ chave: f, r: f === 8 ? "8+" : f, v: hist[k],
+  const i4 = faixas.map((f, k) => ({ chave: f, r: f === 8 ? "8+" : f, v: hist[k],
     apagada: autoresFiltro && autoresFiltro !== f, sel: autoresFiltro === f,
-    tip: `${plural(hist[k], "artigo", "artigos")} com ${f === 8 ? "8 ou mais" : f} autor${f === 1 ? "" : "es"}${dica}` })), "autores");
+    tip: `${plural(hist[k], "artigo", "artigos")} com ${f === 8 ? "8 ou mais" : f} autor${f === 1 ? "" : "es"}${dica}` }));
 
-  $("graficos").innerHTML =
-    cartao("Artigos por ano", `${plural(lista.length, "artigo SBES visível", "artigos SBES visíveis")}`, g1) +
-    cartao("Citações por ano de publicação", `${plural(citVisiveis, "citação recebida", "citações recebidas")} pelos artigos visíveis`, g2) +
-    cartao("Como os artigos foram encontrados", "no Semantic Scholar", g3) +
-    cartao("Número de autores por artigo", `média ${media.toFixed(1)} · ${plural(distintos, "autor distinto", "autores distintos")}`, g4);
+  GRAFICOS = [
+    { id: "artigos-por-ano", titulo: "Artigos por ano",
+      sub: plural(lista.length, "artigo SBES visível", "artigos SBES visíveis"), desenhar: (h) => barrasV(i1, "ano", h) },
+    { id: "citacoes-por-ano", titulo: "Citações por ano de publicação",
+      sub: `${plural(citVisiveis, "citação recebida", "citações recebidas")} pelos artigos visíveis`, desenhar: (h) => barrasV(i2, "ano", h) },
+    { id: "como-encontrados", titulo: "Como os artigos foram encontrados",
+      sub: "no Semantic Scholar", desenhar: () => barrasH(i3, "match") },
+    { id: "autores-por-artigo", titulo: "Número de autores por artigo",
+      sub: `média ${media.toFixed(1)} · ${plural(distintos, "autor distinto", "autores distintos")}`, desenhar: (h) => barrasV(i4, "autores", h) },
+  ];
+  $("graficos").innerHTML = GRAFICOS.map((g) => cartao(g)).join("");
+  if (graficoExpandido) abrirExpandido(graficoExpandido);
 }
 
-// Clique numa barra: filtra por aquele valor; clicar de novo remove o filtro
-$("graficos").addEventListener("click", (e) => {
-  const b = e.target.closest(".filtro");
-  if (!b) return;
+// ---- Expandir e exportar ----
+let graficoExpandido = null;
+
+function abrirExpandido(id) {
+  const g = GRAFICOS.find((x) => x.id === id);
+  if (!g) return fecharExpandido();
+  graficoExpandido = id;
+  $("modalCorpo").innerHTML = cartao(g, 360).replace('class="gcard"', 'class="gcard grande"');
+  $("modalGrafico").hidden = false;
+  document.body.classList.add("sem-rolagem");
+}
+
+function fecharExpandido() {
+  graficoExpandido = null;
+  $("modalGrafico").hidden = true;
+  $("modalCorpo").innerHTML = "";
+  document.body.classList.remove("sem-rolagem");
+}
+
+async function exportarGrafico(cardEl, formato) {
+  if (!window.html2canvas) return alert("Exportação indisponível (sem conexão com o CDN).");
+  const fundo = getComputedStyle(cardEl).backgroundColor || "#ffffff";
+  cardEl.classList.add("exportando");
+  try {
+    const canvas = await html2canvas(cardEl, {
+      scale: 4,  // alta resolução
+      backgroundColor: formato === "jpeg" ? "#ffffff" : fundo,
+      ignoreElements: (el) => el.classList && el.classList.contains("gtools"),
+    });
+    const nome = `sbes-${cardEl.dataset.g}`;
+    if (formato === "pdf") {
+      const { jsPDF } = window.jspdf;
+      const w = canvas.width / 4, h = canvas.height / 4;  // tamanho em pontos, imagem em 4x
+      const pdf = new jsPDF({ orientation: w > h ? "landscape" : "portrait", unit: "pt", format: [w, h], compress: true });
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, w, h, undefined, "SLOW");  // PNG comprimido, sem perda
+      pdf.save(`${nome}.pdf`);
+      return;
+    }
+    const a = document.createElement("a");
+    a.download = `${nome}.${formato === "jpeg" ? "jpg" : "png"}`;
+    a.href = canvas.toDataURL(`image/${formato}`, 0.95);
+    a.click();
+  } finally {
+    cardEl.classList.remove("exportando");
+  }
+}
+
+// Barras como filtros (na coluna e no modo expandido)
+function aplicarFiltroGrafico(b) {
   const { f, v } = b.dataset;
   if (f === "ano") {
     const soEste = TODOS_ANOS.length - anosOff.size === 1 && !anosOff.has(v);
@@ -836,7 +935,31 @@ $("graficos").addEventListener("click", (e) => {
   if (f === "match") matchFiltro = matchFiltro === v ? null : v;
   if (f === "autores") autoresFiltro = autoresFiltro === Number(v) ? null : Number(v);
   renderLista();
+}
+
+function cliqueGraficos(e) {
+  const exp = e.target.closest("[data-exportar]");
+  if (exp) {
+    exp.closest("details").open = false;
+    exportarGrafico(exp.closest(".gcard"), exp.dataset.exportar);
+    return;
+  }
+  const ex = e.target.closest("[data-expandir]");
+  if (ex) {
+    graficoExpandido === ex.dataset.expandir ? fecharExpandido() : abrirExpandido(ex.dataset.expandir);
+    return;
+  }
+  const b = e.target.closest(".filtro");
+  if (b) aplicarFiltroGrafico(b);
+}
+
+// Clique numa barra: filtra por aquele valor; clicar de novo remove o filtro
+$("graficos").addEventListener("click", cliqueGraficos);
+$("modalCorpo").addEventListener("click", cliqueGraficos);
+$("modalGrafico").addEventListener("click", (e) => {
+  if (e.target.id === "modalGrafico" || e.target.closest("#fecharModal")) fecharExpandido();
 });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && graficoExpandido) fecharExpandido(); });
 
 function renderLista() {
   const lista = filtrados();
@@ -1111,6 +1234,12 @@ renderAnos();
 renderLista();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/js/shepherd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+<script>
+  // sem as bibliotecas (sem internet), esconde só a exportação
+  if (!window.html2canvas || !window.jspdf) document.body.classList.add("sem-exportar");
+</script>
 <script>
 // ---- Tour guiado (Shepherd.js) ----
 // Abre sozinho na primeira visita; "Não quero mais ver" grava a preferência no navegador.
