@@ -173,7 +173,11 @@ td.doi a { color: var(--accent); }
 .exportar .menu { position: absolute; right: 0; top: calc(100% + 4px); z-index: 5; display: flex; flex-direction: column; min-width: 90px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.14); padding: 4px; }
 .exportar .menu button { font: inherit; font-size: 12px; text-align: left; background: none; border: 0; border-radius: 4px; padding: 5px 8px; color: var(--text); cursor: pointer; }
 .exportar .menu button:hover { background: var(--accent-soft); }
-.sem-exportar .exportar { display: none; }
+.sem-imagem .exportar [data-exportar="png"], .sem-imagem .exportar [data-exportar="jpeg"], .sem-imagem .exportar [data-exportar="pdf"],
+.sem-imagem .exportar .grupo:first-child, .sem-excel .exportar [data-exportar="xlsx"] { display: none; }
+.exportar .menu .grupo { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); padding: 6px 8px 2px; }
+.exportar .menu .grupo + button { margin-top: 0; }
+.exportar .menu button + .grupo { border-top: 1px solid var(--line); margin-top: 4px; }
 .creditos { display: none; color: var(--muted); font-size: 11px; margin-top: 8px; }
 .gcard.exportando .creditos { display: block; }
 .gcard.exportando .filtro.apagada .b, .gcard.exportando .filtro.apagada .t span { opacity: .25; }
@@ -247,7 +251,7 @@ button.filtro { background: none; border: 0; padding: 0; font: inherit; color: i
 <header>
   <div>
     <h1>Citações dos artigos do SBES</h1>
-    <p>Fonte: Semantic Scholar · gerado em 26/09/2026 11:30</p>
+    <p>Fonte: Semantic Scholar · gerado em 26/09/2026 11:35</p>
   </div>
   <button id="abrirTour" type="button">Ver tour</button>
 </header>
@@ -459,7 +463,14 @@ let GRAFICOS = [];
 const ferramentas = (id) => `
   <div class="gtools">
     <details class="exportar"><summary title="Exportar em alta resolução">Exportar</summary>
-      <div class="menu">${["png", "jpeg", "pdf"].map((f) => `<button data-exportar="${f}" data-g="${id}">${f.toUpperCase()}</button>`).join("")}</div>
+      <div class="menu">
+        <span class="grupo">Imagem</span>
+        ${["png", "jpeg", "pdf"].map((f) => `<button data-exportar="${f}" data-g="${id}">${f.toUpperCase()}</button>`).join("")}
+        <span class="grupo">Dados</span>
+        <button data-exportar="csv" data-g="${id}">CSV</button>
+        <button data-exportar="xlsx" data-g="${id}">Excel</button>
+        <button data-exportar="md" data-g="${id}">Markdown</button>
+      </div>
     </details>
     <button class="expandir" data-expandir="${id}" title="Expandir" aria-label="Expandir gráfico">⤢</button>
   </div>`;
@@ -512,13 +523,19 @@ function renderGraficos(lista) {
 
   GRAFICOS = [
     { id: "artigos-por-ano", titulo: "Artigos por ano",
-      sub: plural(lista.length, "artigo SBES visível", "artigos SBES visíveis"), desenhar: (h) => barrasV(i1, "ano", h) },
+      sub: plural(lista.length, "artigo SBES visível", "artigos SBES visíveis"), desenhar: (h) => barrasV(i1, "ano", h),
+      tabela: { colunas: ["Ano", "Artigos"], linhas: anos.map((ano, k) => [ano, nArt[k]]) } },
     { id: "citacoes-por-ano", titulo: "Citações por ano de publicação",
-      sub: `${plural(citVisiveis, "citação recebida", "citações recebidas")} pelos artigos visíveis`, desenhar: (h) => barrasV(i2, "ano", h) },
+      sub: `${plural(citVisiveis, "citação recebida", "citações recebidas")} pelos artigos visíveis`, desenhar: (h) => barrasV(i2, "ano", h),
+      tabela: { colunas: ["Ano", "Citações", "Artigos", "Média de citações por artigo"],
+                linhas: anos.map((ano, k) => [ano, nCit[k], nArt[k], Number((nCit[k] / nArt[k]).toFixed(2))]) } },
     { id: "como-encontrados", titulo: "Como os artigos foram encontrados",
-      sub: "no Semantic Scholar", desenhar: () => barrasH(i3, "match") },
+      sub: "no Semantic Scholar", desenhar: () => barrasH(i3, "match"),
+      tabela: { colunas: ["Método", "Artigos", "Percentual (%)"],
+                linhas: i3.map((i) => [i.r, i.v, Number(((i.v / lMatch.length) * 100).toFixed(1))]) } },
     { id: "autores-por-artigo", titulo: "Número de autores por artigo",
-      sub: `média ${media.toFixed(1)} · ${plural(distintos, "autor distinto", "autores distintos")}`, desenhar: (h) => barrasV(i4, "autores", h) },
+      sub: `média ${media.toFixed(1)} · ${plural(distintos, "autor distinto", "autores distintos")}`, desenhar: (h) => barrasV(i4, "autores", h),
+      tabela: { colunas: ["Número de autores", "Artigos"], linhas: faixas.map((f, k) => [f === 8 ? "8 ou mais" : f, hist[k]]) } },
   ];
   $("graficos").innerHTML = GRAFICOS.map((g) => cartao(g)).join("");
   if (graficoExpandido) abrirExpandido(graficoExpandido);
@@ -571,6 +588,63 @@ async function exportarGrafico(cardEl, formato) {
   }
 }
 
+// Descrição dos filtros ativos, gravada junto com os dados exportados
+function filtrosAtivos() {
+  const f = [];
+  if (anosOff.size) {
+    const marcados = TODOS_ANOS.filter((a) => !anosOff.has(a));
+    f.push(`anos: ${marcados.length <= 6 ? marcados.join(", ") : `${marcados.length} de ${TODOS_ANOS.length} anos`}`);
+  }
+  const q = $("busca").value.trim();
+  if (q) f.push(`busca: "${q}"`);
+  if (autorFiltro) f.push(`autor: ${autorFiltro}`);
+  if (matchFiltro) f.push(`encontrado por: ${ROT_MATCH[matchFiltro]}`);
+  if (autoresFiltro) f.push(`autores por artigo: ${autoresFiltro === 8 ? "8 ou mais" : autoresFiltro}`);
+  [["soCitados", "só com citações"], ["soSimilares", "só similares"], ["soDuplicatas", "só com duplicata"],
+   ["soTitulo", "só encontrados por título"], ["soErro", "só com erro ao coletar"]]
+    .forEach(([id, rot]) => { if ($(id).checked) f.push(rot); });
+  return f.length ? f.join("; ") : "nenhum";
+}
+
+function baixar(conteudo, nome, tipo) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([conteudo], { type: tipo }));
+  a.download = nome;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function exportarDados(id, formato) {
+  const g = GRAFICOS.find((x) => x.id === id);
+  if (!g) return;
+  const { colunas, linhas } = g.tabela;
+  const fonte = `Fonte: Semantic Scholar · Citações dos artigos do SBES · ${new Date().toLocaleDateString("pt-BR")}`;
+  const filtros = `Filtros: ${filtrosAtivos()}`;
+  const nome = `sbes-${id}`;
+
+  if (formato === "csv") {
+    const cel = (v) => { const t = String(v ?? ""); return /[",\n;]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; };
+    const csv = [colunas, ...linhas].map((l) => l.map(cel).join(",")).join("\r\n");
+    baixar("\ufeff" + csv + "\r\n", `${nome}.csv`, "text/csv;charset=utf-8");  // BOM: acentos corretos no Excel
+  }
+  if (formato === "md") {
+    const lin = (l) => `| ${l.map((v) => String(v ?? "").replace(/\|/g, "\\|")).join(" | ")} |`;
+    const alin = colunas.map((_, k) => (linhas.every((l) => typeof l[k] === "number") ? "---:" : "---"));
+    const md = [`## ${g.titulo}`, "", `_${g.sub}_`, "", lin(colunas), `| ${alin.join(" | ")} |`, ...linhas.map(lin), "",
+                filtros, "", fonte, ""].join("\n");
+    baixar(md, `${nome}.md`, "text/markdown;charset=utf-8");
+  }
+  if (formato === "xlsx") {
+    if (!window.XLSX) return alert("Exportação para Excel indisponível (sem conexão com o CDN).");
+    const aoa = [[g.titulo], [g.sub], [filtros], [], colunas, ...linhas, [], [fonte]];
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws["!cols"] = colunas.map((c, k) => ({ wch: Math.max(c.length, ...linhas.map((l) => String(l[k]).length)) + 2 }));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, g.titulo.slice(0, 31));
+    XLSX.writeFile(wb, `${nome}.xlsx`);
+  }
+}
+
 // Barras como filtros (na coluna e no modo expandido)
 function aplicarFiltroGrafico(b) {
   const { f, v } = b.dataset;
@@ -589,7 +663,9 @@ function cliqueGraficos(e) {
   const exp = e.target.closest("[data-exportar]");
   if (exp) {
     exp.closest("details").open = false;
-    exportarGrafico(exp.closest(".gcard"), exp.dataset.exportar);
+    const f = exp.dataset.exportar;
+    if (["csv", "xlsx", "md"].includes(f)) exportarDados(exp.dataset.g, f);
+    else exportarGrafico(exp.closest(".gcard"), f);
     return;
   }
   const ex = e.target.closest("[data-expandir]");
@@ -884,9 +960,11 @@ renderLista();
 <script src="https://cdn.jsdelivr.net/npm/shepherd.js@11.2.0/dist/js/shepherd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.mini.min.js"></script>
 <script>
-  // sem as bibliotecas (sem internet), esconde só a exportação
-  if (!window.html2canvas || !window.jspdf) document.body.classList.add("sem-exportar");
+  // sem as bibliotecas (sem internet), some só o que depende delas; CSV e Markdown funcionam sempre
+  if (!window.html2canvas || !window.jspdf) document.body.classList.add("sem-imagem");
+  if (!window.XLSX) document.body.classList.add("sem-excel");
 </script>
 <script>
 // ---- Tour guiado (Shepherd.js) ----

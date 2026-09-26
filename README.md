@@ -68,7 +68,11 @@ Os registros continuam na contagem de citações (que segue o `citationCount` do
 - Faixa de anos de publicação abaixo dos cards do topo: todos marcados por padrão; clicar desmarca (ou marca de novo) um ano, com atalhos para marcar ou desmarcar todos.
 - Tour guiado ([Shepherd.js](https://shepherdjs.dev/) 11.2.0, licença MIT) que abre na primeira visita e termina sempre pelos gráficos (a coluna fica fechada até a última etapa e volta ao estado anterior ao sair); o botão **Não quero mais ver** grava a preferência no navegador e **Ver tour**, no topo, abre o tour de novo.
 - **Ver gráficos** abre uma terceira coluna com artigos por ano, citações por ano de publicação, como os artigos foram encontrados (DOI/título) e número de autores por artigo; os gráficos acompanham os filtros ativos, e cada barra é um filtro (clique para aplicar, clique de novo ou use o ✕ acima da lista para remover).
-- Cada gráfico da coluna tem os botões **Expandir** (⤢), que abre o gráfico em tamanho maior (as barras continuam filtrando; `Esc` fecha), e **Exportar**, que gera **PNG**, **JPEG** ou **PDF** em alta resolução (4× a da tela), com a fonte dos dados no rodapé da imagem. A exportação usa [html2canvas](https://html2canvas.hertzen.com/) 1.4.1 e [jsPDF](https://github.com/parallax/jsPDF) 2.5.2 (licença MIT), carregados do jsDelivr.
+- Cada gráfico da coluna tem os botões **Expandir** (⤢), que abre o gráfico em tamanho maior (as barras continuam filtrando; `Esc` fecha), e **Exportar**, com dois grupos:
+  - **Imagem:** PNG, JPEG ou PDF em alta resolução (4× a da tela), com a fonte dos dados no rodapé;
+  - **Dados:** CSV (UTF-8 com BOM, abre com acentos no Excel), Excel (.xlsx) ou Markdown (tabela), com título, subtítulo, os **filtros ativos** no momento e a fonte.
+
+  A exportação usa [html2canvas](https://html2canvas.hertzen.com/) 1.4.1 e [jsPDF](https://github.com/parallax/jsPDF) 2.5.2 (MIT) para imagens e [SheetJS](https://sheetjs.com/) 0.18.5 (Apache-2.0) para Excel, carregados do jsDelivr; CSV e Markdown não dependem de bibliotecas.
 - Nos detalhes de um artigo, o gráfico **Citações por ano** também filtra: clicar em um ano mostra só as citações daquele ano.
 - Busca por título/autor, ordenação por número de citações e clique no nome de um autor para ver os artigos dele.
 - Badges com explicação ao passar o mouse: **similar** (título diferente no Semantic Scholar), **título** (encontrado pela busca por título, porque o DOI não foi reconhecido), **duplicata** e **preprint**. Cada badge da lista tem um filtro correspondente.
