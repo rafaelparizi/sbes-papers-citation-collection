@@ -4,7 +4,7 @@ Coleta, no [Semantic Scholar](https://www.semanticscholar.org/), dos artigos que
 
 **Dashboard:** https://rafaelparizi.github.io/sbes-papers-citation-collection/
 
-**Situação atual:** coletados os 783 artigos de 2010 a 2025 (linhas 0 a 782 da planilha), com 5.971 citações, em 26/09/2026.
+**Situação atual:** coletados os 897 artigos de 2005 a 2025 (linhas 0 a 896 da planilha), com 6.725 citações, em 26/09/2026.
 
 ## Como a coleta é realizada
 
@@ -35,7 +35,7 @@ Para cada `paperId` encontrado, o script percorre `GET /paper/{paperId}/citation
 - autores (nomes e `authorId`);
 - DOI, quando existe.
 
-Pares repetidos (mesmo artigo citado e mesmo artigo citante) são removidos. O total coletado de cada artigo é comparado com o `citationCount` informado pelo próprio Semantic Scholar.
+Pares repetidos (mesmo artigo citado e mesmo artigo citante) são removidos, assim como citações que o Semantic Scholar devolve sem `paperId` (em geral, referências mal extraídas, com títulos como o sumário de uns anais); por isso, o total coletado pode ficar um pouco abaixo do `citationCount`. O total coletado de cada artigo é comparado com o `citationCount` informado pelo próprio Semantic Scholar.
 
 ### Limite de requisições e novas tentativas
 
