@@ -4,7 +4,7 @@ Coleta, no [Semantic Scholar](https://www.semanticscholar.org/), dos artigos que
 
 **Dashboard:** https://rafaelparizi.github.io/sbes-papers-citation-collection/
 
-**Situação atual:** coletados os 1.035 artigos de 2000 a 2025 (linhas 0 a 1034 da planilha), com 7.663 citações, em 26/09/2026.
+**Situação atual:** coletados os 1.275 artigos de 1990 a 2025 (linhas 0 a 1274 da planilha), com 7.992 citações, em 26/09/2026.
 
 ## Como a coleta é realizada
 
