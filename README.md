@@ -106,13 +106,13 @@ No dashboard, a tabela de quem citou tem a coluna **Qualis** (◆ indica periód
 
 Para identificar os artigos de alto impacto, o dashboard usa percentis de citação, prática comum em bibliometria. O **conjunto de referência é o ano de publicação no SBES**: cada artigo é comparado só com os artigos do mesmo ano, o que neutraliza a vantagem de tempo dos artigos mais antigos.
 
-Regra, para cada ano com `n` artigos e cada faixa X ∈ {10, 5, 1}:
+Regra, para cada ano com `n` artigos e cada faixa X ∈ {10, 5, 1}. O Top X% deve ser formado pelos X% mais citados **entre os artigos do SBES publicados naquele ano**, sem nunca passar de X% deles:
 
-1. `cota = arredondar para cima (X% × n)`, então todo ano tem ao menos 1 artigo por faixa;
-2. os artigos do ano são ordenados por citações; o **limiar** é o número de citações do artigo na posição da cota (mínimo de 1 citação);
-3. entram no **Top X%** todos os artigos com citações ≥ limiar, **incluindo empates** no limite. As faixas são aninhadas: todo Top 1% também é Top 5% e Top 10%.
+1. `cota = arredondar para cima (X% × n)`: o número máximo de artigos da faixa naquele ano;
+2. os artigos entram do mais citado para o menos citado, só com pelo menos 1 citação;
+3. artigos **empatados** formam um grupo, que **entra inteiro se couber** nas vagas restantes da cota; o primeiro grupo que não couber fica **todo de fora**, e a faixa para ali. Assim, nenhum desempate arbitrário é necessário, e o Top X% nunca passa de X% dos artigos do ano. As faixas são aninhadas: todo Top 1% também é Top 5% e Top 10%.
 
-Com os dados atuais: **Top 10% = 187 artigos, Top 5% = 104, Top 1% = 49**. Os empates podem fazer uma faixa passar da cota. Por exemplo, em 2025 a cota do Top 10% é 12, mas entram 25 artigos, porque vários empatam no limiar de 2 citações. O painel mostra, para cada ano, "entram N (cota C, limiar L)".
+Com os dados atuais: **Top 10% = 135 artigos, Top 5% = 77, Top 1% = 37**. Por causa dos empates, algumas faixas ficam abaixo da cota. Por exemplo, em 2025 a cota do Top 10% é 12, mas entram 10, porque os 15 artigos seguintes empatam com 2 citações e não cabem nas 2 vagas restantes. Em 1995, 1989 e 1988 não há Top 1%, porque o 1º lugar é um empate de mais de um artigo e a cota é 1. O painel mostra, para cada ano, "entram N de C (cota)" e, quando é o caso, qual grupo empatado ficou de fora.
 
 Fórmulas:
 
@@ -120,11 +120,11 @@ Fórmulas:
 percentil no ano = 100 × (artigos do ano com menos citações) ÷ (artigos do ano)
 posição no ano   = 1 + (artigos do ano com mais citações)
 cota Top X%      = ⌈X% × artigos do ano⌉
-limiar           = citações do artigo na posição da cota (mínimo 1)
-Top X%           = artigos com citações ≥ limiar
+Top X%           = do mais citado ao menos citado (≥ 1 citação), cada grupo empatado
+                   entra inteiro se couber na cota; o primeiro que não couber fica de fora
 ```
 
-Exemplo, 2019 (67 artigos): o artigo mais citado tem 69 citações e 66 artigos do ano têm menos, então percentil = 100 × 66 ÷ 67 = 98,5 e posição = 1º. Para o Top 10%, cota = ⌈10% × 67⌉ = ⌈6,7⌉ = 7; o 7º colocado tem 21 citações (limiar), e entram 8 artigos com ≥ 21 citações (um empate no limiar). O percentil é informativo: a faixa é decidida pela cota, por isso em anos pequenos o 1º colocado pode ter percentil 95 e ser Top 1%.
+Exemplo, 2019 (67 artigos): o artigo mais citado tem 69 citações e 66 artigos do ano têm menos, então percentil = 100 × 66 ÷ 67 = 98,5 e posição = 1º. Para o Top 10%, cota = ⌈10% × 67⌉ = ⌈6,7⌉ = 7; os 6 mais citados (≥ 29 citações) entram, e os 2 artigos seguintes, empatados com 21 citações, não cabem na única vaga restante e ficam de fora, então entram 6. O percentil é informativo: a faixa é decidida pela cota, por isso em anos pequenos o 1º colocado pode ter percentil 95 e ser Top 1%.
 
 A contagem usada é a de citações coletadas do Semantic Scholar (registros). Para cada artigo são guardados também a **posição no ano** (ranking com empates: 1, 2, 2, 4…) e o **percentil no ano** (percentual de artigos do mesmo ano com menos citações).
 

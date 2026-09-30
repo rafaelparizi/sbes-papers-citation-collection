@@ -1003,7 +1003,8 @@ async function exportarGrafico(cardEl, formato) {
 // ---- Alto impacto por ano (Top 10% / 5% / 1%) ----
 let faixaPainel = "10";
 const NOTA_IMPACTO = "Regra: em cada ano, cota = arredondar para cima X% dos artigos do SBES daquele ano; " +
-  "entram os artigos com citações maiores ou iguais às do artigo na posição da cota (empates incluídos), com no mínimo 1 citação. " +
+  "os artigos entram do mais citado para o menos citado (mínimo de 1 citação), e um grupo de artigos empatados só entra se couber inteiro na cota — " +
+  "assim o Top X% nunca passa de X% dos artigos do ano. " +
   "Percentil no ano = 100 × (artigos do mesmo ano com menos citações) ÷ (artigos do ano). " +
   "Citações coletadas do Semantic Scholar.";
 const num = (v) => String(v).replace(".", ",");
@@ -1025,9 +1026,9 @@ function quadroCalculo(secoes) {
           <li><b>Percentil</b> = 100 × ${menos} ÷ ${r.n} = <b>${num(a.impacto.percentil)}</b> &nbsp;<span>(${menos} artigos de ${ano} têm menos citações)</span></li>
           <li><b>Posição</b> = 1 + ${mais} = <b>${a.impacto.posicao}º</b> &nbsp;<span>(${plural(mais, "artigo tem", "artigos têm")} mais citações)</span></li>
           <li><b>Cota do Top ${faixaPainel}%</b> = ⌈${faixaPainel}% × ${r.n}⌉ = ⌈${num(Number(bruto.toFixed(2)))}⌉ = <b>${fx.cota}</b></li>
-          <li><b>Limiar</b> = citações do ${fx.cota}º colocado = <b>${fx.limiar}</b> &nbsp;<span>(mínimo 1)</span></li>
-          <li><b>Entram</b> os artigos com ≥ ${fx.limiar} citações = <b>${fx.entram}</b>${fx.entram > fx.cota
-            ? ` &nbsp;<span>(mais que a cota porque ${plural(fx.entram - fx.cota, "artigo empata", "artigos empatam")} no limiar)</span>` : ""}</li>
+          <li><b>Entram</b> ${plural(fx.entram, "artigo", "artigos")} de ${fx.cota} possíveis${fx.limiar !== null ? `, com ≥ ${plural(fx.limiar, "citação", "citações")}` : ""}${fx.fora
+            ? ` &nbsp;<span>(o grupo seguinte — ${plural(fx.fora.artigos, "artigo empatado", "artigos empatados")} com ${fx.fora.citacoes} ${fx.fora.citacoes === 1 ? "citação" : "citações"} — não cabe nas ${fx.cota - fx.entram} ${fx.cota - fx.entram === 1 ? "vaga restante" : "vagas restantes"} e fica de fora)</span>`
+            : fx.entram < fx.cota ? ` &nbsp;<span>(não há mais artigos com citações)</span>` : ""}</li>
         </ul>
       </div>`;
   }
@@ -1040,11 +1041,11 @@ function quadroCalculo(secoes) {
           <code>percentil no ano = 100 × (artigos do ano com menos citações) ÷ (artigos do ano)</code>
           <code>posição no ano = 1 + (artigos do ano com mais citações)</code>
           <code>cota Top X% = ⌈X% × artigos do ano⌉ &nbsp;(arredonda para cima)</code>
-          <code>limiar = citações do artigo na posição da cota (mínimo 1)</code>
-          <code>Top X% = artigos com citações ≥ limiar (empates incluídos)</code>
+          <code>Top X% = do mais citado ao menos citado (≥ 1 citação), cada grupo empatado entra inteiro se couber na cota</code>
+          <code>o primeiro grupo empatado que não couber fica de fora → Top X% ≤ X% dos artigos do ano</code>
         </div>
         ${exemplo}
-        <p class="calc-obs">O percentil é informativo; a faixa é decidida pela cota. Em anos com poucos artigos, o 1º colocado pode ter percentil 95 e ainda ser Top 1% (ex.: 20 artigos → cota ⌈0,2⌉ = 1).</p>
+        <p class="calc-obs">O percentil é informativo; a faixa é decidida pela cota. Em anos com poucos artigos, o 1º colocado pode ter percentil 95 e ainda ser Top 1% (ex.: 20 artigos → cota ⌈0,2⌉ = 1). Se dois ou mais artigos empatam em 1º lugar e a cota é 1, nenhum entra no Top 1% daquele ano.</p>
       </div>
     </details>`;
 }
@@ -1056,10 +1057,12 @@ function especImpacto() {
     const arts = DADOS.filter((a) => a.ano === ano && a.impacto.faixa && Number(a.impacto.faixa) <= Number(faixaPainel))
       .sort((x, y) => x.impacto.posicao - y.impacto.posicao || x.idx - y.idx);
     return {
-      ano, arts, titulo: String(ano),
-      sub: `${r.n} artigos · Top ${faixaPainel}%: entram ${fx.entram} (cota ${fx.cota}, limiar ${plural(fx.limiar, "citação", "citações")})`,
+      ano, arts, fx, titulo: String(ano),
+      sub: `${r.n} artigos · Top ${faixaPainel}%: entram ${fx.entram} de ${fx.cota} (cota)` +
+        (fx.limiar !== null ? `, a partir de ${plural(fx.limiar, "citação", "citações")}` : "") +
+        (fx.fora ? ` · ${plural(fx.fora.artigos, "artigo", "artigos")} com ${fx.fora.citacoes} ${fx.fora.citacoes === 1 ? "citação" : "citações"} ${fx.fora.artigos === 1 ? "ficou" : "ficaram"} de fora (empate não cabe na cota)` : ""),
       linhas: arts.map((a) => [ano, a.impacto.posicao, a.titulo, a.autores, a.citantes.length, a.impacto.percentil,
-                               `Top ${a.impacto.faixa}%`, fx.cota, fx.limiar]),
+                               `Top ${a.impacto.faixa}%`, fx.cota, fx.limiar ?? ""]),
     };
   });
   const total = secoes.reduce((s, x) => s + x.arts.length, 0);
@@ -1067,7 +1070,7 @@ function especImpacto() {
     id: "impacto", titulo: `Artigos de alto impacto por ano — Top ${faixaPainel}%`,
     sub: `${plural(total, "artigo", "artigos")} em ${plural(anos.length, "ano", "anos")} · conjunto de referência: artigos do SBES do mesmo ano`,
     secoes, nota: NOTA_IMPACTO,
-    tabela: { colunas: ["Ano", "Posição no ano", "Título", "Autores", "Citações", "Percentil no ano", "Faixa", "Cota do ano", "Limiar do ano"],
+    tabela: { colunas: ["Ano", "Posição no ano", "Título", "Autores", "Citações", "Percentil no ano", "Faixa", "Cota do ano", "Mínimo de citações para entrar"],
               linhas: secoes.flatMap((x) => x.linhas) },
   };
 }
@@ -1084,7 +1087,7 @@ function abrirImpacto() {
           <td><button class="imp-link" data-abrir-idx="${a.idx}" title="Abrir nos detalhes">${esc(a.titulo)}</button><div class="imp-aut">${esc(a.autores)}</div></td>
           <td class="num">${a.citantes.length}</td><td class="num">${String(a.impacto.percentil).replace(".", ",")}</td>
           <td><span class="tag imp${a.impacto.faixa}">Top ${a.impacto.faixa}%</span></td></tr>`).join("")}
-      </tbody></table>` : `<p class="imp-vazio">Nenhum artigo com citações neste ano.</p>`}
+      </tbody></table>` : `<p class="imp-vazio">Nenhum artigo nesta faixa: ${sec.fx && sec.fx.fora && sec.fx.entram === 0 ? "o empate no 1º lugar não cabe na cota." : "nenhum artigo com citações neste ano."}</p>`}
     </div>`).join("");
   $("modalCorpo").innerHTML = `
     <div class="gcard grande imp-painel" data-g="impacto">
@@ -1604,9 +1607,11 @@ if (window.Shepherd) {
 def calcular_impacto(artigos: list[dict]) -> dict:
     """Marca os artigos Top 1%/5%/10% mais citados do seu ano de publicação no SBES.
 
-    Por ano (n artigos) e faixa X: cota = ceil(X% de n); limiar = citações do artigo na
-    posição da cota (mínimo 1); entram todos com citações >= limiar (empates incluídos).
-    Grava em cada artigo {faixa, posicao, percentil} e devolve o resumo por ano.
+    Por ano (n artigos) e faixa X: cota = ceil(X% de n). Percorrendo os valores de citação do
+    maior para o menor (só >= 1 citação), cada grupo de artigos empatados entra INTEIRO se
+    couber na cota; o primeiro grupo que não couber fica de fora, e a faixa para ali.
+    Assim o Top X% nunca passa de X% dos artigos do ano. Grava {faixa, posicao, percentil}
+    em cada artigo e devolve o resumo por ano (cota, limiar, entram, grupo que ficou de fora).
     """
     resumo = {}
     por_ano = {}
@@ -1615,15 +1620,25 @@ def calcular_impacto(artigos: list[dict]) -> dict:
     for ano, grupo in por_ano.items():
         n = len(grupo)
         cits = sorted((len(a["citantes"]) for a in grupo), reverse=True)
+        valores = sorted({c for c in cits if c >= 1}, reverse=True)
         faixas = {}
         for x in FAIXAS_IMPACTO:
             cota = math.ceil(x / 100 * n)
-            limiar = max(cits[cota - 1], 1)
-            faixas[str(x)] = {"cota": cota, "limiar": limiar, "entram": sum(1 for c in cits if c >= limiar)}
+            entram, limiar, fora = 0, None, None
+            for v in valores:
+                m = cits.count(v)
+                if entram + m > cota:
+                    if entram < cota:  # sobravam vagas, mas o grupo empatado não coube inteiro
+                        fora = {"citacoes": v, "artigos": m}
+                    break
+                entram += m
+                limiar = v
+            faixas[str(x)] = {"cota": cota, "limiar": limiar, "entram": entram, "fora": fora}
         resumo[str(ano)] = {"n": n, "faixas": faixas}
         for a in grupo:
             c = len(a["citantes"])
-            faixa = next((str(x) for x in FAIXAS_IMPACTO if c >= faixas[str(x)]["limiar"]), None)
+            faixa = next((str(x) for x in FAIXAS_IMPACTO
+                          if faixas[str(x)]["limiar"] is not None and c >= faixas[str(x)]["limiar"]), None)
             a["impacto"] = {
                 "faixa": faixa,
                 "posicao": 1 + sum(1 for v in cits if v > c),  # ranking por competição (1, 2, 2, 4…)
