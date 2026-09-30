@@ -13,6 +13,7 @@ que a coleta avançar.
 import html
 import itertools
 import json
+import math
 import re
 import unicodedata
 from difflib import SequenceMatcher, get_close_matches
@@ -34,6 +35,7 @@ ARQ_APELIDOS = RAIZ / "qualis_apelidos.csv"  # venue do Semantic Scholar -> sigl
 ARQ_VENUES_S2 = SAIDA_DIR / "venues_s2.jsonl"  # venue estruturada dos citantes (tipo, ISSN), da coleta
 ARQ_VENUES = SAIDA_DIR / "venues_qualis.csv"  # como cada venue foi classificada, para conferência
 ESTRATOS = ["A1", "A2", "A3", "A4", "B1", "B2", "B3", "B4", "C"]
+FAIXAS_IMPACTO = [1, 5, 10]  # Top X% dos artigos do SBES mais citados em cada ano
 # cópia publicada pelo GitHub Pages (pasta docs/ do repositório)
 ARQ_PAGES = Path(__file__).resolve().parent / "docs" / "index.html"
 
@@ -431,6 +433,35 @@ input[type="search"]:focus { outline: 2px solid var(--accent); outline-offset: -
 .tag { display: inline-block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; color: #8a5a00; background: #fff3d6; border: 1px solid #f0c865; border-radius: 4px; padding: 0 5px; margin-left: 4px; vertical-align: 1px; }
 .tag.tit { color: #a3261b; background: #fde8e6; border-color: #f2a79f; }
 .tag.erro { color: #fff; background: #c0392b; border-color: #c0392b; }
+.tag.imp1 { color: #fff; background: #7a4300; border-color: #7a4300; }
+.tag.imp5 { color: #fff; background: #a15f00; border-color: #a15f00; }
+.tag.imp10 { color: #6b3d00; background: #fde7b4; border-color: #f0c865; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tag.imp1 { color: #2a1a00; background: #f5b544; border-color: #f5b544; }
+  :root:not([data-theme="light"]) .tag.imp5 { color: #1d1200; background: #b8781d; border-color: #b8781d; }
+  :root:not([data-theme="light"]) .tag.imp10 { color: #ffd88a; background: #4a3312; border-color: #6b5420; } }
+:root[data-theme="dark"] .tag.imp1 { color: #2a1a00; background: #f5b544; border-color: #f5b544; }
+:root[data-theme="dark"] .tag.imp5 { color: #1d1200; background: #b8781d; border-color: #b8781d; }
+:root[data-theme="dark"] .tag.imp10 { color: #ffd88a; background: #4a3312; border-color: #6b5420; }
+.acoes-topo { display: flex; gap: 8px; }
+#abrirImpacto { font: inherit; font-size: 13px; color: var(--accent); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+#abrirImpacto:hover { border-color: var(--accent); }
+#impacto { padding: 7px 8px; }
+.imp-painel #faixaImpacto { font: inherit; font-size: 12px; padding: 2px 6px; }
+.imp-ano { margin-top: 18px; }
+.imp-cab { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+.imp-cab b { font-size: 16px; }
+.imp-cab span { color: var(--muted); font-size: 12px; }
+.imp-tab { width: 100%; border-collapse: collapse; margin-top: 4px; }
+.imp-tab th, .imp-tab td { text-align: left; padding: 6px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 13px; }
+.imp-tab th { color: var(--muted); font-size: 12px; }
+.imp-tab .num { text-align: right; font-variant-numeric: tabular-nums; }
+.imp-tab td:last-child, .imp-tab th:last-child { width: 1%; white-space: nowrap; }
+.tag[class*="imp"] { white-space: nowrap; }
+.imp-link { background: none; border: 0; padding: 0; font: inherit; text-align: left; color: var(--text); cursor: pointer; }
+.imp-link:hover { color: var(--accent); text-decoration: underline; }
+.imp-aut { color: var(--muted); font-size: 12px; }
+.imp-vazio { color: var(--muted); font-size: 13px; margin: 6px 0; }
+.imp-nota { color: var(--muted); font-size: 12px; margin-top: 18px; border-top: 1px solid var(--line); padding-top: 8px; }
 .badge.falha { background: #c0392b; border-color: #c0392b; color: #fff; }
 .erro-nota { border-color: #f2a79f; background: #fde8e6; color: #7a1d14; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .erro-nota { background: #3d1c19; border-color: #7a3630; color: #ffc9c2; } }
@@ -605,7 +636,10 @@ button.filtro { background: none; border: 0; padding: 0; font: inherit; color: i
     <h1>Citações dos artigos do SBES</h1>
     <p>Fonte: Semantic Scholar · gerado em __GERADO__</p>
   </div>
-  <button id="abrirTour" type="button">Ver tour</button>
+  <div class="acoes-topo">
+    <button id="abrirImpacto" type="button">Alto impacto por ano</button>
+    <button id="abrirTour" type="button">Ver tour</button>
+  </div>
 </header>
 <div class="kpis" id="kpis"></div>
 <div class="anos-barra">
@@ -624,6 +658,12 @@ button.filtro { background: none; border: 0; padding: 0; font: inherit; color: i
         <option value="asc">Menos citados primeiro</option>
       </select>
       <input id="busca" type="search" placeholder="🔍  Buscar por título ou autor…">
+      <select id="impacto" aria-label="Alto impacto no ano">
+        <option value="">Todos os artigos</option>
+        <option value="10">Top 10% do ano</option>
+        <option value="5">Top 5% do ano</option>
+        <option value="1">Top 1% do ano</option>
+      </select>
       <label class="toggle"><input id="soCitados" type="checkbox"> Só com citações</label>
       <label class="toggle"><input id="soSimilares" type="checkbox"> Só <span class="tag" data-tip="O título no Semantic Scholar não é idêntico ao da planilha (ignorando ponto final e espaços).">similar</span></label>
       <label class="toggle"><input id="soDuplicatas" type="checkbox"> Só com <span class="tag dup" data-tip="Há citações que parecem ser o mesmo trabalho em registros separados (ex.: preprint no arXiv e versão publicada).">duplicata</span></label>
@@ -646,6 +686,9 @@ button.filtro { background: none; border: 0; padding: 0; font: inherit; color: i
 </div>
 <script>
 const DADOS = __DADOS__;
+const IMPACTO_ANOS = __IMPACTO__;  // por ano: n e, por faixa, cota/limiar/entram
+const tagImpacto = (a) => a.impacto && a.impacto.faixa
+  ? ` <span class="tag imp${a.impacto.faixa}" data-tip="${esc(TIP.impacto(a))}">Top ${a.impacto.faixa}%</span>` : "";
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 // Destaca em negrito as palavras de `novo` que não aparecem, na mesma ordem, em `orig` (LCS por palavra)
@@ -673,6 +716,10 @@ const TIP = {
   titulo: (a) => a.match === "titulo_aproximado"
     ? "Encontrado pela busca por título, com título apenas parecido (≥ 90% de semelhança): vale conferir."
     : "Encontrado no Semantic Scholar pela busca por título, porque o DOI da planilha não foi reconhecido.",
+  impacto: (a) => {
+    const i = a.impacto, n = IMPACTO_ANOS[a.ano].n;
+    return `Top ${i.faixa}% dos artigos do SBES de ${a.ano} mais citados · ${plural(a.citantes.length, "citação", "citações")} · ${i.posicao}º de ${n} no ano (percentil ${String(i.percentil).replace(".", ",")})`;
+  },
   erro: (a) => `Erro ao coletar na etapa de ${a.erro}. A API não respondeu após 5 tentativas; rode a coleta de novo para completar este artigo.`,
   preprint: "Preprint: publicado no arXiv (venue arXiv ou DOI com prefixo 10.48550).",
 };
@@ -769,6 +816,7 @@ function filtrados(ignorar = null) {
   const soDuplicatas = $("soDuplicatas").checked;
   const soTitulo = $("soTitulo").checked;
   const soErro = $("soErro").checked;
+  const imp = $("impacto").value;
   const ordem = $("ordem").value;
   const lista = DADOS.filter((a) =>
     (ignorar === "ano" || !anosOff.has(String(a.ano))) &&
@@ -779,6 +827,7 @@ function filtrados(ignorar = null) {
     (!soDuplicatas || a.distintos < a.citantes.length) &&
     (!soTitulo || porTitulo(a)) &&
     (!soErro || a.erro) &&
+    (!imp || (a.impacto.faixa && Number(a.impacto.faixa) <= Number(imp))) &&
     (!autorFiltro || autoresDe(a).includes(autorFiltro)) &&
     (!q || (a.titulo + " " + a.autores).toLowerCase().includes(q)));
   // empates mantêm a ordem da planilha (sort estável)
@@ -897,6 +946,7 @@ function renderGraficos(lista) {
 let graficoExpandido = null;
 
 function abrirExpandido(id) {
+  if (id === "impacto") return abrirImpacto();
   const g = GRAFICOS.find((x) => x.id === id);
   if (!g) return fecharExpandido();
   graficoExpandido = id;
@@ -940,6 +990,69 @@ async function exportarGrafico(cardEl, formato) {
   }
 }
 
+// ---- Alto impacto por ano (Top 10% / 5% / 1%) ----
+let faixaPainel = "10";
+const NOTA_IMPACTO = "Regra: em cada ano, cota = arredondar para cima X% dos artigos do SBES daquele ano; " +
+  "entram os artigos com citações maiores ou iguais às do artigo na posição da cota (empates incluídos), com no mínimo 1 citação. " +
+  "Citações coletadas do Semantic Scholar.";
+
+function especImpacto() {
+  const anos = TODOS_ANOS.filter((a) => !anosOff.has(a)).map(Number).sort((x, y) => y - x);
+  const secoes = anos.map((ano) => {
+    const r = IMPACTO_ANOS[ano], fx = r.faixas[faixaPainel];
+    const arts = DADOS.filter((a) => a.ano === ano && a.impacto.faixa && Number(a.impacto.faixa) <= Number(faixaPainel))
+      .sort((x, y) => x.impacto.posicao - y.impacto.posicao || x.idx - y.idx);
+    return {
+      ano, arts, titulo: String(ano),
+      sub: `${r.n} artigos · Top ${faixaPainel}%: entram ${fx.entram} (cota ${fx.cota}, limiar ${plural(fx.limiar, "citação", "citações")})`,
+      linhas: arts.map((a) => [ano, a.impacto.posicao, a.titulo, a.autores, a.citantes.length, a.impacto.percentil,
+                               `Top ${a.impacto.faixa}%`, fx.cota, fx.limiar]),
+    };
+  });
+  const total = secoes.reduce((s, x) => s + x.arts.length, 0);
+  return {
+    id: "impacto", titulo: `Artigos de alto impacto por ano — Top ${faixaPainel}%`,
+    sub: `${plural(total, "artigo", "artigos")} em ${plural(anos.length, "ano", "anos")} · conjunto de referência: artigos do SBES do mesmo ano`,
+    secoes, nota: NOTA_IMPACTO,
+    tabela: { colunas: ["Ano", "Posição no ano", "Título", "Autores", "Citações", "Percentil no ano", "Faixa", "Cota do ano", "Limiar do ano"],
+              linhas: secoes.flatMap((x) => x.linhas) },
+  };
+}
+
+function abrirImpacto() {
+  const g = especImpacto();
+  graficoExpandido = "impacto";
+  const blocos = g.secoes.map((sec) => `
+    <div class="imp-ano">
+      <div class="imp-cab"><b>${sec.titulo}</b> <span>${esc(sec.sub)}</span></div>
+      ${sec.arts.length ? `<table class="imp-tab"><thead><tr><th>#</th><th>Artigo</th><th>Citações</th><th>Percentil</th><th>Faixa</th></tr></thead><tbody>
+        ${sec.arts.map((a) => `<tr>
+          <td>${a.impacto.posicao}º</td>
+          <td><button class="imp-link" data-abrir-idx="${a.idx}" title="Abrir nos detalhes">${esc(a.titulo)}</button><div class="imp-aut">${esc(a.autores)}</div></td>
+          <td class="num">${a.citantes.length}</td><td class="num">${String(a.impacto.percentil).replace(".", ",")}</td>
+          <td><span class="tag imp${a.impacto.faixa}">Top ${a.impacto.faixa}%</span></td></tr>`).join("")}
+      </tbody></table>` : `<p class="imp-vazio">Nenhum artigo com citações neste ano.</p>`}
+    </div>`).join("");
+  $("modalCorpo").innerHTML = `
+    <div class="gcard grande imp-painel" data-g="impacto">
+      <div class="gcab"><div><h3>Artigos de alto impacto por ano</h3><div class="sub">${esc(g.sub)}</div></div>
+        <div class="gtools">
+          <select id="faixaImpacto" aria-label="Faixa">${["10", "5", "1"].map((f) =>
+            `<option value="${f}"${f === faixaPainel ? " selected" : ""}>Top ${f}%</option>`).join("")}</select>
+          <details class="exportar"><summary title="Exportar a lista">Exportar</summary>
+            <div class="menu"><span class="grupo">Dados</span>
+              <button data-exportar="csv" data-g="impacto">CSV</button>
+              <button data-exportar="xlsx" data-g="impacto">Excel</button>
+              <button data-exportar="md" data-g="impacto">Markdown</button></div>
+          </details>
+        </div></div>
+      ${blocos || `<p class="imp-vazio">Nenhum ano marcado na faixa de anos do topo.</p>`}
+      <p class="imp-nota">${esc(NOTA_IMPACTO)} Anos respeitam a seleção na faixa de anos do topo.</p>
+    </div>`;
+  $("modalGrafico").hidden = false;
+  document.body.classList.add("sem-rolagem");
+}
+
 // Descrição dos filtros ativos, gravada junto com os dados exportados
 function filtrosAtivos() {
   const f = [];
@@ -951,6 +1064,7 @@ function filtrosAtivos() {
   if (q) f.push(`busca: "${q}"`);
   if (autorFiltro) f.push(`autor: ${autorFiltro}`);
   if (matchFiltro) f.push(`encontrado por: ${ROT_MATCH[matchFiltro]}`);
+  if ($("impacto").value) f.push(`alto impacto: Top ${$("impacto").value}% do ano`);
   if (autoresFiltro) f.push(`autores por artigo: ${autoresFiltro === 8 ? "8 ou mais" : autoresFiltro}`);
   [["soCitados", "só com citações"], ["soSimilares", "só similares"], ["soDuplicatas", "só com duplicata"],
    ["soTitulo", "só encontrados por título"], ["soErro", "só com erro ao coletar"]]
@@ -967,7 +1081,7 @@ function baixar(conteudo, nome, tipo) {
 }
 
 function exportarDados(id, formato) {
-  const g = GRAFICOS.find((x) => x.id === id);
+  const g = id === "impacto" ? especImpacto() : GRAFICOS.find((x) => x.id === id);
   if (!g) return;
   const { colunas, linhas } = g.tabela;
   const fonte = `Fonte: Semantic Scholar · Citações dos artigos do SBES · ${new Date().toLocaleDateString("pt-BR")}`;
@@ -982,8 +1096,11 @@ function exportarDados(id, formato) {
   if (formato === "md") {
     const lin = (l) => `| ${l.map((v) => String(v ?? "").replace(/\|/g, "\\|")).join(" | ")} |`;
     const alin = colunas.map((_, k) => (linhas.every((l) => typeof l[k] === "number") ? "---:" : "---"));
-    const md = [`## ${g.titulo}`, "", `_${g.sub}_`, "", lin(colunas), `| ${alin.join(" | ")} |`, ...linhas.map(lin), "",
-                filtros, "", fonte, ""].join("\n");
+    const tabelaMd = (ls) => [lin(colunas), `| ${alin.join(" | ")} |`, ...ls.map(lin)];
+    const corpo = g.secoes
+      ? g.secoes.flatMap((sec) => [`### ${sec.titulo}`, "", `_${sec.sub}_`, "", ...tabelaMd(sec.linhas), ""])
+      : [...tabelaMd(linhas), ""];
+    const md = [`## ${g.titulo}`, "", `_${g.sub}_`, "", ...corpo, filtros, "", ...(g.nota ? [g.nota, ""] : []), fonte, ""].join("\n");
     baixar(md, `${nome}.md`, "text/markdown;charset=utf-8");
   }
   if (formato === "xlsx") {
@@ -1020,6 +1137,16 @@ function cliqueGraficos(e) {
     else exportarGrafico(exp.closest(".gcard"), f);
     return;
   }
+  const ab = e.target.closest("[data-abrir-idx]");
+  if (ab) {
+    fecharExpandido();
+    selecionado = Number(ab.dataset.abrirIdx);
+    venuesOff.clear(); anoCitFiltro = null; qualisFiltro = null;
+    renderDetalhe(DADOS.find((a) => a.idx === selecionado));
+    renderLista();
+    document.querySelector(`.item[data-idx="${selecionado}"]`)?.scrollIntoView({ block: "center" });
+    return;
+  }
   const ex = e.target.closest("[data-expandir]");
   if (ex) {
     graficoExpandido === ex.dataset.expandir ? fecharExpandido() : abrirExpandido(ex.dataset.expandir);
@@ -1032,6 +1159,12 @@ function cliqueGraficos(e) {
 // Clique numa barra: filtra por aquele valor; clicar de novo remove o filtro
 $("graficos").addEventListener("click", cliqueGraficos);
 $("modalCorpo").addEventListener("click", cliqueGraficos);
+$("modalCorpo").addEventListener("change", (e) => {
+  if (e.target.id !== "faixaImpacto") return;
+  faixaPainel = e.target.value;
+  abrirImpacto();
+});
+$("abrirImpacto").addEventListener("click", () => abrirImpacto());
 $("modalGrafico").addEventListener("click", (e) => {
   if (e.target.id === "modalGrafico" || e.target.closest("#fecharModal")) fecharExpandido();
 });
@@ -1041,6 +1174,7 @@ function renderLista() {
   const lista = filtrados();
   renderKpis(lista);
   renderGraficos(lista);
+  if (graficoExpandido === "impacto") abrirImpacto();
   const chip = (tipo, texto) =>
     `<button class="chip" data-limpar="${tipo}" title="Remover filtro">${texto} <span aria-hidden="true">✕</span></button>`;
   $("chips").innerHTML = [
@@ -1052,7 +1186,7 @@ function renderLista() {
   $("lista").innerHTML = lista.map((a) => `
     <div class="item${a.idx === selecionado ? " ativo" : ""}" data-idx="${a.idx}">
       <div class="t">
-        <div>${esc(a.titulo)}${a.similar ? ` <span class="tag" data-tip="${TIP.similar}">similar</span>` : ""}${a.distintos < a.citantes.length ? ` <span class="tag dup" data-tip="${TIP.dup}">duplicata</span>` : ""}${porTitulo(a) ? ` <span class="tag tit" data-tip="${TIP.titulo(a)}">título</span>` : ""}${a.erro ? ` <span class="tag erro" data-tip="${esc(TIP.erro(a))}">erro ao coletar</span>` : ""}</div>
+        <div>${esc(a.titulo)}${a.similar ? ` <span class="tag" data-tip="${TIP.similar}">similar</span>` : ""}${a.distintos < a.citantes.length ? ` <span class="tag dup" data-tip="${TIP.dup}">duplicata</span>` : ""}${porTitulo(a) ? ` <span class="tag tit" data-tip="${TIP.titulo(a)}">título</span>` : ""}${a.erro ? ` <span class="tag erro" data-tip="${esc(TIP.erro(a))}">erro ao coletar</span>` : ""}${tagImpacto(a)}</div>
         <div class="meta">${esc(a.ano)} · ${esc(a.autores)}</div>
       </div>
       <div class="badge${a.citantes.length ? " tem" : ""}${a.erro ? " falha" : ""}" title="citações">${a.erro ? "!" : a.citantes.length}</div>
@@ -1067,7 +1201,7 @@ function renderDetalhe(a) {
 
   $("detalhe").innerHTML = `
     <div class="detalhe">
-      <h2>${esc(a.titulo)}${a.similar ? ` <span class="tag" data-tip="${TIP.similar}">similar</span>` : ""}${a.distintos < a.citantes.length ? ` <span class="tag dup" data-tip="${TIP.dup}">duplicata</span>` : ""}${porTitulo(a) ? ` <span class="tag tit" data-tip="${TIP.titulo(a)}">título</span>` : ""}${a.erro ? ` <span class="tag erro" data-tip="${esc(TIP.erro(a))}">erro ao coletar</span>` : ""}</h2>
+      <h2>${esc(a.titulo)}${a.similar ? ` <span class="tag" data-tip="${TIP.similar}">similar</span>` : ""}${a.distintos < a.citantes.length ? ` <span class="tag dup" data-tip="${TIP.dup}">duplicata</span>` : ""}${porTitulo(a) ? ` <span class="tag tit" data-tip="${TIP.titulo(a)}">título</span>` : ""}${a.erro ? ` <span class="tag erro" data-tip="${esc(TIP.erro(a))}">erro ao coletar</span>` : ""}${tagImpacto(a)}</h2>
       <div class="autores">${autoresDe(a).map((n) =>
         `<button class="autor" data-autor="${esc(n)}" title="Ver artigos deste autor">${esc(n)}</button>`).join(", ")} · SBES ${esc(a.ano)}</div>
       <div class="links">${links}</div>
@@ -1192,6 +1326,7 @@ function renderPainel(a) {
       ${kpi(primeiro, "primeira citação")}
       ${kpi(nVenues, "venues distintos")}
       ${kpi(encontrado, "encontrado por")}
+      ${kpi(`${a.impacto.faixa ? `Top ${a.impacto.faixa}%` : "—"}`, `impacto no ano · ${a.impacto.posicao}º de ${IMPACTO_ANOS[a.ano].n}`)}
     </div>
     <div class="blocos">
       ${cardQualis(porAnoCit)}
@@ -1298,6 +1433,7 @@ $("anosAcoes").addEventListener("click", (e) => {
   renderLista();
 });
 $("ordem").addEventListener("change", renderLista);
+$("impacto").addEventListener("change", renderLista);
 $("busca").addEventListener("input", renderLista);
 
 try { $("verGraficos").checked = localStorage.getItem("verGraficos") === "1"; } catch (e) {}
@@ -1369,6 +1505,8 @@ function criarTour() {
       text: "Clique em um artigo para ver os detalhes. O número à direita é a quantidade de citações." },
     { id: "detalhe", title: "Detalhes e quem citou", attachTo: { element: "#detalhe", on: "left" }, beforeShowPromise: abrirArtigo,
       text: "Clique no nome de um autor para ver os artigos dele. No gráfico <b>Citações por ano</b>, clique em um ano para ver só as citações daquele ano. Os cards e a tabela são recalculados." },
+    { id: "impacto", title: "Artigos de alto impacto", attachTo: { element: "#abrirImpacto", on: "bottom" }, beforeShowPromise: fecharGraficos,
+      text: "Os badges <b>Top 10%</b>, <b>Top 5%</b> e <b>Top 1%</b> marcam os artigos mais citados <b>entre os do mesmo ano</b> do SBES, e o filtro ao lado da busca mostra só eles. O botão <b>Alto impacto por ano</b> abre a lista completa, ano a ano, exportável em CSV, Excel ou Markdown." },
     { id: "qualis", title: "Qualis e venues das citações", attachTo: { element: ".blocos", on: "bottom" }, beforeShowPromise: abrirArtigo,
       text: "O card <b>Qualis</b> resume as citações por estrato (A1 a C; ◆ indica periódico) e a lista de <b>venues</b> mostra onde elas foram publicadas. Clique em um estrato para ver só aquelas citações, ou em uma venue para desmarcá-la (há também <b>marcar/desmarcar todas</b>)." },
   ];
@@ -1409,11 +1547,44 @@ if (window.Shepherd) {
 """
 
 
+def calcular_impacto(artigos: list[dict]) -> dict:
+    """Marca os artigos Top 1%/5%/10% mais citados do seu ano de publicação no SBES.
+
+    Por ano (n artigos) e faixa X: cota = ceil(X% de n); limiar = citações do artigo na
+    posição da cota (mínimo 1); entram todos com citações >= limiar (empates incluídos).
+    Grava em cada artigo {faixa, posicao, percentil} e devolve o resumo por ano.
+    """
+    resumo = {}
+    por_ano = {}
+    for a in artigos:
+        por_ano.setdefault(a["ano"], []).append(a)
+    for ano, grupo in por_ano.items():
+        n = len(grupo)
+        cits = sorted((len(a["citantes"]) for a in grupo), reverse=True)
+        faixas = {}
+        for x in FAIXAS_IMPACTO:
+            cota = math.ceil(x / 100 * n)
+            limiar = max(cits[cota - 1], 1)
+            faixas[str(x)] = {"cota": cota, "limiar": limiar, "entram": sum(1 for c in cits if c >= limiar)}
+        resumo[str(ano)] = {"n": n, "faixas": faixas}
+        for a in grupo:
+            c = len(a["citantes"])
+            faixa = next((str(x) for x in FAIXAS_IMPACTO if c >= faixas[str(x)]["limiar"]), None)
+            a["impacto"] = {
+                "faixa": faixa,
+                "posicao": 1 + sum(1 for v in cits if v > c),  # ranking por competição (1, 2, 2, 4…)
+                "percentil": round(100 * sum(1 for v in cits if v < c) / n, 1),
+            }
+    return resumo
+
+
 def main():
     artigos = montar_dados()
+    impacto = calcular_impacto(artigos)
     dados = json.dumps(artigos, ensure_ascii=False).replace("</", "<\\/")
     gerado = pd.Timestamp.now().strftime("%d/%m/%Y %H:%M")
-    html = HTML.replace("__DADOS__", dados).replace("__GERADO__", gerado)
+    html = (HTML.replace("__DADOS__", dados).replace("__IMPACTO__", json.dumps(impacto))
+            .replace("__GERADO__", gerado))
     ARQ_HTML.write_text(html, encoding="utf-8")
     ARQ_PAGES.parent.mkdir(parents=True, exist_ok=True)
     ARQ_PAGES.write_text(html, encoding="utf-8")

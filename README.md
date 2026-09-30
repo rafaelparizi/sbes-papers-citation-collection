@@ -102,6 +102,26 @@ Workshops e trilhas satélite não herdam o Qualis do evento principal. Os nomes
 
 No dashboard, a tabela de quem citou tem a coluna **Qualis** (◆ indica periódico; o tooltip mostra sigla ou ISSN, nome oficial e como foi identificado), e os detalhes do artigo mostram o card **Qualis das citações**, com a contagem por estrato (A1 a C e "sem"). Clicar em um estrato mostra só aquelas citações.
 
+### Artigos de alto impacto por ano (Top 10% / 5% / 1%)
+
+Para identificar os artigos de alto impacto, o dashboard usa percentis de citação, prática comum em bibliometria. O **conjunto de referência é o ano de publicação no SBES**: cada artigo é comparado só com os artigos do mesmo ano, o que neutraliza a vantagem de tempo dos artigos mais antigos.
+
+Regra, para cada ano com `n` artigos e cada faixa X ∈ {10, 5, 1}:
+
+1. `cota = arredondar para cima (X% × n)`, então todo ano tem ao menos 1 artigo por faixa;
+2. os artigos do ano são ordenados por citações; o **limiar** é o número de citações do artigo na posição da cota (mínimo de 1 citação);
+3. entram no **Top X%** todos os artigos com citações ≥ limiar, **incluindo empates** no limite. As faixas são aninhadas: todo Top 1% também é Top 5% e Top 10%.
+
+Com os dados atuais: **Top 10% = 187 artigos, Top 5% = 104, Top 1% = 49**. Os empates podem fazer uma faixa passar da cota. Por exemplo, em 2025 a cota do Top 10% é 12, mas entram 25 artigos, porque vários empatam no limiar de 2 citações. O painel mostra, para cada ano, "entram N (cota C, limiar L)".
+
+A contagem usada é a de citações coletadas do Semantic Scholar (registros). Para cada artigo são guardados também a **posição no ano** (ranking com empates: 1, 2, 2, 4…) e o **percentil no ano** (percentual de artigos do mesmo ano com menos citações).
+
+No dashboard:
+
+- **Badges:** **Top 1%**, **Top 5%** e **Top 10%** (a faixa mais alta) na lista e nos detalhes, com tooltip de posição e percentil, e um card "impacto no ano".
+- **Filtro:** ao lado da busca, combinável com os demais filtros.
+- **Painel "Alto impacto por ano":** botão no topo; lista os artigos de cada ano para a faixa escolhida, respeita os anos marcados e exporta a lista em CSV, Excel ou Markdown (uma seção por ano).
+
 ### Limitações
 
 - A cobertura depende do Semantic Scholar: citações que ele não indexou não aparecem, e artigos antigos tendem a ter menos citações registradas.
