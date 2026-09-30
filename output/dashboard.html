@@ -94,6 +94,16 @@ input[type="search"]:focus { outline: 2px solid var(--accent); outline-offset: -
 #impacto { padding: 7px 8px; }
 .imp-painel #faixaImpacto { font: inherit; font-size: 12px; padding: 2px 6px; }
 .imp-ano { margin-top: 18px; }
+.calc { margin-top: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; }
+.calc summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+.calc-corpo { font-size: 13px; }
+.calc-corpo p { margin: 8px 0; }
+.formulas { display: flex; flex-direction: column; gap: 4px; margin: 8px 0; }
+.formulas code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; }
+.calc-ex { background: var(--panel); border-left: 3px solid var(--accent); border-radius: 4px; padding: 8px 12px; margin: 8px 0; }
+.calc-ex ul { margin: 6px 0 0; padding-left: 18px; }
+.calc-ex li { margin: 3px 0; font-variant-numeric: tabular-nums; }
+.calc-ex span, .calc-obs { color: var(--muted); }
 .imp-cab { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
 .imp-cab b { font-size: 16px; }
 .imp-cab span { color: var(--muted); font-size: 12px; }
@@ -280,7 +290,7 @@ button.filtro { background: none; border: 0; padding: 0; font: inherit; color: i
 <header>
   <div>
     <h1>Citações dos artigos do SBES</h1>
-    <p>Fonte: Semantic Scholar · gerado em 30/09/2026 13:54</p>
+    <p>Fonte: Semantic Scholar · gerado em 30/09/2026 13:59</p>
   </div>
   <div class="acoes-topo">
     <button id="abrirImpacto" type="button">Alto impacto por ano</button>
@@ -640,7 +650,50 @@ async function exportarGrafico(cardEl, formato) {
 let faixaPainel = "10";
 const NOTA_IMPACTO = "Regra: em cada ano, cota = arredondar para cima X% dos artigos do SBES daquele ano; " +
   "entram os artigos com citações maiores ou iguais às do artigo na posição da cota (empates incluídos), com no mínimo 1 citação. " +
+  "Percentil no ano = 100 × (artigos do mesmo ano com menos citações) ÷ (artigos do ano). " +
   "Citações coletadas do Semantic Scholar.";
+const num = (v) => String(v).replace(".", ",");
+
+// Quadro explicativo com as fórmulas e um exemplo real (ano mais recente marcado, 1º colocado)
+function quadroCalculo(secoes) {
+  const sec = secoes.find((x) => x.arts.length);
+  let exemplo = "";
+  if (sec) {
+    const a = sec.arts[0], ano = sec.ano, r = IMPACTO_ANOS[ano], fx = r.faixas[faixaPainel];
+    const c = a.citantes.length;
+    const menos = DADOS.filter((d) => d.ano === ano && d.citantes.length < c).length;
+    const mais = a.impacto.posicao - 1;
+    const bruto = (Number(faixaPainel) / 100) * r.n;
+    exemplo = `
+      <div class="calc-ex">
+        <b>Exemplo — ${ano}</b> (${r.n} artigos no ano), artigo <i>${esc(a.titulo)}</i>, com ${plural(c, "citação", "citações")}:
+        <ul>
+          <li><b>Percentil</b> = 100 × ${menos} ÷ ${r.n} = <b>${num(a.impacto.percentil)}</b> &nbsp;<span>(${menos} artigos de ${ano} têm menos citações)</span></li>
+          <li><b>Posição</b> = 1 + ${mais} = <b>${a.impacto.posicao}º</b> &nbsp;<span>(${plural(mais, "artigo tem", "artigos têm")} mais citações)</span></li>
+          <li><b>Cota do Top ${faixaPainel}%</b> = ⌈${faixaPainel}% × ${r.n}⌉ = ⌈${num(Number(bruto.toFixed(2)))}⌉ = <b>${fx.cota}</b></li>
+          <li><b>Limiar</b> = citações do ${fx.cota}º colocado = <b>${fx.limiar}</b> &nbsp;<span>(mínimo 1)</span></li>
+          <li><b>Entram</b> os artigos com ≥ ${fx.limiar} citações = <b>${fx.entram}</b>${fx.entram > fx.cota
+            ? ` &nbsp;<span>(mais que a cota porque ${plural(fx.entram - fx.cota, "artigo empata", "artigos empatam")} no limiar)</span>` : ""}</li>
+        </ul>
+      </div>`;
+  }
+  return `
+    <details class="calc" open>
+      <summary>Como o percentil e as faixas são calculados</summary>
+      <div class="calc-corpo">
+        <p>O conjunto de referência é o <b>ano de publicação no SBES</b>: cada artigo é comparado só com os artigos do mesmo ano.</p>
+        <div class="formulas">
+          <code>percentil no ano = 100 × (artigos do ano com menos citações) ÷ (artigos do ano)</code>
+          <code>posição no ano = 1 + (artigos do ano com mais citações)</code>
+          <code>cota Top X% = ⌈X% × artigos do ano⌉ &nbsp;(arredonda para cima)</code>
+          <code>limiar = citações do artigo na posição da cota (mínimo 1)</code>
+          <code>Top X% = artigos com citações ≥ limiar (empates incluídos)</code>
+        </div>
+        ${exemplo}
+        <p class="calc-obs">O percentil é informativo; a faixa é decidida pela cota. Em anos com poucos artigos, o 1º colocado pode ter percentil 95 e ainda ser Top 1% (ex.: 20 artigos → cota ⌈0,2⌉ = 1).</p>
+      </div>
+    </details>`;
+}
 
 function especImpacto() {
   const anos = TODOS_ANOS.filter((a) => !anosOff.has(a)).map(Number).sort((x, y) => y - x);
@@ -692,6 +745,7 @@ function abrirImpacto() {
               <button data-exportar="md" data-g="impacto">Markdown</button></div>
           </details>
         </div></div>
+      ${quadroCalculo(g.secoes)}
       ${blocos || `<p class="imp-vazio">Nenhum ano marcado na faixa de anos do topo.</p>`}
       <p class="imp-nota">${esc(NOTA_IMPACTO)} Anos respeitam a seleção na faixa de anos do topo.</p>
     </div>`;

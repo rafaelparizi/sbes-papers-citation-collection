@@ -114,13 +114,25 @@ Regra, para cada ano com `n` artigos e cada faixa X ∈ {10, 5, 1}:
 
 Com os dados atuais: **Top 10% = 187 artigos, Top 5% = 104, Top 1% = 49**. Os empates podem fazer uma faixa passar da cota. Por exemplo, em 2025 a cota do Top 10% é 12, mas entram 25 artigos, porque vários empatam no limiar de 2 citações. O painel mostra, para cada ano, "entram N (cota C, limiar L)".
 
+Fórmulas:
+
+```text
+percentil no ano = 100 × (artigos do ano com menos citações) ÷ (artigos do ano)
+posição no ano   = 1 + (artigos do ano com mais citações)
+cota Top X%      = ⌈X% × artigos do ano⌉
+limiar           = citações do artigo na posição da cota (mínimo 1)
+Top X%           = artigos com citações ≥ limiar
+```
+
+Exemplo, 2019 (67 artigos): o artigo mais citado tem 69 citações e 66 artigos do ano têm menos, então percentil = 100 × 66 ÷ 67 = 98,5 e posição = 1º. Para o Top 10%, cota = ⌈10% × 67⌉ = ⌈6,7⌉ = 7; o 7º colocado tem 21 citações (limiar), e entram 8 artigos com ≥ 21 citações (um empate no limiar). O percentil é informativo: a faixa é decidida pela cota, por isso em anos pequenos o 1º colocado pode ter percentil 95 e ser Top 1%.
+
 A contagem usada é a de citações coletadas do Semantic Scholar (registros). Para cada artigo são guardados também a **posição no ano** (ranking com empates: 1, 2, 2, 4…) e o **percentil no ano** (percentual de artigos do mesmo ano com menos citações).
 
 No dashboard:
 
 - **Badges:** **Top 1%**, **Top 5%** e **Top 10%** (a faixa mais alta) na lista e nos detalhes, com tooltip de posição e percentil, e um card "impacto no ano".
 - **Filtro:** ao lado da busca, combinável com os demais filtros.
-- **Painel "Alto impacto por ano":** botão no topo; lista os artigos de cada ano para a faixa escolhida, respeita os anos marcados e exporta a lista em CSV, Excel ou Markdown (uma seção por ano).
+- **Painel "Alto impacto por ano":** botão no topo; traz um quadro "Como o percentil e as faixas são calculados", com as fórmulas e um exemplo calculado com os dados do ano mais recente marcado; lista os artigos de cada ano para a faixa escolhida, respeita os anos marcados e exporta a lista em CSV, Excel ou Markdown (uma seção por ano).
 
 ### Limitações
 
