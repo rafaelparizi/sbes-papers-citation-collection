@@ -98,10 +98,13 @@ input[type="search"]:focus { outline: 2px solid var(--accent); outline-offset: -
 .calc summary { cursor: pointer; font-weight: 600; font-size: 14px; }
 .calc-corpo { font-size: 13px; }
 .calc-corpo p { margin: 8px 0; }
-.formulas { display: flex; flex-direction: column; gap: 4px; margin: 8px 0; }
-.formulas code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; }
+.passos { margin: 8px 0; padding-left: 20px; }
+.passos li { margin: 4px 0; }
+.calc code { display: inline; padding: 1px 5px !important; }
+.calc code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; }
 .calc-ex { background: var(--panel); border-left: 3px solid var(--accent); border-radius: 4px; padding: 8px 12px; margin: 8px 0; }
-.calc-ex ul { margin: 6px 0 0; padding-left: 18px; }
+.calc-ex ol { margin: 6px 0 0; padding-left: 20px; }
+.calc-perc { margin-top: 6px; font-size: 12px; color: var(--muted); }
 .calc-ex li { margin: 3px 0; font-variant-numeric: tabular-nums; }
 .calc-ex span, .calc-obs { color: var(--muted); }
 .imp-cab { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
@@ -290,7 +293,7 @@ button.filtro { background: none; border: 0; padding: 0; font: inherit; color: i
 <header>
   <div>
     <h1>Citações dos artigos do SBES</h1>
-    <p>Fonte: Semantic Scholar · gerado em 30/09/2026 14:06</p>
+    <p>Fonte: Semantic Scholar · gerado em 30/09/2026 14:09</p>
   </div>
   <div class="acoes-topo">
     <button id="abrirImpacto" type="button">Alto impacto por ano</button>
@@ -655,43 +658,52 @@ const NOTA_IMPACTO = "Regra: em cada ano, cota = arredondar para cima X% dos art
   "Citações coletadas do Semantic Scholar.";
 const num = (v) => String(v).replace(".", ",");
 
-// Quadro explicativo com as fórmulas e um exemplo real (ano mais recente marcado, 1º colocado)
+// Quadro explicativo: a regra em passos e um exemplo real (ano mais recente marcado)
 function quadroCalculo(secoes) {
+  const X = faixaPainel;
   const sec = secoes.find((x) => x.arts.length);
   let exemplo = "";
   if (sec) {
-    const a = sec.arts[0], ano = sec.ano, r = IMPACTO_ANOS[ano], fx = r.faixas[faixaPainel];
-    const c = a.citantes.length;
+    const ano = sec.ano, r = IMPACTO_ANOS[ano], fx = r.faixas[X];
+    const a = sec.arts[0], c = a.citantes.length;
     const menos = DADOS.filter((d) => d.ano === ano && d.citantes.length < c).length;
-    const mais = a.impacto.posicao - 1;
-    const bruto = (Number(faixaPainel) / 100) * r.n;
+    const vagas = fx.cota - fx.entram;
+    const bruto = num(Number(((Number(X) / 100) * r.n).toFixed(2)));
+    const entra = (k) => (k === 1 ? "Entra 1 artigo" : `Entram ${k} artigos`);
+    const passo3 = fx.fora
+      ? `${fx.entram === 1 ? "Entra o artigo mais citado" : `Entram os ${fx.entram} artigos mais citados`} (≥ ${plural(fx.limiar, "citação", "citações")}). ` +
+        `Sobram ${plural(vagas, "vaga", "vagas")}, mas o grupo seguinte tem ${plural(fx.fora.artigos, "artigo empatado", "artigos empatados")} ` +
+        `com ${plural(fx.fora.citacoes, "citação", "citações")} e não cabe → fica de fora.`
+      : vagas > 0
+        ? `${entra(fx.entram)} (≥ ${plural(fx.limiar, "citação", "citações")}); não há mais artigos com citações para ${vagas === 1 ? "a vaga restante" : `as ${vagas} vagas restantes`}.`
+        : `${entra(fx.entram)} (≥ ${plural(fx.limiar, "citação", "citações")}) e a cota fica completa.`;
     exemplo = `
       <div class="calc-ex">
-        <b>Exemplo — ${ano}</b> (${r.n} artigos no ano), artigo <i>${esc(a.titulo)}</i>, com ${plural(c, "citação", "citações")}:
-        <ul>
-          <li><b>Percentil</b> = 100 × ${menos} ÷ ${r.n} = <b>${num(a.impacto.percentil)}</b> &nbsp;<span>(${menos} artigos de ${ano} têm menos citações)</span></li>
-          <li><b>Posição</b> = 1 + ${mais} = <b>${a.impacto.posicao}º</b> &nbsp;<span>(${plural(mais, "artigo tem", "artigos têm")} mais citações)</span></li>
-          <li><b>Cota do Top ${faixaPainel}%</b> = ⌈${faixaPainel}% × ${r.n}⌉ = ⌈${num(Number(bruto.toFixed(2)))}⌉ = <b>${fx.cota}</b></li>
-          <li><b>Entram</b> ${plural(fx.entram, "artigo", "artigos")} de ${fx.cota} possíveis${fx.limiar !== null ? `, com ≥ ${plural(fx.limiar, "citação", "citações")}` : ""}${fx.fora
-            ? ` &nbsp;<span>(o grupo seguinte — ${plural(fx.fora.artigos, "artigo empatado", "artigos empatados")} com ${fx.fora.citacoes} ${fx.fora.citacoes === 1 ? "citação" : "citações"} — não cabe nas ${fx.cota - fx.entram} ${fx.cota - fx.entram === 1 ? "vaga restante" : "vagas restantes"} e fica de fora)</span>`
-            : fx.entram < fx.cota ? ` &nbsp;<span>(não há mais artigos com citações)</span>` : ""}</li>
-        </ul>
+        <b>Exemplo — Top ${X}% de ${ano}</b>
+        <ol>
+          <li>${ano} tem <b>${r.n} artigos</b> → cota = ⌈${X}% × ${r.n}⌉ = ⌈${bruto}⌉ = <b>${fx.cota}</b></li>
+          <li>Ordenados por citações, do mais citado ao menos citado (só quem tem ≥ 1 citação).</li>
+          <li>${passo3}</li>
+          <li>Resultado: <b>${fx.entram} de ${fx.cota}</b> ${fx.cota === 1 ? "vaga preenchida" : "vagas preenchidas"}${fx.entram < fx.cota ? " (a faixa pode ficar abaixo da cota, nunca acima)" : ""}.</li>
+        </ol>
+        <div class="calc-perc">1º colocado: <i>${esc(a.titulo)}</i>, ${plural(c, "citação", "citações")} → percentil = 100 × ${menos} ÷ ${r.n} = <b>${num(a.impacto.percentil)}</b>, posição <b>${a.impacto.posicao}º</b>.</div>
       </div>`;
   }
   return `
     <details class="calc" open>
-      <summary>Como o percentil e as faixas são calculados</summary>
+      <summary>Como o Top ${X}% de cada ano é calculado</summary>
       <div class="calc-corpo">
-        <p>O conjunto de referência é o <b>ano de publicação no SBES</b>: cada artigo é comparado só com os artigos do mesmo ano.</p>
-        <div class="formulas">
-          <code>percentil no ano = 100 × (artigos do ano com menos citações) ÷ (artigos do ano)</code>
-          <code>posição no ano = 1 + (artigos do ano com mais citações)</code>
-          <code>cota Top X% = ⌈X% × artigos do ano⌉ &nbsp;(arredonda para cima)</code>
-          <code>Top X% = do mais citado ao menos citado (≥ 1 citação), cada grupo empatado entra inteiro se couber na cota</code>
-          <code>o primeiro grupo empatado que não couber fica de fora → Top X% ≤ X% dos artigos do ano</code>
-        </div>
+        <p><b>Top ${X}%</b> = os ${X}% artigos mais citados <b>entre os artigos do SBES publicados no mesmo ano</b> — nunca mais que ${X}% deles.</p>
+        <ol class="passos">
+          <li><b>Cota:</b> <code>cota = ⌈${X}% × artigos do ano⌉</code> (arredonda para cima; é o número máximo de vagas).</li>
+          <li><b>Ordem:</b> artigos do ano ordenados por citações, do mais citado ao menos citado; só entram artigos com pelo menos 1 citação.</li>
+          <li><b>Empates:</b> artigos com o mesmo número de citações entram <b>juntos, se couberem</b> nas vagas restantes. O primeiro grupo empatado que não couber fica <b>todo de fora</b> e a lista termina ali.</li>
+        </ol>
         ${exemplo}
-        <p class="calc-obs">O percentil é informativo; a faixa é decidida pela cota. Em anos com poucos artigos, o 1º colocado pode ter percentil 95 e ainda ser Top 1% (ex.: 20 artigos → cota ⌈0,2⌉ = 1). Se dois ou mais artigos empatam em 1º lugar e a cota é 1, nenhum entra no Top 1% daquele ano.</p>
+        <p class="calc-obs"><b>Percentil e posição</b> (informativos, não decidem a faixa):
+          <code>percentil = 100 × (artigos do ano com menos citações) ÷ (artigos do ano)</code> ·
+          <code>posição = 1 + (artigos do ano com mais citações)</code>.
+          Em anos pequenos, o 1º colocado pode ter percentil 95 e ser Top 1% (20 artigos → cota ⌈0,2⌉ = 1); se o 1º lugar é um empate e a cota é 1, o ano fica sem Top 1%.</p>
       </div>
     </details>`;
 }
