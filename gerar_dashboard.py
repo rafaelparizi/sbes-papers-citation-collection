@@ -487,6 +487,8 @@ tr.dup td { background: #f7f2fd; }
 #tip.on { opacity: 1; }
 .nota { background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; margin: 10px 0 0; font-size: 13px; }
 .nota b { color: var(--muted); font-weight: 600; }
+.nota.comparar div + div { margin-top: 4px; }
+.item .nota.comparar { margin-top: 6px; font-size: 12px; }
 .nota strong { font-weight: 700; color: var(--text); background: #fff3d6; border-radius: 3px; padding: 0 2px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .nota strong { background: #3a2e12; } }
 :root[data-theme="dark"] .nota strong { background: #3a2e12; }
@@ -720,6 +722,11 @@ function destacarDiferencas(orig, novo) {
   }
   return b.map((w, j) => (igual[j] ? esc(w) : `<strong>${esc(w)}</strong>`)).join(" ");
 }
+
+// Título do Semantic Scholar em cima e o da planilha embaixo, com as diferenças destacadas nos dois
+const compararTitulos = (a) => `<div class="nota comparar">
+  <div><b>Semantic Scholar:</b> ${destacarDiferencas(a.titulo, a.s2_titulo)}</div>
+  <div><b>Planilha:</b> ${destacarDiferencas(a.s2_titulo, a.titulo)}</div></div>`;
 
 let selecionado = null;
 let autorFiltro = null;
@@ -1252,11 +1259,13 @@ function renderLista() {
     autoresFiltro && chip("autores", `Autores: ${autoresFiltro === 8 ? "8 ou mais" : autoresFiltro}`),
   ].filter(Boolean).join(" ");
   if (!lista.length) { $("lista").innerHTML = `<div class="vazio">Nenhum artigo encontrado.</div>`; return; }
+  const comparar = $("soSimilares").checked;
   $("lista").innerHTML = lista.map((a) => `
     <div class="item${a.idx === selecionado ? " ativo" : ""}" data-idx="${a.idx}">
       <div class="t">
         <div>${esc(a.titulo)}${a.similar ? ` <span class="tag" data-tip="${TIP.similar}">similar</span>` : ""}${a.distintos < a.citantes.length ? ` <span class="tag dup" data-tip="${TIP.dup}">duplicata</span>` : ""}${porTitulo(a) ? ` <span class="tag tit" data-tip="${TIP.titulo(a)}">título</span>` : ""}${a.erro ? ` <span class="tag erro" data-tip="${esc(TIP.erro(a))}">erro ao coletar</span>` : ""}${tagImpacto(a)}</div>
         <div class="meta">${esc(a.ano)} · ${esc(a.autores)}</div>
+        ${comparar && a.similar ? compararTitulos(a) : ""}
       </div>
       <div class="badge${a.citantes.length ? " tem" : ""}${a.erro ? " falha" : ""}" title="citações">${a.erro ? "!" : a.citantes.length}</div>
     </div>`).join("");
@@ -1274,7 +1283,7 @@ function renderDetalhe(a) {
       <div class="autores">${autoresDe(a).map((n) =>
         `<button class="autor" data-autor="${esc(n)}" title="Ver artigos deste autor">${esc(n)}</button>`).join(", ")} · SBES ${esc(a.ano)}</div>
       <div class="links">${links}</div>
-      ${a.similar ? `<div class="nota"><b>Título no Semantic Scholar:</b> ${destacarDiferencas(a.titulo, a.s2_titulo)}</div>` : ""}
+      ${a.similar ? compararTitulos(a) : ""}
       ${a.erro ? `<div class="nota erro-nota"><b>Erro ao coletar:</b> a API do Semantic Scholar não respondeu na etapa de ${esc(a.erro)}. Os dados deste artigo estão incompletos; rode a coleta de novo.</div>` : ""}
       <div id="painel"></div>
     </div>`;
